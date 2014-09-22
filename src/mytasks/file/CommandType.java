@@ -14,28 +14,21 @@ public class CommandType {
 	
 	//Private variables
 	private String mType;
-	private String mDesc;
-	private ArrayList<String> mLabels;
+	private Task mTask;
 	
 	//Constructor
-	public CommandType(String comdType, String comdDes, ArrayList<String> comdLabels) {
-		//TODO missing datetime field
+	public CommandType(String comdType, String comdDes, String dateTime, ArrayList<String> comdLabels) {
 		mType = comdType;
-		mDesc = comdDes;
-		mLabels = comdLabels;
-		
+		Task thisTask = new Task(comdDes, dateTime, comdLabels);
+		mTask = thisTask;
 	}
 	
 	public String getType() {
 		return mType;
 	}
 	
-	public String getDesc() {
-		return mDesc;
-	}
-	
-	public ArrayList<String> getLabels() {
-		return mLabels;
+	public Task getTask() {
+		return mTask;
 	}
 	
 }

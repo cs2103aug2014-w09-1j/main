@@ -1,4 +1,5 @@
 package mytasks.file;
+
 import java.util.ArrayList;
 
 /**
@@ -8,6 +9,10 @@ import java.util.ArrayList;
  */
 
 public class MyTasksLogic implements ILogic {
+	
+	//Private variables
+	MyTasksParser mParser;
+	MyTasksStorage mStorage;
 	
 	//Constructor
 	public MyTasksLogic(){
@@ -19,6 +24,7 @@ public class MyTasksLogic implements ILogic {
 	 */
 	private void initLogic(){
 		//TODO init local variables
+		//TODO init parser object
 		//TODO init Storage object 
 	}
 	
@@ -26,11 +32,11 @@ public class MyTasksLogic implements ILogic {
 	 * {@inheritDoc}
 	 */	
 	public String executeCommand(String input) {
-		// TODO Auto-generated method stub
-		CommandType command = parseInput(input); 
+		
+		CommandType commandObject = parseInput(input);
 		String output = "";
 		
-		switch(command.getType()) {
+		switch(commandObject.getType()) {
 			case "add":
 				addCommand();
 				return output + " added";
@@ -77,8 +83,7 @@ public class MyTasksLogic implements ILogic {
 	 * {@inheritDoc}
 	 */	
 	public CommandType parseInput(String userInput) {
-		// TODO call Parser.parseinput
-		CommandType input = MyTasksParser.parseInput(userInput);
+		CommandType input = mParser.parseInput(userInput);
 		return input;
 	}
 
