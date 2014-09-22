@@ -26,15 +26,15 @@ public class CommandType {
 		
 	}
 	
-	private String getType() {
+	public String getType() {
 		return mType;
 	}
 	
-	private String getDesc() {
+	public String getDesc() {
 		return mDesc;
 	}
 	
-	private ArrayList<String> getLabels() {
+	public ArrayList<String> getLabels() {
 		return mLabels;
 	}
 	

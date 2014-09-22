@@ -1,10 +1,12 @@
 package mytasks.file;
+import java.util.ArrayList;
 
 /**
  * MyTasksLogic handles all logic related operations such as program flow and execution of commands
- * @author Wilson
+ * @author Wilson, Huiwen, Shuan Siang, Michael 
  *
  */
+
 public class MyTasksLogic implements ILogic {
 	
 	//Constructor
@@ -17,7 +19,7 @@ public class MyTasksLogic implements ILogic {
 	 */
 	private void initLogic(){
 		//TODO init local variables
-		//TODO init Storage object
+		//TODO init Storage object 
 	}
 	
 	/**
@@ -25,7 +27,50 @@ public class MyTasksLogic implements ILogic {
 	 */	
 	public String executeCommand(String input) {
 		// TODO Auto-generated method stub
+		CommandType command = parseInput(input); 
+		switch(command.getType()) {
+			case "add":
+				addCommand();
+				break;
+			case "delete":
+				deleteCommand();
+				break;
+			case "sort":
+				sortCommand();
+				break;
+			case "search":
+				searchCommand();
+				break;
+			case "invalid":
+				invalidCommand();
+				break;
+		}
 		return null;
+	}
+
+	private void searchCommand() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void sortCommand() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void addCommand() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void deleteCommand() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void invalidCommand() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -33,7 +78,8 @@ public class MyTasksLogic implements ILogic {
 	 */	
 	public CommandType parseInput(String userInput) {
 		// TODO call Parser.parseinput
-		return null;
+		CommandType input = MyTasksParser.parseInput(userInput);
+		return input;
 	}
 
 
