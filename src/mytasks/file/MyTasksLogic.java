@@ -28,24 +28,24 @@ public class MyTasksLogic implements ILogic {
 	public String executeCommand(String input) {
 		// TODO Auto-generated method stub
 		CommandType command = parseInput(input); 
+		String output = "";
+		
 		switch(command.getType()) {
 			case "add":
 				addCommand();
-				break;
+				return output + " added";
 			case "delete":
 				deleteCommand();
-				break;
+				return output + " deleted";
 			case "sort":
 				sortCommand();
-				break;
+				return output + " sorted";
 			case "search":
 				searchCommand();
-				break;
-			case "invalid":
-				invalidCommand();
-				break;
+				return output + " search";
+			default:
+				return invalidCommand();
 		}
-		return null;
 	}
 
 	private void searchCommand() {
