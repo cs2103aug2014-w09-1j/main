@@ -1,10 +1,10 @@
-package mytasks.file;
+package mytasks.logic;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class StorageTest {
+public class LogicTest {
 
 	@Test
 	public void test() {

@@ -1,4 +1,6 @@
-package mytasks.file;
+package mytasks.logic;
+
+import mytasks.file.CommandInfo;
 
 /**
  * ILogic interface defines abstract methods to be used by logic component
@@ -19,6 +21,11 @@ public interface ILogic {
 	 * @param userInput
 	 * @return CommandType object that contains the relevant fields
 	 */
-	public CommandType parseInput (String userInput);
+	public CommandInfo parseInput (String userInput);
 	
+	/**
+	 * obtainPrintableOutput reads and converts local memory into a form that is directly printable by UI.
+	 * @return printable format that is not neccessarily a string. Will use string temporarily
+	 */
+	public String obtainPrintableOutput();
 }

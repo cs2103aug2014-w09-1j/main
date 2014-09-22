@@ -1,4 +1,4 @@
-package mytasks.file;
+package mytasks.storage;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import mytasks.file.MyTasks;
+import mytasks.file.Task;
 
 /**
  * MyTasksStorage handles the storage of tasks into external memory as well as
@@ -19,7 +22,6 @@ import java.util.ArrayList;
  */
 public class MyTasksStorage implements IStorage {
 
-	private String externalMemoryFile = "externalmemoryfile.txt";
 	private ArrayList<String> localMemory = new ArrayList<String>();
 
 	// Constructor
@@ -30,10 +32,9 @@ public class MyTasksStorage implements IStorage {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @throws IOException
 	 */
-	public ArrayList<String> readExtMem(String fileName) {
-		File f = new File(externalMemoryFile);
+	public ArrayList<Task> readExtMem(String fileName) {
+		File f = new File(fileName);
 		if (!f.exists()) {
 			writeExtMem(localMemory);
 		}
@@ -42,7 +43,7 @@ public class MyTasksStorage implements IStorage {
 		// BufferedReader bufferedReader;
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(
-							externalMemoryFile));
+							fileName));
 			while ((line = bufferedReader.readLine()) != null) {
 				localMemory.add(line);
 			}
@@ -60,9 +61,9 @@ public class MyTasksStorage implements IStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeExtMem(ArrayList<String> localMemory) {
+	public void writeExtMem(ArrayList<Task> localMemory) {
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(externalMemoryFile));
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(MyTasks.DEFAULT_FILENAME));
 			for (int i=0; i<localMemory.size(); i++) {
 				bufferedWriter.write(localMemory.get(i));
 				bufferedWriter.newLine();

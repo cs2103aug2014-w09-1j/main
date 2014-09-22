@@ -1,6 +1,8 @@
-package mytasks.file;
+package mytasks.logic;
 
-import java.util.ArrayList;
+import mytasks.file.CommandInfo;
+import mytasks.parser.MyTasksParser;
+import mytasks.storage.MyTasksStorage;
 
 /**
  * MyTasksLogic handles all logic related operations such as program flow and execution of commands
@@ -13,6 +15,8 @@ public class MyTasksLogic implements ILogic {
 	//Private variables
 	MyTasksParser mParser;
 	MyTasksStorage mStorage;
+	LocalMemory mLocalMem;
+	MemorySnapshotHandler mViewHandler;
 	
 	//Constructor
 	public MyTasksLogic(){
@@ -23,9 +27,11 @@ public class MyTasksLogic implements ILogic {
 	 * initProgram initializes all local variables to prevent and data overflow from previous sessions
 	 */
 	private void initLogic(){
-		//TODO init local variables
-		//TODO init parser object
-		//TODO init Storage object 
+		mParser = new MyTasksParser();
+		mStorage = new MyTasksStorage();
+		mLocalMem = new LocalMemory();
+		mLocalMem.loadLocalMemory();
+		mViewHandler = new MemorySnapshotHandler();
 	}
 	
 	/**
@@ -33,7 +39,7 @@ public class MyTasksLogic implements ILogic {
 	 */	
 	public String executeCommand(String input) {
 		
-		CommandType commandObject = parseInput(input);
+		CommandInfo commandObject = parseInput(input);
 		String output = "";
 		
 		switch(commandObject.getType()) {
@@ -50,8 +56,17 @@ public class MyTasksLogic implements ILogic {
 				searchCommand();
 				return output + " search";
 			default:
-				return invalidCommand();
+				invalidCommand();
+				return "invalid command";
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */	
+	public CommandInfo parseInput(String userInput) {
+		CommandInfo input = mParser.parseInput(userInput);
+		return input;
 	}
 
 	private void searchCommand() {
@@ -81,11 +96,8 @@ public class MyTasksLogic implements ILogic {
 
 	/**
 	 * {@inheritDoc}
-	 */	
-	public CommandType parseInput(String userInput) {
-		CommandType input = mParser.parseInput(userInput);
-		return input;
+	 */
+	public String obtainPrintableOutput() {
+		return mViewHandler.getSnapshot();
 	}
-
-
 }

@@ -10,14 +10,14 @@ import java.util.ArrayList;
  * @author Wilson
  *
  */
-public class CommandType {
+public class CommandInfo {
 	
 	//Private variables
 	private String mType;
 	private Task mTask;
 	
 	//Constructor
-	public CommandType(String comdType, String comdDes, String dateTime, ArrayList<String> comdLabels) {
+	public CommandInfo(String comdType, String comdDes, String dateTime, ArrayList<String> comdLabels) {
 		mType = comdType;
 		Task thisTask = new Task(comdDes, dateTime, comdLabels);
 		mTask = thisTask;
