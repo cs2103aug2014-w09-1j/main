@@ -1,11 +1,8 @@
 package mytasks.storage;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -13,11 +10,9 @@ import mytasks.file.MyTasks;
 import mytasks.file.Task;
 
 /**
- * MyTasksStorage handles the storage of tasks into external memory as well as
- * converting it to readable
+ * MyTasksStorage handles the storage of tasks into external memory as well as converting it to readable
  * local memory for logical processes
- * 
- * @author Tay Shuan Siang
+ * @author Wilson
  *
  */
 public class MyTasksStorage implements IStorage {
@@ -26,7 +21,6 @@ public class MyTasksStorage implements IStorage {
 
 	// Constructor
 	public MyTasksStorage() {
-
 	}
 
 	/**
@@ -36,7 +30,7 @@ public class MyTasksStorage implements IStorage {
 	public ArrayList<Task> readExtMem(String fileName) {
 		File f = new File(fileName);
 		if (!f.exists()) {
-			writeExtMem(localMemory);
+			writeExtMem(localMemory); //This line doesnt make sense.
 		}
 
 		String line = null;
@@ -73,5 +67,5 @@ public class MyTasksStorage implements IStorage {
 			e.printStackTrace();
 		}
 	}
-
+	
 }
