@@ -1,6 +1,7 @@
 package mytasks.file;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * CommandType instance used to access different fields of a command that has been parsed.
@@ -18,7 +19,7 @@ public class CommandInfo {
 	private Task mTask;
 	
 	//Constructor
-	public CommandInfo(String comdType, String comdDes, String dateTime, ArrayList<String> comdLabels) {
+	public CommandInfo(String comdType, String comdDes, Date dateTime, ArrayList<String> comdLabels) {
 		determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, dateTime, comdLabels);
 		mTask = thisTask;

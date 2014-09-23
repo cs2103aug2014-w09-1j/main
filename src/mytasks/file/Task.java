@@ -1,6 +1,7 @@
 package mytasks.file;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Task object represents a single task with all the relevant fields that is essential to a task
@@ -11,11 +12,11 @@ public class Task {
 	
 	//Private local variables
 	private String mDescription;
-	private String mDateTime;
+	private Date mDateTime;
 	private ArrayList<String> mLabels;
 	
 	//Constructor
-	public Task(String details, String dateTime, ArrayList<String> labels) {
+	public Task(String details, Date dateTime, ArrayList<String> labels) {
 		mDescription = details;
 		mDateTime = dateTime;
 		mLabels = labels;
@@ -25,7 +26,7 @@ public class Task {
 		return mDescription;
 	}
 	
-	public String getDateTime() {
+	public Date getDateTime() {
 		return mDateTime;
 	}
 	
