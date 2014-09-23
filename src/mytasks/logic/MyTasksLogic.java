@@ -94,8 +94,10 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */	
+	 * parseInput calls the parser to read and understand user input 
+	 * @param userInput
+	 * @return CommandType object that contains the relevant fields
+	 */
 	public CommandInfo parseInput(String userInput) {
 		CommandInfo input = mParser.parseInput(userInput);
 		return input;

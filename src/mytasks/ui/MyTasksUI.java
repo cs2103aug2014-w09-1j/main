@@ -12,7 +12,7 @@ import mytasks.logic.MyTasksLogic;
  * @author Wilson
  *
  */
-public class MyTasksUI implements IUserInterface{
+public class MyTasksUI{
 	
 	public boolean isRunning;
 	private Scanner sc;

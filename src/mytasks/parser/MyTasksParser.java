@@ -13,7 +13,7 @@ import mytasks.file.CommandInfo;
  * @author Wilson
  *
  */
-public class MyTasksParser {
+public class MyTasksParser implements IParser {
 	
 	//Date and Time formats that are currently useable.
 	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -25,11 +25,9 @@ public class MyTasksParser {
 		dateTimeFormat.setLenient(false);
 	}
 	
+
 	/**
-	 * parseInput reads and converts String input into its equivalent CommandType object with the respective
-	 * fields
-	 * @param input from user
-	 * @return CommandInfo object that is used to execute input
+	 * {@inheritDoc}
 	 */
 	public CommandInfo parseInput (String input){
 		String[] words = input.split("\\s+");

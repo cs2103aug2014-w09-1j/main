@@ -23,4 +23,12 @@ public interface IStorage {
 	 */
 	public void writeExtMem(ArrayList<Task> localMem);
 	
+	/**
+	 * exportFile exports the current tasks to a file that is of a suitable, natural task-like format
+	 * that is readable by humans
+	 * @param fileName specified by user
+	 * @return feedback to user
+	 */
+	public String exportFile(String fileName);
+	
 }

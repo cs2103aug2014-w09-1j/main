@@ -67,5 +67,13 @@ public class MyTasksStorage implements IStorage {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * {@inheritDoc} //Does not need to be implemented in v0.1 as of yet
+	 */
+	public String exportFile(String fileName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
