@@ -43,16 +43,16 @@ public class MyTasksLogic implements ILogic {
 		String output = "";
 		
 		switch(commandObject.getType()) {
-			case "add":
+			case ADD: //REMOVE COMMENT WHEN READ. Enum types are found in CommandInfo. Refer there
 				addCommand();
 				return output + " added";
-			case "delete":
+			case DELETE:
 				deleteCommand();
 				return output + " deleted";
-			case "sort":
+			case SORT:
 				sortCommand();
 				return output + " sorted";
-			case "search":
+			case SEARCH:
 				searchCommand();
 				return output + " search";
 			default:

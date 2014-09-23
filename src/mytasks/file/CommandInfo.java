@@ -13,17 +13,38 @@ import java.util.ArrayList;
 public class CommandInfo {
 	
 	//Private variables
-	private String mType;
+	public enum CommandType {ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID};
+	private CommandType mType;
 	private Task mTask;
 	
 	//Constructor
 	public CommandInfo(String comdType, String comdDes, String dateTime, ArrayList<String> comdLabels) {
-		mType = comdType;
+		determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, dateTime, comdLabels);
 		mTask = thisTask;
 	}
+
+	public void determineCommandType(String comdType) {
+		if (comdType.equals("add")) {
+			mType = CommandType.ADD;
+		} else if (comdType.equals("delete")) {
+			mType = CommandType.DELETE;
+		} else if (comdType.equals("sort")) {
+			mType = CommandType.SORT;
+		} else if (comdType.equals("search")) {
+			mType = CommandType.SEARCH;
+		} else if (comdType.equals("update")) {
+			mType = CommandType.UPDATE;
+		} else if (comdType.equals("undo")) {
+			mType = CommandType.UNDO;
+		} else if (comdType.equals("redo")) {
+			mType = CommandType.REDO;
+		} else {
+			mType = CommandType.INVALID;
+		}
+	}
 	
-	public String getType() {
+	public CommandType getType() {
 		return mType;
 	}
 	
