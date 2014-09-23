@@ -17,6 +17,8 @@ public class ParserTest {
 	private CommandInfo test2 = null;
 	private CommandInfo test3 = null;
 	private CommandInfo test4 = null;
+	private CommandInfo test5 = null;
+	private CommandInfo test6 = null;
 
 	@Test
 	public void parseInputTest() {
@@ -25,20 +27,37 @@ public class ParserTest {
 		assertObjFields(test1, tester.parseInput("add dinner"));
 		assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
 		assertObjFields(test3, tester.parseInput("add submit assignment 20.09.2014 12:00"));
-		assertObjFields(test4, tester.parseInput("do homework 19.09.2014 #cs2103"));
+		assertObjFields(test4, tester.parseInput("add do homework 19.09.2014 #cs2103"));
+		assertObjFields(test5, tester.parseInput("add do homework 19.09.2014 #cs2103 #urgent #gg"));
+		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
 	}
 	
 	private void initTestObjects() {
 		try {
 			test1 = new CommandInfo("add","dinner",null,null);
+			
 			Date date2 = MyTasksParser.dateFormat.parse("18.09.2014");
 			test2 = new CommandInfo("add","dinner",date2,null);
+			
 			Date date3 = MyTasksParser.dateTimeFormat.parse("20.09.2014 12:00");
 			test3 = new CommandInfo("add","submit assignment",date3,null);
-			ArrayList<String> temp = new ArrayList<String>();
-			temp.add("cs2103");
+			
+			ArrayList<String> list4 = new ArrayList<String>();
+			list4.add("cs2103");
 			Date date4 = MyTasksParser.dateFormat.parse("19.09.2014");
-			test4 = new CommandInfo("add","do homework",date4,temp);
+			test4 = new CommandInfo("add","do homework",date4,list4);
+			
+			ArrayList<String> list5 = new ArrayList<String>();
+			list5.add("cs2103");
+			list5.add("urgent");
+			list5.add("gg");
+			Date date5 = MyTasksParser.dateFormat.parse("19.09.2014");
+			test5 = new CommandInfo("add","do homework",date5,list5);
+			
+			ArrayList<String> list6 = new ArrayList<String>();
+			list6.add("notpossible");
+			Date date6 = MyTasksParser.dateFormat.parse("18.09.2014");
+			test6 = new CommandInfo("add","have fun!",date6,list6);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -76,7 +95,6 @@ public class ParserTest {
 				assertEquals(testCaseTask.getLabels().get(i),resultTask.getLabels().get(i));
 			}
 		}
-		
 	}
 
 }

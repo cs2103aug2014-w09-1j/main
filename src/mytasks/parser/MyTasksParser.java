@@ -105,7 +105,7 @@ public class MyTasksParser {
 				String[] tempWords = hashtagged[i].split("\\s+");
 				result.add(tempWords[0]);
 			} else {
-				result.add(hashtagged[i]);
+				result.add(hashtagged[i].trim());
 			}
 		}
 		return result;
@@ -113,7 +113,9 @@ public class MyTasksParser {
 
 //	public static void main(String[] args) {
 //		MyTasksParser test = new MyTasksParser();
-//		CommandInfo testcase = test.parseInput("add dinner 23.09.2014 12:00");
+//		CommandInfo testcase = test.parseInput("add do work 23.09.2014 #cs2103 #gg");
+//		System.out.println(testcase.getTask().getLabels().get(1));
+//		System.out.println(testcase.getTask().getDescription());
 //		System.out.println(testcase.getTask().getDateTime().toString());
 //		
 //	}
