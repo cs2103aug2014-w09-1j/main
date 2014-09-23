@@ -25,11 +25,20 @@ public class Task {
 		return mDescription;
 	}
 	
+	public void setDescription(String updateDesc) {
+		mDescription = updateDesc;
+	}
+	
 	public String getDateTime() {
 		return mDateTime;
 	}
 	
 	public ArrayList<String> getLabels() {
 		return mLabels;
+	}
+	
+	public void setLabels(ArrayList<String> labels) {
+		mLabels.clear(); 
+		mLabels = labels;
 	}
 }

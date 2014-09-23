@@ -40,25 +40,57 @@ public class MyTasksLogic implements ILogic {
 	public String executeCommand(String input) {
 		
 		CommandInfo commandObject = parseInput(input);
-		String output = "";
+		String output = removeFirstWord(input);
 		
 		switch(commandObject.getType()) {
 			case "add":
-				addCommand();
+				addCommand(commandObject);
 				return output + " added";
 			case "delete":
-				deleteCommand();
+				deleteCommand(commandObject);
 				return output + " deleted";
+			case "update":
+				updateCommand(commandObject);
+				return output + " updated"; 
 			case "sort":
-				sortCommand();
+				sortCommand(commandObject);
 				return output + " sorted";
 			case "search":
-				searchCommand();
+				searchCommand(commandObject);
 				return output + " search";
 			default:
-				invalidCommand();
 				return "invalid command";
 		}
+	}
+	
+	private static String removeFirstWord(String input) {
+		return input.replace(input.trim().split("\\s+")[0], "").trim();
+	}
+	
+	private void addCommand(CommandInfo commandObject) {
+		mLocalMem.add(commandObject.getTask());
+	}
+
+	private void deleteCommand(CommandInfo commandObject) {
+		mLocalMem.remove(commandObject.getTask());
+	}
+
+	private void updateCommand(CommandInfo commandObject) {
+		// either update task desc 
+		// or update task desc and label (delete all labels prior to this) 
+		// for update, I assume the parser will send in this format: task1, task2, labels (if any)
+		// the updatedDesc will be labeled as updateDesc 
+		mLocalMem.update(commandObject.getTask());
+	}
+
+	private void sortCommand(CommandInfo commandObject) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void searchCommand(CommandInfo commandObject) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -67,31 +99,6 @@ public class MyTasksLogic implements ILogic {
 	public CommandInfo parseInput(String userInput) {
 		CommandInfo input = mParser.parseInput(userInput);
 		return input;
-	}
-
-	private void searchCommand() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void sortCommand() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void addCommand() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void deleteCommand() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void invalidCommand() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
