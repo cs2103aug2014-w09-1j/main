@@ -31,17 +31,27 @@ public class LocalMemory {
 		mStore.writeExtMem(mLocalMem);
 	}
 	
-	//TODO add return strings
-	public String add(Task userRequest) {
+	public void add(Task userRequest) {
 		mLocalMem.add(userRequest);
-		return "";
 	}
 	
-	//TODO add return strings
-	public String remove(Task userRequest) {
-		//TODO insert body. NOTE: you can't simply use remove since they are different objects.
-		return "";
+	public void remove(Task userRequest) {
+		for(int i = 0; i < mLocalMem.size(); i++) {
+			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
+				mLocalMem.remove(i);
+			}
+		}
 	}
 	
+	public void update(Task userRequest) {
+		for(int i = 0; i < mLocalMem.size(); i++) {
+			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
+				mLocalMem.get(i).setDescription(updateDesc);				
+				if(!userRequest.getLabels().isEmpty()) {
+					mLocalMem.get(i).setLabels(userRequest.getLabels()); 
+				}
+			} 
+		}
+	}	
 	//TODO add more functionality
 }

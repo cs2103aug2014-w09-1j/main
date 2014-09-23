@@ -52,5 +52,4 @@ public class CommandInfo {
 	public Task getTask() {
 		return mTask;
 	}
-	
 }

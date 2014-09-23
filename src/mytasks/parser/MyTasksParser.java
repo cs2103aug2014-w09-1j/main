@@ -15,6 +15,7 @@ import mytasks.file.CommandInfo;
  */
 public class MyTasksParser {
 	
+	//Date and Time formats that are currently useable.
 	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	
@@ -57,6 +58,12 @@ public class MyTasksParser {
 		return hashtagged;
 	}
 	
+	/**
+	 * extractDate checks if the given array of words contains a date/time that complies with the current
+	 * useable formats and returns the date object if so.
+	 * @param words arrays
+	 * @return Date(object) of the task
+	 */
 	private Date extractDate(String[] words) {
 		Date dateTime = null;
 		for (int i = 0; i<words.length; i++) {
@@ -110,13 +117,4 @@ public class MyTasksParser {
 		}
 		return result;
 	}
-
-//	public static void main(String[] args) {
-//		MyTasksParser test = new MyTasksParser();
-//		CommandInfo testcase = test.parseInput("add do work 23.09.2014 #cs2103 #gg");
-//		System.out.println(testcase.getTask().getLabels().get(1));
-//		System.out.println(testcase.getTask().getDescription());
-//		System.out.println(testcase.getTask().getDateTime().toString());
-//		
-//	}
 }
