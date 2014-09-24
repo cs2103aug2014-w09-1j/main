@@ -106,7 +106,11 @@ public class MyTasksParser implements IParser {
 		String dateAndTime = dateTimeFormat.format(dateTime);
 		String temp = message.replace(dateAndTime, "");
 		String date = dateFormat.format(dateTime);
-		return temp.replace(date,"").trim();
+		String temp2 = temp.replace(date,"").trim();
+		if(temp2.equals("")){
+			return null;
+		}
+		return temp2;
 	}
 	
 	/**
