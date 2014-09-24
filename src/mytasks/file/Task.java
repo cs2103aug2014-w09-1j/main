@@ -39,7 +39,7 @@ public class Task {
 	}
 	
 	public void setLabels(ArrayList<String> labels) {
-		mLabels.clear(); 
+		mLabels.clear(); // for resetting after every update
 		mLabels = labels;
 	}
 }
