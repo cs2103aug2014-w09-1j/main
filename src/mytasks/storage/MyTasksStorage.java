@@ -1,23 +1,29 @@
 package mytasks.storage;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
+import mytasks.parser.MyTasksParser;
 
 /**
- * MyTasksStorage handles the storage of tasks into external memory as well as converting it to readable
+ * MyTasksStorage handles the storage of tasks into external memory as well as
+ * converting it to readable
  * local memory for logical processes
- * @author Wilson
+ * 
+ * @author Tay Shuan Siang
  *
  */
 public class MyTasksStorage implements IStorage {
 
-	private ArrayList<String> localMemory = new ArrayList<String>();
+	// private ArrayList<Task> localMemory = new ArrayList<Task>();
 
 	// Constructor
 	public MyTasksStorage() {
@@ -28,9 +34,10 @@ public class MyTasksStorage implements IStorage {
 	 * 
 	 */
 	public ArrayList<Task> readExtMem(String fileName) {
+		// TODO
 		File f = new File(fileName);
 		if (!f.exists()) {
-			writeExtMem(localMemory); //This line doesnt make sense.
+			writeExtMem(localMemory); // This line doesnt make sense.
 		}
 
 		String line = null;
@@ -57,9 +64,21 @@ public class MyTasksStorage implements IStorage {
 	 */
 	public void writeExtMem(ArrayList<Task> localMemory) {
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(MyTasks.DEFAULT_FILENAME));
-			for (int i=0; i<localMemory.size(); i++) {
-				bufferedWriter.write(localMemory.get(i));
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(
+							MyTasks.DEFAULT_FILENAME));
+			for (int i = 0; i < localMemory.size(); i++) {
+				bufferedWriter.write(localMemory.get(i).getDescription());
+				bufferedWriter.newLine();
+				if (localMemory.get(i).getDateTime() != null) {
+					bufferedWriter.write(MyTasksParser.dateTimeFormat.format(localMemory.get(i).getDateTime()));
+					bufferedWriter.newLine();
+				}
+				if (localMemory.get(i).getLabels() != null) {
+					for (int j=0; j<localMemory.get(i).getLabels().size(); j++) {
+						bufferedWriter.write(localMemory.get(i).getLabels().get(j) + " ");
+					}
+					bufferedWriter.newLine();
+				}
 				bufferedWriter.newLine();
 			}
 			bufferedWriter.close();
@@ -73,7 +92,8 @@ public class MyTasksStorage implements IStorage {
 	 */
 	public String exportFile(String fileName) {
 		// TODO Auto-generated method stub
+		// TODO for humans to read
 		return null;
 	}
-	
+
 }
