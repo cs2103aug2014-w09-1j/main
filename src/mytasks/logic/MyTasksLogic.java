@@ -6,7 +6,7 @@ import mytasks.storage.MyTasksStorage;
 
 /**
  * MyTasksLogic handles all logic related operations such as program flow and execution of commands
- * @author Wilson, Huiwen, Shuan Siang, Michael 
+ * @author Wilson, Huiwen
  *
  */
 
@@ -17,20 +17,24 @@ public class MyTasksLogic implements ILogic {
 	MyTasksStorage mStorage;
 	LocalMemory mLocalMem;
 	MemorySnapshotHandler mViewHandler;
+	boolean isDeveloper;
 	
 	//Constructor
-	public MyTasksLogic(){
-		initLogic();
+	public MyTasksLogic(boolean isDeveloper){
+		initLogic(isDeveloper);
 	}
 	
 	/**
 	 * initProgram initializes all local variables to prevent and data overflow from previous sessions
 	 */
-	private void initLogic(){
+	private void initLogic(boolean isDev){
+		isDeveloper = isDev;
 		mParser = new MyTasksParser();
 		mStorage = new MyTasksStorage();
 		mLocalMem = new LocalMemory();
-		mLocalMem.loadLocalMemory();
+		if (!isDeveloper) {
+			mLocalMem.loadLocalMemory();	
+		}
 		mViewHandler = new MemorySnapshotHandler();
 	}
 	
@@ -45,12 +49,17 @@ public class MyTasksLogic implements ILogic {
 		switch(commandObject.getType()) {
 			case ADD:
 				addCommand(commandObject);
+				if(!isDeveloper){
+					mLocalMem.saveLocalMemory(); 
+				}
 				return output + " added";
 			case DELETE:
 				deleteCommand(commandObject);
+				mLocalMem.saveLocalMemory(); 
 				return output + " deleted";
 			case UPDATE:
 				updateCommand(commandObject);
+				mLocalMem.saveLocalMemory(); 
 				return output + " updated"; 
 			case SORT:
 				sortCommand(commandObject);
@@ -58,13 +67,20 @@ public class MyTasksLogic implements ILogic {
 			case SEARCH:
 				searchCommand(commandObject);
 				return output + " search";
+			case UNDO:
+				undoCommand();
+				return "";
+			case REDO:
+				redoCommand();
+				return "";
 			default:
 				return "invalid command";
 		}
 	}
-	
+
 	private static String removeFirstWord(String input) {
-		return input.replace(input.trim().split("\\s+")[0], "").trim();
+		int i = input.indexOf(' ');
+		return input.substring(i).trim();
 	}
 	
 	private void addCommand(CommandInfo commandObject) {
@@ -89,10 +105,18 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	private void searchCommand(CommandInfo commandObject) {
+			
+	}
+	
+	private void undoCommand() {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	private void redoCommand() {
+		// TODO Auto-generated method stub
+		
+	}
 	/**
 	 * parseInput calls the parser to read and understand user input 
 	 * @param userInput

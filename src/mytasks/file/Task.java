@@ -34,6 +34,9 @@ public class Task {
 		return mDateTime;
 	}
 	
+	public void setDateTime() {
+		
+	}
 	public ArrayList<String> getLabels() {
 		return mLabels;
 	}
