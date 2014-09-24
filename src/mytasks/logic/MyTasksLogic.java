@@ -84,13 +84,11 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	private void sortCommand(CommandInfo commandObject) {
-		// TODO Auto-generated method stub
-		
+		mViewHandler.setView(commandObject.getTask().getLabels());
 	}
 
 	private void searchCommand(CommandInfo commandObject) {
-		// TODO Auto-generated method stub
-		
+		mLocalMem.search(commandObject.getTask());		
 	}
 
 	/**
@@ -107,6 +105,6 @@ public class MyTasksLogic implements ILogic {
 	 * {@inheritDoc}
 	 */
 	public String obtainPrintableOutput() {
-		return mViewHandler.getSnapshot();
+		return mViewHandler.getSnapshot(mLocalMem);
 	}
 }

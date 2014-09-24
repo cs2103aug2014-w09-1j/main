@@ -53,5 +53,16 @@ public class LocalMemory {
 			} 
 		}
 	}	
+	
+	public void sort(Task userRequest){
+		
+		
+	}
+	
+	public void search(Task userRequest){
+		
+		
+	}
+	
 	//TODO add more functionality
 }

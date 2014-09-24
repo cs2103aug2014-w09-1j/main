@@ -1,5 +1,7 @@
 package mytasks.logic;
 
+import java.util.ArrayList;
+
 import mytasks.file.MyTasks;
 
 /**
@@ -17,15 +19,15 @@ public class MemorySnapshotHandler {
 		currentSettings = MyTasks.DEFAULT_VIEW;
 	}
 	
-	public void setView(String[] newSettings) {
-		currentSettings = newSettings;
+	public void setView(ArrayList<String> newSettings) {
+		currentSettings = (String[]) newSettings.toArray();
 	}
 	
 	/**
 	 * getSnapshot takes looks at local memory and organizes it according to currentSettings. 
 	 * @return data structure that is read and printed by UI
 	 */
-	public String getSnapshot() {
+	public String getSnapshot(LocalMemory mLocalMem) {
 		//TODO main body
 		return null;
 	}
