@@ -21,6 +21,7 @@ public class ParserTest {
 	private CommandInfo test6 = null;
 	private CommandInfo test7 = null;
 	private CommandInfo test8 = null;
+	private CommandInfo test9 = null;
 
 	@Test
 	public void parseInputTest() {
@@ -33,7 +34,8 @@ public class ParserTest {
 		assertObjFields(test5, tester.parseInput("add do homework 19.09.2014 #cs2103 #urgent #gg"));
 		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
-		assertObjFields(test8, tester.parseInput("update meeting - cs2103 meeting"));
+		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
+		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
 	}
 	
 	private void initTestObjects() {
@@ -66,6 +68,9 @@ public class ParserTest {
 			test7 = new CommandInfo("delete", "CS2103 meeting", null, null, null);
 			
 			test8 = new CommandInfo("update", "CS2103 meeting", null, null, "meeting");
+			
+			Date date9 = MyTasksParser.dateFormat.parse("20.09.2014");
+			test9 = new CommandInfo("update", null, date9, null, "meeting cs2103");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -77,6 +82,7 @@ public class ParserTest {
 		Task resultTask = result.getTask();
 		//Assert type
 		assertEquals(testCase.getType(), result.getType());
+		
 		
 		//Assert task description
 		assertEquals(testCaseTask.getDescription(),resultTask.getDescription());
@@ -103,6 +109,11 @@ public class ParserTest {
 				assertEquals(testCaseTask.getLabels().get(i),resultTask.getLabels().get(i));
 			}
 		}
+		
+		//Assert update task's description
+		assertEquals(testCase.getUpdateDesc(),result.getUpdateDesc());
+		//System.out.println(testCase.getUpdateDesc());
+		//System.out.println(result.getUpdateDesc());
 	}
 
 }
