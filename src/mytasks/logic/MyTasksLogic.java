@@ -6,7 +6,7 @@ import mytasks.storage.MyTasksStorage;
 
 /**
  * MyTasksLogic handles all logic related operations such as program flow and execution of commands
- * @author Wilson, Huiwen, Shuan Siang, Michael 
+ * @author Wilson, Huiwen
  *
  */
 
@@ -45,12 +45,15 @@ public class MyTasksLogic implements ILogic {
 		switch(commandObject.getType()) {
 			case ADD:
 				addCommand(commandObject);
+				mLocalMem.saveLocalMemory(); 
 				return output + " added";
 			case DELETE:
 				deleteCommand(commandObject);
+				mLocalMem.saveLocalMemory(); 
 				return output + " deleted";
 			case UPDATE:
 				updateCommand(commandObject);
+				mLocalMem.saveLocalMemory(); 
 				return output + " updated"; 
 			case SORT:
 				sortCommand(commandObject);
@@ -58,11 +61,17 @@ public class MyTasksLogic implements ILogic {
 			case SEARCH:
 				searchCommand(commandObject);
 				return output + " search";
+			case UNDO:
+				undoCommand();
+				return "";
+			case REDO:
+				redoCommand();
+				return "";
 			default:
 				return "invalid command";
 		}
 	}
-	
+
 	private static String removeFirstWord(String input) {
 		return input.replace(input.trim().split("\\s+")[0], "").trim();
 	}
@@ -89,10 +98,18 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	private void searchCommand(CommandInfo commandObject) {
+			
+	}
+	
+	private void undoCommand() {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	private void redoCommand() {
+		// TODO Auto-generated method stub
+		
+	}
 	/**
 	 * parseInput calls the parser to read and understand user input 
 	 * @param userInput

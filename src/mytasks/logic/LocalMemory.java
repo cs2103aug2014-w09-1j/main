@@ -31,6 +31,10 @@ public class LocalMemory {
 		mStore.writeExtMem(mLocalMem);
 	}
 	
+	public ArrayList<Task> getLocalMem() {
+		return mLocalMem;
+	}
+	
 	public void add(Task userRequest) {
 		mLocalMem.add(userRequest);
 	}
