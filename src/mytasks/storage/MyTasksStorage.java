@@ -67,23 +67,29 @@ public class MyTasksStorage implements IStorage {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(
 							MyTasks.DEFAULT_FILENAME));
 			for (int i = 0; i < localMemory.size(); i++) {
-				bufferedWriter.write(localMemory.get(i).getDescription());
+				// to save the title of the task in the first line
+				bufferedWriter.write(localMemory.get(i).getDescription()); 
 				bufferedWriter.newLine();
-				if (localMemory.get(i).getDateTime() != null) {
-					bufferedWriter.write(MyTasksParser.dateTimeFormat.format(localMemory.get(i).getDateTime()));
+
+				// to check if there is a date and time recorded with the task
+				if (localMemory.get(i).getDateTime() != null) {	
+					// save the date and time of the task in the second line
+					bufferedWriter.write(MyTasksParser.dateTimeFormat.format(localMemory.get(i).getDateTime())); 
 					bufferedWriter.newLine();
 				}
-				if (localMemory.get(i).getLabels() != null) {
-					for (int j=0; j<localMemory.get(i).getLabels().size(); j++) {
+				// to check if there are any labels included in the tasks
+				if (localMemory.get(i).getLabels() != null) {	
+					// save the n labels in the next n lines
+					for (int j=0; j<localMemory.get(i).getLabels().size(); j++) {	
 						bufferedWriter.write(localMemory.get(i).getLabels().get(j) + " ");
 					}
 					bufferedWriter.newLine();
 				}
-				bufferedWriter.newLine();
+				bufferedWriter.newLine(); // use an empty line to separate between tasks
 			}
 			bufferedWriter.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Error with reading existing file");
 		}
 	}
 
