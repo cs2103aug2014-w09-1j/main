@@ -25,7 +25,7 @@ public class CommandInfo {
 		mTask = thisTask;
 	}
 
-	public void determineCommandType(String comdType) {
+	private void determineCommandType(String comdType) {
 		if (comdType.equals("add")) {
 			mType = CommandType.ADD;
 		} else if (comdType.equals("delete")) {
