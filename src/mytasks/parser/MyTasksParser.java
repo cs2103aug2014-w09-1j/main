@@ -39,21 +39,24 @@ public class MyTasksParser implements IParser {
 			Date dateTime = extractDate(words);
 			String taskDesc = null;
 			String updateFrom = null;
+			ArrayList<String> labels = splitLabels(hashtagged);
 			if (comdType.equals("update")){
 				String[] updateSplit = splitMinus(messageAndDateTime);
 				updateFrom = updateSplit[0].trim();
 				try{
 					taskDesc = removeDate(updateSplit[1].trim(),dateTime);
 				} catch (IndexOutOfBoundsException e) {
-					//Ie. incorrect form of update is passed
-					return null;
+					if (labels!=null){
+						//Update labels only.
+						taskDesc = null;
+					} else {
+						//Incorrect form of update is passed
+						return null;
+					}
 				}
 			} else {
 				taskDesc = removeDate(messageAndDateTime,dateTime);
 			}
-			ArrayList<String> labels = splitLabels(hashtagged);
-			
-			
 			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime, labels, updateFrom);
 			return result;
 		}

@@ -23,6 +23,7 @@ public class ParserTest {
 	private CommandInfo test8 = null;
 	private CommandInfo test9 = null;
 	private CommandInfo test10 = null;
+	private CommandInfo test11 = null;
 
 	@Test
 	public void parseInputTest() {
@@ -38,6 +39,7 @@ public class ParserTest {
 		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
 		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
 		assertObjFields(test10, tester.parseInput("update meeting - #CS2103"));
+		assertObjFields(test11, tester.parseInput("update meeting - play 19.09.2014 #yolo"));
 	}
 	
 	private void initTestObjects() {
@@ -76,7 +78,12 @@ public class ParserTest {
 			
 			ArrayList<String> list10 = new ArrayList<String>();
 			list10.add("CS2103");
-			test10 = new CommandInfo("update", null, null, list10, "meeting cs2103");
+			test10 = new CommandInfo("update", null, null, list10, "meeting");
+			
+			ArrayList<String> list11 = new ArrayList<String>();
+			list11.add("yolo");
+			Date date11 = MyTasksParser.dateFormat.parse("19.09.2014");
+			test11 = new CommandInfo("update", "play", date11, list11, "meeting");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -95,9 +102,9 @@ public class ParserTest {
 			assertEquals(null, resultTask.getDescription());
 		} else {
 			assertEquals(testCaseTask.getDescription(), resultTask.getDescription());
+			//System.out.println(testCaseTask.getDescription());
+			//System.out.println(resultTask.getDescription());
 		}
-		//System.out.println(testCaseTask.getDescription());
-		//System.out.println(resultTask.getDescription());
 		
 		//Assert dateTime
 		if (testCaseTask.getDateTime()==null) {
@@ -121,7 +128,7 @@ public class ParserTest {
 		}
 		
 		//Assert update task's description
-		assertEquals(testCase.getUpdateDesc(),result.getUpdateDesc());
+		assertEquals(testCase.getToUpdateTaskDesc(),result.getToUpdateTaskDesc());
 		//System.out.println(testCase.getUpdateDesc());
 		//System.out.println(result.getUpdateDesc());
 	}
