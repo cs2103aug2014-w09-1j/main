@@ -31,7 +31,7 @@ public class MyTasksUI{
 	private void initUI() {
 		isRunning = true;
 		sc = new Scanner(System.in);
-		mLogic = new MyTasksLogic();
+		mLogic = new MyTasksLogic(false);
 	}
 	
 	/**

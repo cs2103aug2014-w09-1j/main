@@ -17,20 +17,24 @@ public class MyTasksLogic implements ILogic {
 	MyTasksStorage mStorage;
 	LocalMemory mLocalMem;
 	MemorySnapshotHandler mViewHandler;
+	boolean isDeveloper;
 	
 	//Constructor
-	public MyTasksLogic(){
-		initLogic();
+	public MyTasksLogic(boolean isDeveloper){
+		initLogic(isDeveloper);
 	}
 	
 	/**
 	 * initProgram initializes all local variables to prevent and data overflow from previous sessions
 	 */
-	private void initLogic(){
+	private void initLogic(boolean isDev){
+		isDeveloper = isDev;
 		mParser = new MyTasksParser();
 		mStorage = new MyTasksStorage();
 		mLocalMem = new LocalMemory();
-		mLocalMem.loadLocalMemory();
+		if (!isDeveloper) {
+			mLocalMem.loadLocalMemory();	
+		}
 		mViewHandler = new MemorySnapshotHandler();
 	}
 	
@@ -45,7 +49,9 @@ public class MyTasksLogic implements ILogic {
 		switch(commandObject.getType()) {
 			case ADD:
 				addCommand(commandObject);
-				mLocalMem.saveLocalMemory(); 
+				if(!isDeveloper){
+					mLocalMem.saveLocalMemory(); 
+				}
 				return output + " added";
 			case DELETE:
 				deleteCommand(commandObject);
@@ -73,7 +79,8 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	private static String removeFirstWord(String input) {
-		return input.replace(input.trim().split("\\s+")[0], "").trim();
+		int i = input.indexOf(' ');
+		return input.substring(i).trim();
 	}
 	
 	private void addCommand(CommandInfo commandObject) {

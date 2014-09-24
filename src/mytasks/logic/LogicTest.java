@@ -1,24 +1,40 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.junit.Test;
-
 public class LogicTest {
 	
-	private static MyTasksLogic taskLogic = new MyTasksLogic();
+	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 
 	@Test
-	public void testRemoveFirstWord() throws NoSuchMethodException,
-			SecurityException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		Method method = MyTasksLogic.class.getDeclaredMethod("removeFirstWord",
-				String.class);
-		method.setAccessible(true);
-		String result = (String) method.invoke(taskLogic, "add meeting 22sep #important");
-		assertEquals("add", result);
+	public void testRemoveFirstWord() {
+		Method method = null;
+		try {
+			method = MyTasksLogic.class.getDeclaredMethod("removeFirstWord",
+					String.class);
+			method.setAccessible(true);
+			String result = (String) method.invoke(taskLogic, "add meeting 22sep #important added");
+			assertEquals("meeting 22sep #important added", result);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
 	}
+	
+	@Test
+	public void testAddCommand() {
+		assertEquals("meeting 22sep #important added", taskLogic.executeCommand("add meeting 22sep #important"));
+	} 
 }
