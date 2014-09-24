@@ -17,12 +17,15 @@ public class CommandInfo {
 	public enum CommandType {ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID};
 	private CommandType mType;
 	private Task mTask;
+	//Variable used to store task description of task to be updated (if any)
+	private String mUpdateDesc;
 	
 	//Constructor
-	public CommandInfo(String comdType, String comdDes, Date dateTime, ArrayList<String> comdLabels) {
+	public CommandInfo(String comdType, String comdDes, Date dateTime, ArrayList<String> comdLabels, String updateDesc) {
 		determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, dateTime, comdLabels);
 		mTask = thisTask;
+		mUpdateDesc = updateDesc;
 	}
 
 	private void determineCommandType(String comdType) {
@@ -51,5 +54,9 @@ public class CommandInfo {
 	
 	public Task getTask() {
 		return mTask;
+	}
+	
+	public String getUpdateDesc() {
+		return mUpdateDesc;
 	}
 }

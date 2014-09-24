@@ -40,7 +40,7 @@ public class MyTasksParser implements IParser {
 			String taskDesc = removeDate(messageAndDateTime,dateTime);
 			ArrayList<String> labels = splitLabels(hashtagged);
 			
-			CommandInfo result = new CommandInfo(comdType,taskDesc,dateTime,labels);
+			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime, labels, null);
 			return result;
 		}
 		return null;
