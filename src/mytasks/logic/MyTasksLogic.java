@@ -60,7 +60,7 @@ public class MyTasksLogic implements ILogic {
 			case UPDATE:
 				updateCommand(commandObject);
 				mLocalMem.saveLocalMemory(); 
-				return output + " updated"; 
+				return commandObject.getToUpdateTaskDesc() + " updated"; 
 			case SORT:
 				sortCommand(commandObject);
 				return output + " sorted";
@@ -96,7 +96,7 @@ public class MyTasksLogic implements ILogic {
 		// or update task desc and label (delete all labels prior to this) 
 		// for update, I assume the parser will send in this format: task1, task2, labels (if any)
 		// the updatedDesc will be labeled as updateDesc 
-		mLocalMem.update(commandObject.getTask());
+		mLocalMem.update(commandObject.getToUpdateTaskDesc(), commandObject.getTask());
 	}
 
 	private void sortCommand(CommandInfo commandObject) {

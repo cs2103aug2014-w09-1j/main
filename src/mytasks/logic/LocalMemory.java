@@ -47,12 +47,12 @@ public class LocalMemory {
 		}
 	}
 	
-	public void update(Task userRequest) {
+	public void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
-			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
-				mLocalMem.get(i).setDescription(updateDesc);				
-				if(!userRequest.getLabels().isEmpty()) {
-					mLocalMem.get(i).setLabels(userRequest.getLabels()); 
+			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
+				mLocalMem.get(i).setDescription(userUpdate.getDescription());				
+				if(!userUpdate.getLabels().isEmpty()) {
+					mLocalMem.get(i).setLabels(userUpdate.getLabels()); 
 				}
 			} 
 		}
