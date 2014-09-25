@@ -23,7 +23,7 @@ public class MyTasksLogic implements ILogic {
 	public MyTasksLogic(boolean isDeveloper){
 		initLogic(isDeveloper);
 	}
-	
+
 	/**
 	 * initProgram initializes all local variables to prevent and data overflow from previous sessions
 	 */
@@ -55,12 +55,18 @@ public class MyTasksLogic implements ILogic {
 				return output + " added";
 			case DELETE:
 				deleteCommand(commandObject);
-				mLocalMem.saveLocalMemory(); 
+				if(!isDeveloper){
+					mLocalMem.saveLocalMemory(); 
+				}				
 				return output + " deleted";
 			case UPDATE:
 				updateCommand(commandObject);
-				mLocalMem.saveLocalMemory(); 
-				return commandObject.getToUpdateTaskDesc() + " updated"; 
+				if(!isDeveloper){
+					mLocalMem.saveLocalMemory(); 
+				}				
+				output = input.replace(input.trim().split("[-]+")[0], "").trim();	
+				output = output.replace(output.trim().split("\\s+")[0], "").trim();		
+				return output + " updated";
 			case SORT:
 				sortCommand(commandObject);
 				return output + " sorted";

@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +18,7 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateCommand() {
-		assertEquals("CS2103T #important updated", taskLogic.executeCommand("meeting - CS2103T #important"));
+		assertEquals("CS2103T #important updated", taskLogic.executeCommand("update meeting - CS2103T #important"));
 	} 
 	
 	@Test
