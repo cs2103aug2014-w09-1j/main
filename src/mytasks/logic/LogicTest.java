@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
+import mytasks.file.Task;
 
 import org.junit.Test;
 
@@ -42,4 +43,17 @@ public class LogicTest {
 			e.printStackTrace();
 		}	
 	}	
+	
+	private void initTestCases(){
+		//test 1
+		taskLogic.executeCommand("add meeting 22.09.2014 #important");
+	}
+	
+	@Test
+	public void testSearchCommand(){
+		//test 1
+		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
+		initTestCases();
+		assertEquals("meeting search", taskLogic.executeCommand("search meeting"));
+	}
 }

@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
@@ -59,7 +60,6 @@ public class LocalMemory {
 				}
 			} 
 		}
-<<<<<<< HEAD
 	}	
 	
 	public void sort(Task userRequest){
@@ -67,13 +67,24 @@ public class LocalMemory {
 		
 	}
 	
-	public void search(Task userRequest){
-		
+	public boolean search(Task userRequest){
+		try{
+			String desc = userRequest.getDescription();
+			boolean isFound = false;
+			
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (mLocalMem.get(i).getDescription().contains(desc)){
+					System.out.println(mLocalMem.get(i));
+					isFound = true;
+				}
+			}
+			return isFound;		
+			
+		}catch(NoSuchElementException e){
+			return false;
+		}
 		
 	}
 	
 	//TODO add more functionality
-=======
-	}
->>>>>>> 5b225513a6af25ee4966c4b8f3c007832dd4864c
 }

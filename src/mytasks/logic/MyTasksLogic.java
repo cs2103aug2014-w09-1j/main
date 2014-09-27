@@ -6,7 +6,7 @@ import mytasks.storage.MyTasksStorage;
 
 /**
  * MyTasksLogic handles all logic related operations such as program flow and execution of commands
- * @author Wilson, Huiwen
+ * @author Wilson, Huiwen, Michael
  *
  */
 
@@ -18,6 +18,7 @@ public class MyTasksLogic implements ILogic {
 	LocalMemory mLocalMem;
 	MemorySnapshotHandler mViewHandler;
 	boolean isDeveloper;
+	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	
 	//Constructor
 	public MyTasksLogic(boolean isDeveloper){
@@ -71,8 +72,12 @@ public class MyTasksLogic implements ILogic {
 				sortCommand(commandObject);
 				return output + " sorted";
 			case SEARCH:
-				searchCommand(commandObject);
-				return output + " search";
+				boolean isFound = searchCommand(commandObject);
+				if (isFound){
+					return output + " search";
+				}else{
+					return String.format(MESSAGE_SEARCH_FAIL, output);
+				}
 			case UNDO:
 				undoCommand();
 				return "";
@@ -109,11 +114,8 @@ public class MyTasksLogic implements ILogic {
 		mViewHandler.setView(commandObject.getTask().getLabels());
 	}
 
-	private void searchCommand(CommandInfo commandObject) {
-<<<<<<< HEAD
-		mLocalMem.search(commandObject.getTask());		
-=======
-			
+	private boolean searchCommand(CommandInfo commandObject) {
+		return mLocalMem.search(commandObject.getTask());				
 	}
 	
 	private void undoCommand() {
@@ -123,8 +125,7 @@ public class MyTasksLogic implements ILogic {
 	
 	private void redoCommand() {
 		// TODO Auto-generated method stub
-		
->>>>>>> 5b225513a6af25ee4966c4b8f3c007832dd4864c
+
 	}
 	/**
 	 * parseInput calls the parser to read and understand user input 
