@@ -31,6 +31,10 @@ public class LocalMemory {
 		mStore.writeExtMem(mLocalMem);
 	}
 	
+	public ArrayList<Task> getLocalMem() {
+		return mLocalMem;
+	}
+	
 	public void add(Task userRequest) {
 		mLocalMem.add(userRequest);
 	}
@@ -42,16 +46,20 @@ public class LocalMemory {
 			}
 		}
 	}
-	
-	public void update(Task userRequest) {
+	//TODO add more functionality
+
+	public void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
-			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
-				mLocalMem.get(i).setDescription(updateDesc);				
-				if(!userRequest.getLabels().isEmpty()) {
-					mLocalMem.get(i).setLabels(userRequest.getLabels()); 
+			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
+				mLocalMem.get(i).setDescription(userUpdate.getDescription());	
+				mLocalMem.get(i).setDateTime(userUpdate.getDateTime());	
+
+				if(!userUpdate.getLabels().isEmpty()) {
+					mLocalMem.get(i).setLabels(userUpdate.getLabels()); 
 				}
 			} 
 		}
+<<<<<<< HEAD
 	}	
 	
 	public void sort(Task userRequest){
@@ -65,4 +73,7 @@ public class LocalMemory {
 	}
 	
 	//TODO add more functionality
+=======
+	}
+>>>>>>> 5b225513a6af25ee4966c4b8f3c007832dd4864c
 }
