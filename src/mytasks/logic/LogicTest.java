@@ -3,14 +3,20 @@ package mytasks.logic;
 import static org.junit.Assert.*;
 import mytasks.file.Task;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 
 public class LogicTest {
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
+	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	
 	@Test
 	public void testAddCommand() {
@@ -44,9 +50,19 @@ public class LogicTest {
 		}	
 	}	
 	
+	@Before
+	public void setUpStreams() {
+	    System.setOut(new PrintStream(outContent));
+	}
+
+	@After
+	public void cleanUpStreams() {
+	    System.setOut(null);
+	}
+	
 	private void initTestCases(){
 		//test 1
-		taskLogic.executeCommand("add meeting 22.09.2014 #important");
+		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
 	}
 	
 	@Test
@@ -54,6 +70,8 @@ public class LogicTest {
 		//test 1
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
 		initTestCases();
-		assertEquals("meeting search", taskLogic.executeCommand("search meeting"));
+		assertEquals("task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
+		assertEquals("CS2103T meeting 22.09.2014 #important ", outContent.toString());
+
 	}
 }

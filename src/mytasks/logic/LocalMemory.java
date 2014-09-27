@@ -13,6 +13,7 @@ import mytasks.storage.MyTasksStorage;
  * @author Wilson
  *
  */
+
 public class LocalMemory {
 	
 	//Private variables
@@ -74,7 +75,7 @@ public class LocalMemory {
 			
 			for (int i=0; i < mLocalMem.size(); i++){
 				if (mLocalMem.get(i).getDescription().contains(desc)){
-					System.out.println(mLocalMem.get(i));
+					System.out.println(mLocalMem.get(i).toString());
 					isFound = true;
 				}
 			}

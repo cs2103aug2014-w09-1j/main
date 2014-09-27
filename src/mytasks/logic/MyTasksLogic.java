@@ -19,6 +19,7 @@ public class MyTasksLogic implements ILogic {
 	MemorySnapshotHandler mViewHandler;
 	boolean isDeveloper;
 	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
+	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
 	
 	//Constructor
 	public MyTasksLogic(boolean isDeveloper){
@@ -74,7 +75,7 @@ public class MyTasksLogic implements ILogic {
 			case SEARCH:
 				boolean isFound = searchCommand(commandObject);
 				if (isFound){
-					return output + " search";
+					return String.format(MESSAGE_SEARCH_SUCCESS, output);
 				}else{
 					return String.format(MESSAGE_SEARCH_FAIL, output);
 				}
