@@ -63,6 +63,8 @@ public class LogicTest {
 	private void initTestCases(){
 		//test 1
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
+		//test 2
+		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
 	}
 	
 	@Test
@@ -71,6 +73,10 @@ public class LogicTest {
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
 		initTestCases();
 		assertEquals("task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
+		assertEquals("CS2103T meeting 22.09.2014 #important " + "\n"
+		            + "CS2101 meeting 29.09.2014 ", outContent.toString());
+		//test 2
+		assertEquals("task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
 		assertEquals("CS2103T meeting 22.09.2014 #important ", outContent.toString());
 
 	}

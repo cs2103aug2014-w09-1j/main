@@ -48,7 +48,6 @@ public class LocalMemory {
 			}
 		}
 	}
-	//TODO add more functionality
 
 	public void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
@@ -69,23 +68,46 @@ public class LocalMemory {
 	}
 	
 	public boolean search(Task userRequest){
+
+		boolean isFound = false;
+
+		for (int i=0; i < mLocalMem.size(); i++){
+			if (haveDesc(userRequest, i) && haveLabels(userRequest, i)){
+				System.out.println(mLocalMem.get(i).toString());
+				isFound = true;
+			}
+		}	
+		return isFound;
+	}
+
+	private boolean haveDesc(Task userRequest, int index){
 		try{
 			String desc = userRequest.getDescription();
-			boolean isFound = false;
-			
-			for (int i=0; i < mLocalMem.size(); i++){
-				if (mLocalMem.get(i).getDescription().contains(desc)){
-					System.out.println(mLocalMem.get(i).toString());
-					isFound = true;
-				}
-			}
-			return isFound;		
-			
+
+			if (mLocalMem.get(index).getDescription().contains(desc)){
+				return true;
+			}	
 		}catch(NoSuchElementException e){
-			return false;
 		}
-		
+		return false;
 	}
-	
-	//TODO add more functionality
+
+	private boolean haveLabels(Task userRequest, int index){
+		String userRequestedTaskLabelsToString = "";
+		String mLocalMemTaskLabelsToString = "";
+		try{
+			for (String s : userRequest.getLabels()){
+				userRequestedTaskLabelsToString += s; 
+			}
+			for (String s : mLocalMem.get(index).getLabels()){
+				mLocalMemTaskLabelsToString += s; 
+			}
+		}catch (NullPointerException e){
+		}
+
+		if (mLocalMemTaskLabelsToString.equals(userRequestedTaskLabelsToString)){
+			return true;
+		}
+		return false;
+	}
 }
