@@ -24,7 +24,7 @@ public class LocalMemory {
 	}
 	
 	public void loadLocalMemory() {
-		mStore.readExtMem(MyTasks.DEFAULT_FILENAME);
+		mLocalMem = mStore.readExtMem(MyTasks.DEFAULT_FILENAME);
 	}
 	
 	public void saveLocalMemory() {

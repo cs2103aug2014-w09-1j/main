@@ -62,7 +62,7 @@ public class MyTasksParser implements IParser {
 	 * @param words arrays
 	 * @return Date(object) of the task
 	 */
-	private Date extractDate(String[] words) {
+	public static Date extractDate(String[] words) {
 		Date dateTime = null;
 		for (int i = 0; i<words.length; i++) {
 			try {
