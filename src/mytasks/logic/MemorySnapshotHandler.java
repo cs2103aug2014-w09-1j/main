@@ -3,6 +3,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 
 import mytasks.file.MyTasks;
+import mytasks.file.Task;
 
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
@@ -28,8 +29,13 @@ public class MemorySnapshotHandler {
 	 * @return data structure that is read and printed by UI
 	 */
 	public String getSnapshot(LocalMemory mLocalMem) {
-		//TODO main body
-		return null;
+		String snapshot = "";
+		
+		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
+			snapshot += mLocalMem.getLocalMem().get(i).toString() + "\n";
+		}
+		
+		return snapshot;
 	}
 	
 }

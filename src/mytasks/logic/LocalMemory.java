@@ -64,11 +64,9 @@ public class LocalMemory {
 	
 	public void sort(Task userRequest){
 		
-		
 	}
 	
 	public boolean search(Task userRequest){
-
 		boolean isFound = false;
 
 		for (int i=0; i < mLocalMem.size(); i++){

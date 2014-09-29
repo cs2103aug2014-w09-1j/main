@@ -65,6 +65,6 @@ public class Task {
 		}catch (NullPointerException e){
 		}
 		
-		return String.format("%s %s %s", mDescription, dateToString, labelsToString);
+		return String.format("%s %s %s", mDescription, dateToString, labelsToString).trim();
 	}
 }

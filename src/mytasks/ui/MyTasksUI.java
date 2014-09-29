@@ -60,7 +60,7 @@ public class MyTasksUI{
 	 * {@inheritDoc}
 	 */
 	public void printToUI(String feedback) {
-		System.out.println(mLogic.obtainPrintableOutput());
+		System.out.print(mLogic.obtainPrintableOutput());
 		if (feedback!=null){
 			System.out.print(feedback);
 		}
