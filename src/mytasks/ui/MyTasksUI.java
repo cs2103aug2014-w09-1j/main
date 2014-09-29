@@ -31,7 +31,7 @@ public class MyTasksUI{
 	private void initUI() {
 		isRunning = true;
 		sc = new Scanner(System.in);
-		mLogic = new MyTasksLogic();
+		mLogic = new MyTasksLogic(false);
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class MyTasksUI{
 	 * {@inheritDoc}
 	 */
 	public void printToUI(String feedback) {
-		System.out.println(mLogic.obtainPrintableOutput());
+		System.out.print(mLogic.obtainPrintableOutput());
 		if (feedback!=null){
 			System.out.print(feedback);
 		}

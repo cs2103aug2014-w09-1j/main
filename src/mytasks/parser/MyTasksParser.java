@@ -37,10 +37,27 @@ public class MyTasksParser implements IParser {
 			String[] hashtagged = splitHashtag(messageAndDateTimeAndLabels);
 			String messageAndDateTime = hashtagged[0].trim();
 			Date dateTime = extractDate(words);
-			String taskDesc = removeDate(messageAndDateTime,dateTime);
+			String taskDesc = null;
+			String updateFrom = null;
 			ArrayList<String> labels = splitLabels(hashtagged);
-			
-			CommandInfo result = new CommandInfo(comdType,taskDesc,dateTime,labels);
+			if (comdType.equals("update")){
+				String[] updateSplit = splitMinus(messageAndDateTime);
+				updateFrom = updateSplit[0].trim();
+				try{
+					taskDesc = removeDate(updateSplit[1].trim(),dateTime);
+				} catch (IndexOutOfBoundsException e) {
+					if (labels!=null){
+						//Update labels only.
+						taskDesc = null;
+					} else {
+						//Incorrect form of update is passed
+						return null;
+					}
+				}
+			} else {
+				taskDesc = removeDate(messageAndDateTime,dateTime);
+			}
+			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime, labels, updateFrom);
 			return result;
 		}
 		return null;
@@ -92,7 +109,11 @@ public class MyTasksParser implements IParser {
 		String dateAndTime = dateTimeFormat.format(dateTime);
 		String temp = message.replace(dateAndTime, "");
 		String date = dateFormat.format(dateTime);
-		return temp.replace(date,"").trim();
+		String temp2 = temp.replace(date,"").trim();
+		if(temp2.equals("")){
+			return null;
+		}
+		return temp2;
 	}
 	
 	/**
@@ -114,5 +135,11 @@ public class MyTasksParser implements IParser {
 			}
 		}
 		return result;
+	}
+	
+	private String[] splitMinus(String line){
+		String delims = "[-]+";
+		String[] newLine = line.split(delims);
+		return newLine;
 	}
 }
