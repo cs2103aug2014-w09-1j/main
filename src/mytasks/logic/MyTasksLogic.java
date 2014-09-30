@@ -107,7 +107,11 @@ public class MyTasksLogic implements ILogic {
 		// either update task desc 
 		// or update task desc and label (delete all labels prior to this) 
 		// for update, I assume the parser will send in this format: task1, task2, labels (if any)
-		// the updatedDesc will be labeled as updateDesc 
+		// the updatedDesc will be labeled as updateDesc
+		
+		//TODO fix update command 30Sep14. Refer to v0.1 for official syntax. Remember, task2 (in ur syntax)
+		// can be non existent BUT that does not mean that i want to make task1 null. I simply just want
+		// to add labels/dates
 		mLocalMem.update(commandObject.getToUpdateTaskDesc(), commandObject.getTask());
 	}
 

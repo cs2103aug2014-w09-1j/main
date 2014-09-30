@@ -24,8 +24,6 @@ import mytasks.parser.MyTasksParser;
  */
 public class MyTasksStorage implements IStorage {
 
-	private ArrayList<Task> newMemory = new ArrayList<Task>();
-
 	// Constructor
 	public MyTasksStorage() {
 	}
@@ -35,6 +33,10 @@ public class MyTasksStorage implements IStorage {
 	 * 
 	 */
 	public ArrayList<Task> readExtMem(String fileName) {
+		//TODO fix readExtMem. 30sep14
+		//1) returns null instead of empty arraylist if file doesnt exist
+		//2) does not work if file already exist
+		ArrayList<Task> newMemory = new ArrayList<Task>();
 		File f = new File(fileName);
 		if (!f.exists()) {
 			return null;
@@ -70,7 +72,6 @@ public class MyTasksStorage implements IStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return newMemory;
 	}
 
@@ -112,7 +113,6 @@ public class MyTasksStorage implements IStorage {
 	 * {@inheritDoc} //Does not need to be implemented in v0.1 as of yet
 	 */
 	public String exportFile(String fileName) {
-		// TODO Auto-generated method stub
 		// TODO for humans to read
 		return null;
 	}

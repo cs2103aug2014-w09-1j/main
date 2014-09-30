@@ -47,7 +47,7 @@ public class Task {
 	}
 	
 	public void setLabels(ArrayList<String> labels) {
-		mLabels.clear(); // for resetting after every update
+		mLabels = new ArrayList<String>(); // for resetting after every update
 		mLabels = labels;
 	}
 	

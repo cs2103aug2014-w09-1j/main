@@ -22,7 +22,7 @@ public class LocalMemory {
 	
 	//Constructor
 	public LocalMemory() {
-		mLocalMem = new ArrayList<Task>();
+		mStore = new MyTasksStorage();
 	}
 	
 	public void loadLocalMemory() {
@@ -38,6 +38,10 @@ public class LocalMemory {
 	}
 	
 	public void add(Task userRequest) {
+		//Temporary fix to null mLocalMem. TODO solve mLocalMem null issue.
+		if (mLocalMem == null) {
+			mLocalMem = new ArrayList<Task>();
+		}
 		mLocalMem.add(userRequest);
 	}
 	
