@@ -1,5 +1,7 @@
 package mytasks.file;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -14,6 +16,8 @@ public class Task {
 	private String mDescription;
 	private Date mDateTime;
 	private ArrayList<String> mLabels;
+	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	
 	//Constructor
 	public Task(String details, Date dateTime, ArrayList<String> labels) {
@@ -34,8 +38,9 @@ public class Task {
 		return mDateTime;
 	}
 	
-	public void setDateTime() {
-		
+	public void setDateTime(Date dateTime) {
+		mDateTime = new Date(); 
+		mDateTime = dateTime;
 	}
 	public ArrayList<String> getLabels() {
 		return mLabels;
@@ -44,5 +49,22 @@ public class Task {
 	public void setLabels(ArrayList<String> labels) {
 		mLabels.clear(); // for resetting after every update
 		mLabels = labels;
+	}
+	
+	public String toString(){
+		String dateToString = dateTimeFormat.format(mDateTime);
+		if (dateToString.contains("00:00")){
+			dateToString = dateFormat.format(mDateTime);
+		}
+		
+		String labelsToString = "";
+		try{
+			for (String s : mLabels){
+				labelsToString += "#" + s + " "; 
+			}
+		}catch (NullPointerException e){
+		}
+		
+		return String.format("%s %s %s", mDescription, dateToString, labelsToString).trim();
 	}
 }

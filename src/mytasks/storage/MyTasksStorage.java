@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
@@ -23,7 +24,7 @@ import mytasks.parser.MyTasksParser;
  */
 public class MyTasksStorage implements IStorage {
 
-	// private ArrayList<Task> localMemory = new ArrayList<Task>();
+	private ArrayList<Task> newMemory = new ArrayList<Task>();
 
 	// Constructor
 	public MyTasksStorage() {
@@ -34,19 +35,33 @@ public class MyTasksStorage implements IStorage {
 	 * 
 	 */
 	public ArrayList<Task> readExtMem(String fileName) {
-		// TODO
 		File f = new File(fileName);
 		if (!f.exists()) {
-			writeExtMem(localMemory); // This line doesnt make sense.
+			return null;
 		}
 
 		String line = null;
-		// BufferedReader bufferedReader;
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(
 							fileName));
 			while ((line = bufferedReader.readLine()) != null) {
-				localMemory.add(line);
+				// saving the new description
+				String newDescription = bufferedReader.readLine();
+
+				// saving the new date and time
+				String[] newDateTimeArray = bufferedReader.readLine().split("\\s+");
+				Date newDateTime = new Date();
+				newDateTime = MyTasksParser.extractDate(newDateTimeArray);
+
+				// saving the labels
+				String[] newLabelsArray = bufferedReader.readLine().split(",");
+				ArrayList<String> newLabels = new ArrayList<String>();
+				for (int i=0; i<newLabelsArray.length; i++) {
+					newLabels.add(newLabelsArray[i]);
+				}
+
+				newMemory.add(new Task(newDescription, newDateTime, newLabels));
+				bufferedReader.readLine(); // read in the empty line
 			}
 			bufferedReader.close();
 
@@ -56,7 +71,7 @@ public class MyTasksStorage implements IStorage {
 			e.printStackTrace();
 		}
 
-		return localMemory;
+		return newMemory;
 	}
 
 	/**
@@ -81,7 +96,7 @@ public class MyTasksStorage implements IStorage {
 				if (localMemory.get(i).getLabels() != null) {	
 					// save the n labels in the next n lines
 					for (int j=0; j<localMemory.get(i).getLabels().size(); j++) {	
-						bufferedWriter.write(localMemory.get(i).getLabels().get(j) + " ");
+						bufferedWriter.write(localMemory.get(i).getLabels().get(j) + ", ");
 					}
 					bufferedWriter.newLine();
 				}
