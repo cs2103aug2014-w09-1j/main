@@ -52,19 +52,20 @@ public class Task {
 	}
 	
 	public String toString(){
-		String dateToString = dateTimeFormat.format(mDateTime);
+		String dateToString = "";
+		if (mDateTime != null){			
+			dateToString = dateTimeFormat.format(mDateTime);
+		}
 		if (dateToString.contains("00:00")){
 			dateToString = dateFormat.format(mDateTime);
 		}
 		
 		String labelsToString = "";
-		try{
+		if (mLabels!= null) {
 			for (String s : mLabels){
-				labelsToString += "#" + s + " "; 
+				labelsToString += "#" + s + " ";
 			}
-		}catch (NullPointerException e){
 		}
-		
 		return String.format("%s %s %s", mDescription, dateToString, labelsToString).trim();
 	}
 }

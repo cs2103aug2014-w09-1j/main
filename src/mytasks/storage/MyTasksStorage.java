@@ -34,12 +34,14 @@ public class MyTasksStorage implements IStorage {
 	 */
 	public ArrayList<Task> readExtMem(String fileName) {
 		//TODO fix readExtMem. 30sep14
-		//1) returns null instead of empty arraylist if file doesnt exist
+		//1) returns null instead of empty arraylist if file doesnt exist (introduced quickfix here)
 		//2) does not work if file already exist
+		//For junit test, may want to create external textfiles to run ur test cases.
+		//You may keep it local without pushing for now.
 		ArrayList<Task> newMemory = new ArrayList<Task>();
 		File f = new File(fileName);
 		if (!f.exists()) {
-			return null;
+			return newMemory;
 		}
 
 		String line = null;
