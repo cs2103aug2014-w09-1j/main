@@ -59,7 +59,7 @@ public class CommandInfo {
 	/**
 	 * getToUpdateTaskDesc is only used for update commands. Is null for all other command
 	 * types.
-	 * @return String of the task description of the task to be updated
+	 * @return String of the task description of the task to be updated || old task 
 	 */
 	public String getToUpdateTaskDesc() {
 		return mToUpdateTaskDesc;

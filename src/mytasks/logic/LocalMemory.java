@@ -52,11 +52,16 @@ public class LocalMemory {
 	public void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
-				mLocalMem.get(i).setDescription(userUpdate.getDescription());	
-				mLocalMem.get(i).setDateTime(userUpdate.getDateTime());	
-
-				if(!userUpdate.getLabels().isEmpty()) {
-					mLocalMem.get(i).setLabels(userUpdate.getLabels()); 
+				if(userUpdate.getDescription() != null) {
+					mLocalMem.get(i).setDescription(userUpdate.getDescription());	
+				}
+				if(userUpdate.getDateTime() != null) {
+					mLocalMem.get(i).setDateTime(userUpdate.getDateTime());	
+				}
+				if(userUpdate.getLabels() != null) {
+					if(!userUpdate.getLabels().isEmpty()) {
+						mLocalMem.get(i).setLabels(userUpdate.getLabels()); 
+					}
 				}
 			} 
 		}
@@ -64,6 +69,25 @@ public class LocalMemory {
 	
 	public void sort(Task userRequest){
 		
+	}
+	
+	public void print() {
+		for(int i = 0; i < mLocalMem.size(); i++) {
+			System.out.println("i: " + i);
+			if(mLocalMem.get(i).getDescription() != null) {
+				System.out.println(mLocalMem.get(i).getDescription());
+			}
+			if(mLocalMem.get(i).getDateTime()!= null) {
+				System.out.println(mLocalMem.get(i).getDateTime().toString());
+			}
+			if(mLocalMem.get(i).getLabels() != null) {
+				if(!mLocalMem.get(i).getLabels().isEmpty()) {
+					for(int k = 0; k < mLocalMem.get(i).getLabels().size() ; k++) {
+					System.out.println("label: " +  mLocalMem.get(i).getLabels().get(k));
+					}
+				}
+			}			
+		}
 	}
 	
 	public boolean search(Task userRequest){

@@ -14,7 +14,7 @@ public class Task {
 	
 	//Private local variables
 	private String mDescription;
-	private Date mDateTime;
+	private Date mDateTime = null;
 	private ArrayList<String> mLabels;
 	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -39,7 +39,6 @@ public class Task {
 	}
 	
 	public void setDateTime(Date dateTime) {
-		mDateTime = new Date(); 
 		mDateTime = dateTime;
 	}
 	public ArrayList<String> getLabels() {
