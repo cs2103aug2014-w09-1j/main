@@ -62,7 +62,7 @@ public class MyTasksUI{
 	public void printToUI(String feedback) {
 		System.out.print(mLogic.obtainPrintableOutput());
 		if (feedback!=null){
-			System.out.print(feedback);
+			System.out.println(feedback);
 		}
 	}
 

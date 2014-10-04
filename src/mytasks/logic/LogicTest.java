@@ -61,6 +61,7 @@ public class LogicTest {
 	    System.setOut(null);
 	}
 	
+	//TODO: what is the purpose of this function?
 	private void initTestCases(){
 		//test 1
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
@@ -82,4 +83,6 @@ public class LogicTest {
 
 	}
 	*/
+	
+	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1
 }

@@ -55,7 +55,9 @@ public class LocalMemoryTest {
 	} 
 	
 	@Test
-	public void testUpdateLocalMemory() {
+	public void testUpdateAllLocalMemory() {
+		labels = new ArrayList<String>();
+		
 		taskLogic.executeCommand("add meeting 04.10.2014 #important");
 		taskLogic.executeCommand("update meeting - meeting two 05.10.2014 #letsdothis");
 		
@@ -68,6 +70,72 @@ public class LocalMemoryTest {
 		}
 		
 		newTask = new Task("meeting two", newDate, labels); 
+
+		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+	} 
+	
+	@Test
+	public void testUpdateTaskLocalMemory() {
+		labels = new ArrayList<String>();
+		
+		taskLogic.executeCommand("add meeting 04.10.2014 #important");
+		taskLogic.executeCommand("update meeting - meeting two");
+		
+		labels.add("important"); 
+		Date newDate = null;
+		try {
+			newDate = mytasks.parser.MyTasksParser.dateFormat.parse("04.10.2014");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		newTask = new Task("meeting two", newDate, labels); 
+
+		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+	} 
+	
+	@Test
+	public void testUpdateDatetimeLocalMemory() {
+		labels = new ArrayList<String>();
+		
+		taskLogic.executeCommand("add meeting 04.10.2014 #important");
+		taskLogic.executeCommand("update meeting - 20.10.2014");
+		
+		labels.add("important"); 
+		Date newDate = null;
+		try {
+			newDate = mytasks.parser.MyTasksParser.dateFormat.parse("20.10.2014");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		newTask = new Task("meeting", newDate, labels); 
+
+		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+	} 
+	
+	@Test
+	public void testUpdateLabelsLocalMemory() {
+		labels = new ArrayList<String>();
+		
+		taskLogic.executeCommand("add meeting 04.10.2014 #important");
+		taskLogic.executeCommand("update meeting - #hiphiphooray");
+		
+		labels.add("hiphiphooray"); 
+		Date newDate = null;
+		try {
+			newDate = mytasks.parser.MyTasksParser.dateFormat.parse("04.10.2014");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		newTask = new Task("meeting", newDate, labels); 
 
 		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getDateTime());

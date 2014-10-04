@@ -14,7 +14,7 @@ public class Task {
 	
 	//Private local variables
 	private String mDescription;
-	private Date mDateTime;
+	private Date mDateTime = null;
 	private ArrayList<String> mLabels;
 	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -39,7 +39,6 @@ public class Task {
 	}
 	
 	public void setDateTime(Date dateTime) {
-		mDateTime = new Date(); 
 		mDateTime = dateTime;
 	}
 	public ArrayList<String> getLabels() {
@@ -47,24 +46,25 @@ public class Task {
 	}
 	
 	public void setLabels(ArrayList<String> labels) {
-		mLabels.clear(); // for resetting after every update
+		mLabels = new ArrayList<String>(); // for resetting after every update
 		mLabels = labels;
 	}
 	
 	public String toString(){
-		String dateToString = dateTimeFormat.format(mDateTime);
+		String dateToString = "";
+		if (mDateTime != null){			
+			dateToString = dateTimeFormat.format(mDateTime);
+		}
 		if (dateToString.contains("00:00")){
 			dateToString = dateFormat.format(mDateTime);
 		}
 		
 		String labelsToString = "";
-		try{
+		if (mLabels!= null) {
 			for (String s : mLabels){
-				labelsToString += "#" + s + " "; 
+				labelsToString += "#" + s + " ";
 			}
-		}catch (NullPointerException e){
 		}
-		
 		return String.format("%s %s %s", mDescription, dateToString, labelsToString).trim();
 	}
 }

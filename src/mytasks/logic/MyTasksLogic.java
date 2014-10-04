@@ -67,7 +67,8 @@ public class MyTasksLogic implements ILogic {
 					mLocalMem.saveLocalMemory(); 
 				}				
 				output = input.replace(input.trim().split("[-]+")[0], "").trim();	
-				output = output.replace(output.trim().split("\\s+")[0], "").trim();		
+				output = output.replace(output.trim().split("\\s+")[0], "").trim();	
+				//mLocalMem.print();
 				return output + " updated";
 			case SORT:
 				sortCommand(commandObject);
@@ -76,7 +77,7 @@ public class MyTasksLogic implements ILogic {
 				boolean isFound = searchCommand(commandObject);
 				if (isFound){
 					return String.format(MESSAGE_SEARCH_SUCCESS, output);
-				}else{
+				} else{
 					return String.format(MESSAGE_SEARCH_FAIL, output);
 				}
 			case UNDO:
@@ -104,10 +105,9 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	private void updateCommand(CommandInfo commandObject) {
-		// either update task desc 
-		// or update task desc and label (delete all labels prior to this) 
-		// for update, I assume the parser will send in this format: task1, task2, labels (if any)
-		// the updatedDesc will be labeled as updateDesc 
+		//TODO fix update command 30Sep14. Refer to v0.1 for official syntax. Remember, task2 (in ur syntax)
+		// can be non existent BUT that does not mean that i want to make task1 null. I simply just want
+		// to add labels/dates
 		mLocalMem.update(commandObject.getToUpdateTaskDesc(), commandObject.getTask());
 	}
 
