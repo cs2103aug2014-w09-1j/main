@@ -29,7 +29,7 @@ public class ParserTest {
 
 	@Test
 	public void addTest() {
-		initTestObjects();
+		//initTestObjects();
 		assertObjFields(test1, tester.parseInput("add dinner"));
 		assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
 		assertObjFields(test3, tester.parseInput("add submit assignment 20.09.2014 12:00"));
@@ -40,13 +40,13 @@ public class ParserTest {
 	
 	@Test
 	public void deleteTest() {
-		initTestObjects();
+		//initTestObjects();
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
 	}
 	
 	@Test
 	public void updateTest() {
-		initTestObjects();
+		//initTestObjects();
 		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
 		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
 		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
@@ -54,6 +54,27 @@ public class ParserTest {
 		assertObjFields(test11, tester.parseInput("update meeting - play 19.09.2014 #yolo"));
 	}
 	
+	@Test
+	public void locateLabelsTest() {
+		String[] words = {"#hashtag", "#can", "not", "#be" ,"#anywhere"};
+		assertEquals("hashtag",tester.locateLabels(words).get(0));
+		assertEquals("can",tester.locateLabels(words).get(1));
+		assertEquals("be",tester.locateLabels(words).get(2));
+		assertEquals("anywhere",tester.locateLabels(words).get(3));
+	}
+	
+	@Test
+	public void removeLabelTest() {
+		String[] words = {"#hashtag", "#can", "not", "#be" ,"#anywhere"};
+		assertEquals("not", tester.removeLabels(words)[0]);
+	}
+	
+	@Test
+	public void extractDateTest() {
+		String[] words = {"#hashtag", "#can", "not", "#be" ,"#anywhere"};
+		assertEquals(null, tester.extractDate(words));
+	}
+	/*
 	private void initTestObjects() {
 		try {
 			test1 = new CommandInfo("add", "dinner", null, null, null, null);
@@ -101,7 +122,7 @@ public class ParserTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	private void assertObjFields(CommandInfo testCase, CommandInfo result){
 		
