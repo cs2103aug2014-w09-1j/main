@@ -57,7 +57,7 @@ public class MyTasksParser implements IParser {
 			} else {
 				taskDesc = removeDate(messageAndDateTime,dateTime);
 			}
-			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime, labels, updateFrom);
+			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime , null, labels, updateFrom);
 			return result;
 		}
 		return null;
