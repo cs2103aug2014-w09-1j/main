@@ -22,12 +22,14 @@ public class MyTasksParser implements IParser {
 	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
 		add(new SimpleDateFormat("dd.MM.yyyy"));
 		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-	    add(new SimpleDateFormat("dd-MMM-yyyy"));
-		
+	    add(new SimpleDateFormat("dd.MMM.yyyy"));
+		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
 	}};
+	private ArrayList<Integer> usedWords;
 	
 	//Constructor
 	public MyTasksParser() {
+		usedWords = new ArrayList<Integer>();
 	}
 	
 
@@ -44,7 +46,7 @@ public class MyTasksParser implements IParser {
 			case "search":
 			case "delete":
 				CommandInfo temp = convertStandard(withoutComdType, comdType);
-				break;
+				return temp;
 			case "undo":
 			case "redo":
 				if (words.length!=1){					//Checks if there are any extra input
@@ -72,8 +74,8 @@ public class MyTasksParser implements IParser {
 					}
 				}
 			}
-			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime , null, labels, updateFrom);*/
-			return null;
+			CommandInfo result = new CommandInfo(comdType, taskDesc, dateTime , null, labels, updateFrom);
+			return null;*/
 		}
 		return null;
 	}
@@ -84,19 +86,14 @@ public class MyTasksParser implements IParser {
 	}
 	
 	private CommandInfo convertStandard(String message, String comdType) {
-		String[] words = message.split("\\s+");
+		String[] words = message.trim().split("\\s+");
 		ArrayList<String> labels = locateLabels(words);
 		String[] withoutLabels = removeLabels(words);
-		//Find date objects
-		//Remove date terms to get description
-		//return commandinfo object
-		String[] hashtagged = splitHashtag(message);
-		String messageAndDateTime = hashtagged[0].trim();
-		Date dateTime = extractDate(words);
-		String taskDesc = null;
-		String updateFrom = null;
-		//taskDesc = removeDate(messageAndDateTime,dateTime);
-		return new CommandInfo(comdType, taskDesc, dateTime, null, labels, null);
+		DoubleDate dates = extractDate(withoutLabels);
+		Date dateFrom = dates.getDate1();
+		Date dateTo = dates.getDate2();
+		String taskDesc = removeDate(withoutLabels);
+		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels, null);
 	}
 	
 	/**
@@ -109,6 +106,8 @@ public class MyTasksParser implements IParser {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<words.length; i++){
 			String curWord = words[i];
+			System.out.println(words.length);
+			System.out.println(curWord);
 			char firstLetter = curWord.charAt(0);
 			if (firstLetter == '#'){
 				String toAdd = curWord.substring(1);
@@ -133,24 +132,22 @@ public class MyTasksParser implements IParser {
 		return result.split("\\s+");
 	}
 	
-	private String[] splitHashtag(String messageAndDateAndLabels) {
-		String[] hashtagged = messageAndDateAndLabels.split("[#]+");
-		return hashtagged;
-	}
-	
 	/**
 	 * extractDate checks if the given array of words contains a date/time that complies with the current
 	 * useable formats and returns the date object if so.
 	 * @param words arrays
 	 * @return Date(object) of the task
 	 */
-	public Date extractDate(String[] words) {
-		Date dateTime = null;
+	public DoubleDate extractDate(String[] words) {
+		Date dateTimeObj1 = null;
+		Date dateTimeObj2 = null;
 		int indexOfFrom = -1;
 		int indexOfTo = -1;
 		final int MAX_SPACING = 3;
-		int indexOfDate = -1;
+		int indexOfDate1 = -1;
+		int indexOfDate2 = -1;
 		int indexOfFormat = -1;
+		usedWords = new ArrayList<Integer>();
 		
 		//Loops to check if "from" and "to" exist in words
 		for (int i = 0; i<words.length; i++) {
@@ -171,31 +168,80 @@ public class MyTasksParser implements IParser {
 				try {
 					dateForm.setLenient(false);
 					dateForm.parse(words[i]);
-					indexOfDate = i;
+					if (indexOfDate1 == -1) {
+						indexOfDate1 = i;
+					} else {
+						indexOfDate2 = i;
+					}
 					indexOfFormat = j;
-					break;
 				} catch (ParseException e) {
 				}
 			}
-			if (dateTime == null) {
-				//TODO: do other checks for natural words such as today, next monday here. by setting
-				//indexOfDate to i
-			}
+			//TODO: do other checks for natural words such as today, next monday here. by setting
+			//indexOfDate to i
+			
 		}
 		
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
-			//TODO: add timed task handling
-		} else {
-			if (indexOfDate!=words.length-1 && indexOfDate>-1){
-				String temp = words[indexOfDate] + " " + words[indexOfDate+1];
+			if (indexOfDate2 == -1){
 				try {
-					dateTime = dateFormats.get(1).parse(temp);
+					String time1 = words[indexOfFrom+1];
+					String time2 = words[indexOfTo+1];
+					String date = words[indexOfDate1];
+					String dateTime1 = date + " " + time1;
+					String dateTime2 = date + " " + time2;
+					SimpleDateFormat dateForm = dateFormats.get(indexOfFormat+1);
+					dateForm.setLenient(false);
+					dateTimeObj1 = dateForm.parse(dateTime1);
+					dateTimeObj2 = dateForm.parse(dateTime2);
+					usedWords.add((Integer)indexOfFrom);
+					usedWords.add((Integer)indexOfTo);
+					usedWords.add((Integer)indexOfDate1);
+					usedWords.add((Integer)indexOfFrom+1);
+					usedWords.add((Integer)indexOfTo+1);
+				} catch (IndexOutOfBoundsException e) {
+					//Implying incorrect format.
+				} catch (ParseException e) {
+					System.out.println("Unexpected error1");
+				}
+			} else {
+				try {
+					String time1 = words[indexOfDate1+1];
+					String time2 = words[indexOfDate2+1];
+					String date1 = words[indexOfDate1];
+					String date2 = words[indexOfDate2];
+					String dateTime1 = date1 + " " + time1;
+					String dateTime2 = date2 + " " + time2;
+					SimpleDateFormat dateForm = dateFormats.get(indexOfFormat+1);
+					dateForm.setLenient(false);
+					dateTimeObj1 = dateForm.parse(dateTime1);
+					dateTimeObj2 = dateForm.parse(dateTime2);
+					usedWords.add((Integer)indexOfFrom);
+					usedWords.add((Integer)indexOfTo);
+					usedWords.add((Integer)indexOfDate1);
+					usedWords.add((Integer)indexOfDate2);
+					usedWords.add((Integer)indexOfDate1+1);
+					usedWords.add((Integer)indexOfDate2+1);
+				} catch (IndexOutOfBoundsException e) {
+					//Implying incorrect format.
+				} catch (ParseException e) {
+					System.out.println("Unexpected error2");
+				}
+			}
+		} else {
+			if (indexOfDate1!=words.length-1 && indexOfDate1>-1){
+				String temp = words[indexOfDate1] + " " + words[indexOfDate1+1];
+				try {
+					dateTimeObj1 = dateFormats.get(1).parse(temp);
+					usedWords.add((Integer)indexOfDate1);
+					usedWords.add((Integer)indexOfDate1+1);
 				} catch (ParseException ne) {
 					try {
 						SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
-						dateTime = dateForm.parse(words[indexOfDate]);
+						dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
+						usedWords.add((Integer)indexOfDate1);
 					} catch (ParseException e) {
-						System.out.println("Unexpected error");
+						System.out.println("Unexpected error3");
 					} catch (IndexOutOfBoundsException e) {
 						//Implying no date found
 					}
@@ -204,15 +250,16 @@ public class MyTasksParser implements IParser {
 				try {
 					SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
 					dateForm.setLenient(false);
-					dateTime = dateForm.parse(words[indexOfDate]);
+					dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
+					usedWords.add((Integer)indexOfDate1);
 				} catch (ParseException e) {
-					System.out.println("Unexpected error");
+					System.out.println("Unexpected error4");
 				} catch (IndexOutOfBoundsException e) {
 					//Implying no date found
 				}
 			}
 		}
-		return dateTime;
+		return new DoubleDate(dateTimeObj1, dateTimeObj2);
 	}
 	
 	private boolean isTimedTask(int indexFrom, int indexTo) {
@@ -221,20 +268,16 @@ public class MyTasksParser implements IParser {
 		}
 		return false;
 	}
-	/*
-	private String removeDate(String message, Date dateTime) {
-		if (dateTime==null) {
-			return message;
+	
+	private String removeDate(String[] words) {
+		String result = "";
+		for (int i = 0; i<words.length; i++) {
+			if (!usedWords.contains((Integer)i)){
+				result+=words[i] + " ";
+			}
 		}
-		String dateAndTime = dateTimeFormat.format(dateTime);
-		String temp = message.replace(dateAndTime, "");
-		String date = dateFormat.format(dateTime);
-		String temp2 = temp.replace(date,"").trim();
-		if(temp2.equals("")){
-			return null;
-		}
-		return temp2;
-	}*/
+		return result.trim();
+	}
 	
 	/**
 	 * splitLabels converts a string array that has been split by "#" into an arraylist.
@@ -262,4 +305,25 @@ public class MyTasksParser implements IParser {
 		String[] newLine = line.split(delims);
 		return newLine;
 	}
+	
+	public class DoubleDate {
+		
+		private Date mDate1;
+		private Date mDate2;
+		
+		private DoubleDate(Date date1, Date date2){
+			mDate1 = date1;
+			mDate2 = date2;
+		}
+		
+		public Date getDate1() {
+			return mDate1;
+		}
+		
+		public Date getDate2() {
+			return mDate2;
+		}
+	}
 }
+
+

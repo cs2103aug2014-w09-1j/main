@@ -29,7 +29,7 @@ public class ParserTest {
 
 	@Test
 	public void addTest() {
-		//initTestObjects();
+		initTestObjects();
 		assertObjFields(test1, tester.parseInput("add dinner"));
 		assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
 		assertObjFields(test3, tester.parseInput("add submit assignment 20.09.2014 12:00"));
@@ -40,13 +40,13 @@ public class ParserTest {
 	
 	@Test
 	public void deleteTest() {
-		//initTestObjects();
+		initTestObjects();
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
 	}
 	
 	@Test
 	public void updateTest() {
-		//initTestObjects();
+		initTestObjects();
 		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
 		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
 		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
@@ -71,42 +71,82 @@ public class ParserTest {
 	
 	@Test
 	public void extractDateTest() {
+
+		Date date1 = null;
+		Date date2 = null;
+		Date date3 = null;
+		Date date4 = null;
+		Date date5 = null;
+		Date date6 = null;
+		Date date7 = null;
+		try {
+			date1 = MyTasksParser.dateFormats.get(0).parse("23.09.2014");
+			date2 = MyTasksParser.dateFormats.get(1).parse("30.10.2014 14:00");
+			date3 = MyTasksParser.dateFormats.get(2).parse("05.Oct.2014");
+			date4 = MyTasksParser.dateFormats.get(3).parse("29.Oct.2014 14:00");
+			date5 = MyTasksParser.dateFormats.get(3).parse("29.Oct.2014 15:00");
+			date6 = MyTasksParser.dateFormats.get(1).parse("05.10.2014 11:00");
+			date7 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 01:00");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
 		String[] words = {"#hashtag", "#can", "not", "#be" ,"#anywhere"};
-		assertEquals(null, tester.extractDate(words));
+		assertEquals(null, tester.extractDate(words).getDate1());
+		
+		String[] words1 = {"#hashtag", "#can", "not", "#be" ,"23.09.2014"};
+		assertEquals(date1, tester.extractDate(words1).getDate1());
+		
+		String[] words2 = {"#hashtag", "#can", "not", "23.09.2014", "#be"};
+		assertEquals(date1, tester.extractDate(words2).getDate1());
+		
+		String[] words3 = {"30.10.2014", "14:00", "#nothing"};
+		assertEquals(date2, tester.extractDate(words3).getDate1());
+		
+		String[] words4 = {"05.10.2014", "desc"};
+		assertEquals(date3, tester.extractDate(words4).getDate1());
+		
+		String[] words5 = {"random", "29.Oct.2014", "from", "14:00", "to", "15:00"};
+		assertEquals(date4, tester.extractDate(words5).getDate1());
+		assertEquals(date5, tester.extractDate(words5).getDate2());
+		
+		String[] words6 = {"desc", "from", "05.10.2014", "11:00", "to", "06.10.2014", "01:00"};
+		assertEquals(date6, tester.extractDate(words6).getDate1());
+		assertEquals(date7, tester.extractDate(words6).getDate2());
 	}
-	/*
+	
 	private void initTestObjects() {
 		try {
 			test1 = new CommandInfo("add", "dinner", null, null, null, null);
 			
-			Date date2 = MyTasksParser.dateFormat.parse("18.09.2014");
+			Date date2 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			test2 = new CommandInfo("add", "dinner", date2, null, null, null);
 			
-			Date date3 = MyTasksParser.dateTimeFormat.parse("20.09.2014 12:00");
+			Date date3 = MyTasksParser.dateFormats.get(1).parse("20.09.2014 12:00");
 			test3 = new CommandInfo("add", "submit assignment", date3, null, null, null);
 			
 			ArrayList<String> list4 = new ArrayList<String>();
 			list4.add("cs2103");
-			Date date4 = MyTasksParser.dateFormat.parse("19.09.2014");
+			Date date4 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
 			test4 = new CommandInfo("add", "do homework", date4, null, list4, null);
 			
 			ArrayList<String> list5 = new ArrayList<String>();
 			list5.add("cs2103");
 			list5.add("urgent");
 			list5.add("gg");
-			Date date5 = MyTasksParser.dateFormat.parse("19.09.2014");
+			Date date5 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
 			test5 = new CommandInfo("add", "do homework", date5, null ,list5, null);
 			
 			ArrayList<String> list6 = new ArrayList<String>();
 			list6.add("notpossible");
-			Date date6 = MyTasksParser.dateFormat.parse("18.09.2014");
+			Date date6 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			test6 = new CommandInfo("add", "have fun!", date6, null, list6, null);
 			
 			test7 = new CommandInfo("delete", "CS2103 meeting", null, null, null, null);
 			
 			test8 = new CommandInfo("update", "CS2103 meeting", null, null, null, "meeting");
 			
-			Date date9 = MyTasksParser.dateFormat.parse("20.09.2014");
+			Date date9 = MyTasksParser.dateFormats.get(0).parse("20.09.2014");
 			test9 = new CommandInfo("update", null, date9, null, null, "meeting cs2103");
 			
 			ArrayList<String> list10 = new ArrayList<String>();
@@ -115,14 +155,14 @@ public class ParserTest {
 			
 			ArrayList<String> list11 = new ArrayList<String>();
 			list11.add("yolo");
-			Date date11 = MyTasksParser.dateFormat.parse("19.09.2014");
+			Date date11 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
 			test11 = new CommandInfo("update", "play", date11, null, list11, "meeting");
 			
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 	
 	private void assertObjFields(CommandInfo testCase, CommandInfo result){
 		
