@@ -24,18 +24,30 @@ public class ParserTest {
 	private CommandInfo test9 = null;
 	private CommandInfo test10 = null;
 	private CommandInfo test11 = null;
+	private CommandInfo test12 = null;
+	MyTasksParser tester = new MyTasksParser();
 
 	@Test
-	public void parseInputTest() {
-		MyTasksParser tester = new MyTasksParser();
+	public void addTest() {
 		initTestObjects();
 		assertObjFields(test1, tester.parseInput("add dinner"));
 		assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
 		assertObjFields(test3, tester.parseInput("add submit assignment 20.09.2014 12:00"));
 		assertObjFields(test4, tester.parseInput("add do homework 19.09.2014 #cs2103"));
 		assertObjFields(test5, tester.parseInput("add do homework 19.09.2014 #cs2103 #urgent #gg"));
-		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
+		assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12:00 to 14:00"));
+	}
+	
+	@Test
+	public void deleteTest() {
+		initTestObjects();
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
+	}
+	
+	@Test
+	public void updateTest() {
+		initTestObjects();
+		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
 		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
 		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
 		assertObjFields(test10, tester.parseInput("update meeting - #CS2103"));
