@@ -1,6 +1,5 @@
 package mytasks.parser;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,8 +16,7 @@ import mytasks.file.CommandInfo;
 public class MyTasksParser implements IParser {
 	
 	//Date and Time formats that are currently useable.
-//	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-//	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	@SuppressWarnings("serial")
 	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
 		add(new SimpleDateFormat("dd.MM.yyyy"));
 		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -54,7 +52,8 @@ public class MyTasksParser implements IParser {
 				}
 				return new CommandInfo(comdType, null, null, null, null, null);
 			case "update":
-				break;
+				CommandInfo temp2 = convertUpdate(withoutComdType, comdType);
+				return temp2;
 			default:
 				return null;
 			}
@@ -93,6 +92,9 @@ public class MyTasksParser implements IParser {
 		Date dateFrom = dates.getDate1();
 		Date dateTo = dates.getDate2();
 		String taskDesc = removeDate(withoutLabels);
+		if (taskDesc.equals("")|| taskDesc.length() == 0) { 		//Ie. no task description
+			return null;
+		}
 		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels, null);
 	}
 	
@@ -106,8 +108,6 @@ public class MyTasksParser implements IParser {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<words.length; i++){
 			String curWord = words[i];
-			System.out.println(words.length);
-			System.out.println(curWord);
 			char firstLetter = curWord.charAt(0);
 			if (firstLetter == '#'){
 				String toAdd = curWord.substring(1);
@@ -152,10 +152,10 @@ public class MyTasksParser implements IParser {
 		//Loops to check if "from" and "to" exist in words
 		for (int i = 0; i<words.length; i++) {
 			String curWord = words[i];
-			if (curWord == "from") {
+			if (curWord.equals("from")) {
 				indexOfFrom = i;
 			}
-			if (curWord == "to" && indexOfFrom>=i-MAX_SPACING && indexOfFrom!=-1) {
+			if (curWord.equals("to") && indexOfFrom>=i-MAX_SPACING && indexOfFrom!=-1) {
 				indexOfTo = i;
 				break;
 			}
@@ -178,16 +178,15 @@ public class MyTasksParser implements IParser {
 				}
 			}
 			//TODO: do other checks for natural words such as today, next monday here. by setting
-			//indexOfDate to i
+			//indexOfDate to i OR refer to below, where it indicates no time is found
 			
 		}
-		
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
 			if (indexOfDate2 == -1){
 				try {
+					String date = words[indexOfDate1];
 					String time1 = words[indexOfFrom+1];
 					String time2 = words[indexOfTo+1];
-					String date = words[indexOfDate1];
 					String dateTime1 = date + " " + time1;
 					String dateTime2 = date + " " + time2;
 					SimpleDateFormat dateForm = dateFormats.get(indexOfFormat+1);
@@ -200,7 +199,7 @@ public class MyTasksParser implements IParser {
 					usedWords.add((Integer)indexOfFrom+1);
 					usedWords.add((Integer)indexOfTo+1);
 				} catch (IndexOutOfBoundsException e) {
-					//Implying incorrect format.
+					//Implying no date/time found
 				} catch (ParseException e) {
 					System.out.println("Unexpected error1");
 				}
@@ -223,7 +222,23 @@ public class MyTasksParser implements IParser {
 					usedWords.add((Integer)indexOfDate1+1);
 					usedWords.add((Integer)indexOfDate2+1);
 				} catch (IndexOutOfBoundsException e) {
-					//Implying incorrect format.
+					//Implying no time found
+					try {
+						String date1 = words[indexOfDate1];
+						String date2 = words[indexOfDate2];
+						SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
+						dateForm.setLenient(false);
+						dateTimeObj1 = dateForm.parse(date1);
+						dateTimeObj2 = dateForm.parse(date2);
+						usedWords.add((Integer)indexOfFrom);
+						usedWords.add((Integer)indexOfTo);
+						usedWords.add((Integer)indexOfDate1);
+						usedWords.add((Integer)indexOfDate2);
+					} catch (ParseException e1) {
+						System.out.println("Unexpected error2");
+					} catch (IndexOutOfBoundsException e1) {
+						//Implying no date found
+					}
 				} catch (ParseException e) {
 					System.out.println("Unexpected error2");
 				}
@@ -279,31 +294,26 @@ public class MyTasksParser implements IParser {
 		return result.trim();
 	}
 	
-	/**
-	 * splitLabels converts a string array that has been split by "#" into an arraylist.
-	 * @param hashtagged is an array of strings that have been split by "#"
-	 * @return ArrayList<String> containing all labels
-	 */
-	private ArrayList<String> splitLabels (String[] hashtagged) {
-		if (hashtagged.length<=1) {
+	private CommandInfo convertUpdate(String message, String comdType){
+
+		String delims = "[-]+";
+		String[] messageSplit = message.split(delims);
+		if (messageSplit.length!=2) {					//Wrong format of update command
 			return null;
 		}
-		ArrayList<String> result = new ArrayList<String>();
-		for (int i = 1; i< hashtagged.length; i++){
-			if (i == hashtagged.length-1) {
-				String[] tempWords = hashtagged[i].split("\\s+");
-				result.add(tempWords[0]);
-			} else {
-				result.add(hashtagged[i].trim());
-			}
+		String toUpdateFrom = messageSplit[0].trim();
+		String remainingMessage = messageSplit[1].trim();
+		String[] words = remainingMessage.split("\\s+");
+		ArrayList<String> labels = locateLabels(words);
+		String[] withoutLabels = removeLabels(words);
+		DoubleDate dates = extractDate(withoutLabels);
+		Date dateFrom = dates.getDate1();
+		Date dateTo = dates.getDate2();
+		String taskDesc = removeDate(withoutLabels);
+		if (taskDesc.equals("") || taskDesc.length() == 0) {
+			taskDesc = null;
 		}
-		return result;
-	}
-	
-	private String[] splitMinus(String line){
-		String delims = "[-]+";
-		String[] newLine = line.split(delims);
-		return newLine;
+		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels, toUpdateFrom);
 	}
 	
 	public class DoubleDate {
@@ -325,5 +335,3 @@ public class MyTasksParser implements IParser {
 		}
 	}
 }
-
-

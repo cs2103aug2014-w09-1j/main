@@ -25,33 +25,37 @@ public class ParserTest {
 	private CommandInfo test10 = null;
 	private CommandInfo test11 = null;
 	private CommandInfo test12 = null;
+	private CommandInfo test13 = null;
+	private CommandInfo test14 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
 	public void addTest() {
-		initTestObjects();
+		initAddObjects();
 		assertObjFields(test1, tester.parseInput("add dinner"));
 		assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
 		assertObjFields(test3, tester.parseInput("add submit assignment 20.09.2014 12:00"));
 		assertObjFields(test4, tester.parseInput("add do homework 19.09.2014 #cs2103"));
 		assertObjFields(test5, tester.parseInput("add do homework 19.09.2014 #cs2103 #urgent #gg"));
-		//assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12:00 to 14:00"));
+		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
+		assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12:00 to 14:00"));
 	}
 	
 	@Test
 	public void deleteTest() {
-		initTestObjects();
+		initDeleteObjects();
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
 	}
 	
 	@Test
 	public void updateTest() {
-		initTestObjects();
-		assertObjFields(test6, tester.parseInput("add have fun! #notpossible 18.09.2014"));
+		initUpdateObjects();
 		assertObjFields(test8, tester.parseInput("update meeting - CS2103 meeting"));
 		assertObjFields(test9, tester.parseInput("update meeting cs2103 - 20.09.2014"));
 		assertObjFields(test10, tester.parseInput("update meeting - #CS2103"));
 		assertObjFields(test11, tester.parseInput("update meeting - play 19.09.2014 #yolo"));
+		assertObjFields(test13, tester.parseInput("update read book - write report from 09.Oct.2014 14:00 to 10.Oct.2014 14:00  #gg"));
+		assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
 	}
 	
 	@Test
@@ -115,7 +119,7 @@ public class ParserTest {
 		assertEquals(date7, tester.extractDate(words6).getDate2());
 	}
 	
-	private void initTestObjects() {
+	private void initAddObjects() {
 		try {
 			test1 = new CommandInfo("add", "dinner", null, null, null, null);
 			
@@ -142,8 +146,21 @@ public class ParserTest {
 			Date date6 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			test6 = new CommandInfo("add", "have fun!", date6, null, list6, null);
 			
-			test7 = new CommandInfo("delete", "CS2103 meeting", null, null, null, null);
+			Date date121 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 12:00");
+			Date date122 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 14:00");
+			test12 = new CommandInfo("add", "code for project", date121, date122, null, null);
 			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void initDeleteObjects() {
+		test7 = new CommandInfo("delete", "CS2103 meeting", null, null, null, null);
+	}
+	
+	private void initUpdateObjects() {
+		try {
 			test8 = new CommandInfo("update", "CS2103 meeting", null, null, null, "meeting");
 			
 			Date date9 = MyTasksParser.dateFormats.get(0).parse("20.09.2014");
@@ -158,7 +175,15 @@ public class ParserTest {
 			Date date11 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
 			test11 = new CommandInfo("update", "play", date11, null, list11, "meeting");
 			
+			ArrayList<String> list13 = new ArrayList<String>();
+			list13.add("gg");
+			Date date131 = MyTasksParser.dateFormats.get(1).parse("09.10.2014 14:00");
+			Date date132 = MyTasksParser.dateFormats.get(1).parse("10.10.2014 14:00");
+			test13 = new CommandInfo("update", "write report", date131, date132, list13, "read book");
 			
+			Date date141 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
+			Date date142 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			test14 = new CommandInfo("update", "wake up", date141, date142, null, "sleep");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
