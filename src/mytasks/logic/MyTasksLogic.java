@@ -10,7 +10,7 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class MyTasksLogic implements ILogic {
+public class MyTasksLogic{
 	
 	//Private variables
 	MyTasksParser mParser;

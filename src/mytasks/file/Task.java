@@ -63,11 +63,17 @@ public class Task {
 	
 	public String toString(){
 		String dateToString = "";
-		if (mDateTime != null){			
-			dateToString = dateTimeFormat.format(mDateTime);
+		if (mFromDateTime != null){			
+			dateToString = dateTimeFormat.format(mFromDateTime);
 		}
 		if (dateToString.contains("00:00")){
-			dateToString = dateFormat.format(mDateTime);
+			dateToString = dateFormat.format(mFromDateTime);
+		}
+		if (mToDateTime != null){			
+			dateToString = dateTimeFormat.format(mToDateTime);
+		}
+		if (dateToString.contains("00:00")){
+			dateToString = dateFormat.format(mToDateTime);
 		}
 		
 		String labelsToString = "";
