@@ -21,9 +21,9 @@ public class CommandInfo {
 	private String mToUpdateTaskDesc;
 	
 	//Constructor
-	public CommandInfo(String comdType, String comdDes, Date dateTime, ArrayList<String> comdLabels, String updateDesc) {
+	public CommandInfo(String comdType, String comdDes, Date fromDateTime, Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		determineCommandType(comdType);
-		Task thisTask = new Task(comdDes, dateTime, comdLabels);
+		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;
 	}
