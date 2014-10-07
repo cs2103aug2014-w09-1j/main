@@ -193,10 +193,13 @@ public class ParserTest {
 		
 		Task testCaseTask = testCase.getTask();
 		Task resultTask = result.getTask();
+		
+
 		//Assert type
 		assertEquals(testCase.getType(), result.getType());
 		
-		
+		assertEquals(testCaseTask, resultTask);
+		/*
 		//Assert task description
 		if (testCaseTask.getDescription()==null) {
 			assertEquals(null, resultTask.getDescription());
@@ -233,7 +236,7 @@ public class ParserTest {
 				//System.out.println(resultTask.getLabels().get(i));
 				assertEquals(testCaseTask.getLabels().get(i),resultTask.getLabels().get(i));
 			}
-		}
+		}*/
 		
 		//Assert update task's description
 		assertEquals(testCase.getToUpdateTaskDesc(),result.getToUpdateTaskDesc());

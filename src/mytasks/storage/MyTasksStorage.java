@@ -1,16 +1,15 @@
 package mytasks.storage;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.Paths.get;
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
@@ -34,48 +33,79 @@ public class MyTasksStorage implements IStorage {
 	 * 
 	 */
 	public ArrayList<Task> readExtMem(String fileName) {
-		//TODO fix readExtMem. 30sep14
-		//1) returns null instead of empty arraylist if file doesnt exist (introduced quickfix here)
-		//2) does not work if file already exist
-		//For junit test, may want to create external textfiles to run ur test cases.
-		//You may keep it local without pushing for now.
-		ArrayList<Task> newMemory = new ArrayList<Task>();
-		File f = new File(fileName);
-		if (!f.exists()) {
-			return newMemory;
-		}
-
-		String line = null;
+		String pastMem = null;
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(
-							fileName));
-			while ((line = bufferedReader.readLine()) != null) {
-				// saving the new description
-				String newDescription = bufferedReader.readLine();
-
-				// saving the new date and time
-				String[] newDateTimeArray = bufferedReader.readLine().split("\\s+");
-				Date newDateTime = new Date();
-				newDateTime = MyTasksParser.extractDate(newDateTimeArray);
-
-				// saving the labels
-				String[] newLabelsArray = bufferedReader.readLine().split(",");
-				ArrayList<String> newLabels = new ArrayList<String>();
-				for (int i=0; i<newLabelsArray.length; i++) {
-					newLabels.add(newLabelsArray[i]);
-				}
-
-				newMemory.add(new Task(newDescription, newDateTime, newLabels));
-				bufferedReader.readLine(); // read in the empty line
-			}
-			bufferedReader.close();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			pastMem = readString(fileName);
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		return newMemory;
+		ArrayList<Task> result = convertToTasks(pastMem);
+		return result;
+	}
+	
+	private String readString(String fileName) throws IOException {
+		File tempFile = new File(fileName);
+		String result = null;
+		if (!tempFile.exists()) {
+			return result;
+		} else {
+			result = new String(readAllBytes(get(fileName)));
+		}
+		return result;
+	}
+	
+	public ArrayList<Task> convertToTasks(String memString) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		if (memString == null) {
+			return result;
+		}
+		if (memString.length()==0) {
+			return result;
+		}
+		String delims = "[/]+";
+		String[] memBlock = memString.split(delims);
+		int noBlocks = memBlock.length;
+		int sizeBlocks = 4;
+		if (noBlocks%sizeBlocks != 0){
+			System.out.println("Corrupted data");
+			return result;
+		}
+		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
+			String taskDesc = null;
+			Date dateFrom = null;
+			Date dateTo = null;
+			ArrayList<String> labels = null;
+			for (int j = 0; j<sizeBlocks; j++) {
+				int temp = (i*sizeBlocks)+j;
+				String curBlock = memBlock[temp];
+				if (j == 0) {
+					taskDesc = curBlock;
+				} else if (j == 1) {
+					try {
+						dateFrom = MyTasksParser.dateFormats.get(1).parse(curBlock);
+					} catch (ParseException e) {
+						//Implying empty space which is null date
+					}
+				} else if (j == 2) {
+					try {
+						dateTo = MyTasksParser.dateFormats.get(1).parse(curBlock);
+					} catch (ParseException e) {
+						//Implying empty space which is null date
+					}
+				} else {
+					if (!curBlock.equals(" ")) {
+						String delims2 = "[,]+";
+						String[] indivLabels = curBlock.split(delims2);
+						ArrayList<String> tempLabels = new ArrayList<String> ();
+						for (int k = 0; k<indivLabels.length; k++) {
+							tempLabels.add(indivLabels[k]);
+						}
+						labels = tempLabels;
+					}
+				}
+			}
+			result.add(new Task(taskDesc, dateFrom, dateTo, labels));
+		}
+		return result;
 	}
 
 	/**
@@ -87,10 +117,39 @@ public class MyTasksStorage implements IStorage {
 	}
 	
 	public String determineOutput(ArrayList<Task> localMem){
+		String result = "";
 		for (int i = 0; i<localMem.size(); i++){
-			
+			Task currentTask = localMem.get(i);
+			result += currentTask.getDescription();
+			result += addBreak();
+			if (currentTask.getFromDateTime() == null){
+				result += " ";
+			} else {
+				result += MyTasksParser.dateFormats.get(1).format(currentTask.getFromDateTime());
+			}
+			result += addBreak();
+			if (currentTask.getToDateTime() == null){
+				result += " ";
+			} else {
+				result += MyTasksParser.dateFormats.get(1).format(currentTask.getToDateTime());
+			}
+			result += addBreak();
+			ArrayList<String> labels = currentTask.getLabels();
+			if (labels == null) {
+				result += " ";
+			} else {
+				for (int j = 0; j<labels.size(); j++) {
+					result += labels.get(j);
+					result += ",";
+				}
+			}
+			result += addBreak();
 		}
-		return null;
+		return result;
+	}
+	
+	private String addBreak() {
+		return "/";
 	}
 	
 	private void printOutput(String output, String fileName){
@@ -110,5 +169,4 @@ public class MyTasksStorage implements IStorage {
 		// TODO for humans to read
 		return null;
 	}
-
 }
