@@ -82,7 +82,15 @@ public class Task {
 				labelsToString += "#" + s + " ";
 			}
 		}
-		return String.format("%s %s %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
+		String result = "";
+		if (dateFromString.equals("")){
+			result = String.format("%s %s", mDescription, labelsToString);
+		} else if (dateToString.equals("")){
+			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString);
+		} else {
+			result = String.format("%s from %s to %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
+		}
+		return result;
 	}
 	
 	@Override
