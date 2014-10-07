@@ -49,6 +49,7 @@ public class LocalMemory {
 		}
 	}
 
+	
 	public void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
@@ -65,11 +66,13 @@ public class LocalMemory {
 				}
 			} 
 		}
+		
 	}	
 	
 	public void sort(Task userRequest){
 		
 	}
+	
 	
 	public void print() {
 		for(int i = 0; i < mLocalMem.size(); i++) {
@@ -89,6 +92,7 @@ public class LocalMemory {
 			}			
 		}
 	}
+	
 	
 	public boolean search(Task userRequest){
 		boolean isFound = false;

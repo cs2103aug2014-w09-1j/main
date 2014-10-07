@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
 public class LogicTest {
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
@@ -68,7 +67,7 @@ public class LogicTest {
 		//test 2
 		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
 	}
-	/*
+	
 	@Test
 	public void testSearchCommand(){
 		//test 1
@@ -82,7 +81,7 @@ public class LogicTest {
 		assertEquals("CS2103T meeting 22.09.2014 #important", outContent.toString());
 
 	}
-	*/
+	
 	
 	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1
 }
