@@ -17,7 +17,7 @@ import mytasks.storage.MyTasksStorage;
 public class LocalMemory {
 	
 	//Private variables
-	private ArrayList<Task> mLocalMem;
+	private ArrayList<Task> mLocalMem = new ArrayList<Task>();
 	private MyTasksStorage mStore;
 	
 	//Constructor
@@ -56,8 +56,11 @@ public class LocalMemory {
 				if(userUpdate.getDescription() != null) {
 					mLocalMem.get(i).setDescription(userUpdate.getDescription());	
 				}
-				if(userUpdate.getDateTime() != null) {
-					mLocalMem.get(i).setDateTime(userUpdate.getDateTime());	
+				if(userUpdate.getFromDateTime() != null) {
+					mLocalMem.get(i).setFromDateTime(userUpdate.getFromDateTime());	
+				}
+				if(userUpdate.getToDateTime() != null) {
+					mLocalMem.get(i).setToDateTime(userUpdate.getToDateTime());	
 				}
 				if(userUpdate.getLabels() != null) {
 					if(!userUpdate.getLabels().isEmpty()) {
@@ -80,8 +83,11 @@ public class LocalMemory {
 			if(mLocalMem.get(i).getDescription() != null) {
 				System.out.println(mLocalMem.get(i).getDescription());
 			}
-			if(mLocalMem.get(i).getDateTime()!= null) {
-				System.out.println(mLocalMem.get(i).getDateTime().toString());
+			if(mLocalMem.get(i).getFromDateTime()!= null) {
+				System.out.println(mLocalMem.get(i).getFromDateTime().toString());
+			}
+			if(mLocalMem.get(i).getToDateTime()!= null) {
+				System.out.println(mLocalMem.get(i).getToDateTime().toString());
 			}
 			if(mLocalMem.get(i).getLabels() != null) {
 				if(!mLocalMem.get(i).getLabels().isEmpty()) {

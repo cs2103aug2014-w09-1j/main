@@ -1,9 +1,9 @@
 package mytasks.file;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import mytasks.parser.MyTasksParser;
 
 /**
  * Task object represents a single task with all the relevant fields that is essential to a task
@@ -17,8 +17,6 @@ public class Task {
 	private Date mFromDateTime = null;
 	private Date mToDateTime = null;
 	private ArrayList<String> mLabels;
-	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-	public static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	
 	//Constructor
 	public Task(String details, Date fromDateTime, Date toDateTime, ArrayList<String> labels) {
@@ -61,13 +59,29 @@ public class Task {
 		mLabels = labels;
 	}
 	
+	@Override
 	public String toString(){
 		String dateToString = "";
+<<<<<<< HEAD
 		if (mFromDateTime != null){			
 			dateToString = dateTimeFormat.format(mFromDateTime);
 		}
 		if (dateToString.contains("00:00")){
 			dateToString = dateFormat.format(mFromDateTime);
+=======
+		String dateFromString = "";
+		if (mFromDateTime != null){			
+			dateFromString = MyTasksParser.dateFormats.get(1).format(mFromDateTime);
+		}
+		if (dateFromString.contains("00:00")){
+			dateFromString = MyTasksParser.dateFormats.get(0).format(mFromDateTime);
+		}
+		if (mToDateTime != null){			
+			dateToString = MyTasksParser.dateFormats.get(1).format(mToDateTime);
+		}
+		if (dateToString.contains("00:00")){
+			dateToString = MyTasksParser.dateFormats.get(0).format(mToDateTime);
+>>>>>>> 181d5aa7ad302143087b0deff39175f32dd1ed6a
 		}
 		
 		String labelsToString = "";
@@ -76,6 +90,85 @@ public class Task {
 				labelsToString += "#" + s + " ";
 			}
 		}
-		return String.format("%s %s %s", mDescription, dateToString, labelsToString).trim();
+		String result = "";
+		if (dateFromString.equals("")){
+			result = String.format("%s %s", mDescription, labelsToString);
+		} else if (dateToString.equals("")){
+			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString);
+		} else {
+			result = String.format("%s from %s to %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object otherTask) {
+		if (otherTask == this) {
+			return true;
+		}
+		
+		if (!(otherTask instanceof Task)) {
+			return false;
+		} else {
+			Task other = (Task)otherTask;
+			if (other.getDescription()==null){
+				if (mDescription != null) {
+					return false;
+				}
+			} else {
+				if (mDescription == null) {
+					return false;
+				}
+				if (!other.getDescription().equals(mDescription)){
+					return false;
+				}
+			}
+			
+			
+			if (other.getFromDateTime() == null){
+				if (mFromDateTime != null) {
+					return false;
+				}
+			} else {
+				if (mFromDateTime == null) {
+					return false;
+				}
+				if (!other.getFromDateTime().equals(mFromDateTime)) {
+					return false;
+				}
+			}
+			
+			if (other.getToDateTime() == null){
+				if (mToDateTime != null) {
+					return false;
+				}
+			} else {
+				if (mToDateTime == null) {
+					return false;
+				}
+				if (!other.getToDateTime().equals(mToDateTime)) {
+					return false;
+				}
+			}
+			
+			if (other.getLabels() == null) {
+				if (mLabels != null) {
+					return false;
+				}
+			} else {
+				if (mLabels == null) {
+					return false;
+				}
+				if (other.getLabels().size() != mLabels.size()) {
+					return false;
+				}
+				for(int i = 0; i<mLabels.size(); i++) {
+					if (!mLabels.get(i).equals(other.getLabels().get(i))) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 }
