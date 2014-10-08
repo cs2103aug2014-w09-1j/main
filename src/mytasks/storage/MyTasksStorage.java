@@ -23,6 +23,9 @@ import mytasks.parser.MyTasksParser;
  *
  */
 public class MyTasksStorage implements IStorage {
+	
+	private final String MESSAGE_CORPTDATA = "Corrupted data";
+	private final String MESSAGE_FILEERROR = "Error with reading existing file";
 
 	// Constructor
 	public MyTasksStorage() {
@@ -66,7 +69,7 @@ public class MyTasksStorage implements IStorage {
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks%sizeBlocks != 0){
-			System.out.println("Corrupted data");
+			System.out.println(MESSAGE_CORPTDATA);
 			return result;
 		}
 		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
@@ -158,7 +161,7 @@ public class MyTasksStorage implements IStorage {
 			writer.print(output);
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Error with reading existing file");
+			System.out.println(MESSAGE_FILEERROR);
 		}
 	}
 	

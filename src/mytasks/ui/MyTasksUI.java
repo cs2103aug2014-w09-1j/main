@@ -9,10 +9,12 @@ import javax.swing.JTextField;
 //covers text with asterix **
 import javax.swing.JPasswordField;
 import javax.swing.JOptionPane;
+
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import mytasks.file.MyTasks;
+import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogic;
 
 
@@ -29,7 +31,7 @@ public class MyTasksUI extends Frame implements ActionListener {
 	
 	public boolean isRunning;
 	private Scanner sc;
-	MyTasksLogic mLogic;
+	ILogic mLogic;
 	
 	//Constructor
 	public MyTasksUI(){

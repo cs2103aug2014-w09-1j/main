@@ -11,7 +11,7 @@ import mytasks.file.Task;
 
 import org.junit.Test;
 
-public class ParserTest {
+class ParserTest {
 	
 	private CommandInfo test1 = null;
 	private CommandInfo test2 = null;

@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
-public class LogicTest {
+class LogicTest {
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();

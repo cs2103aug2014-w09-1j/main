@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
-import mytasks.storage.MyTasksStorage;
+import mytasks.storage.IStorage;
 
 /**
  * LocalMemory holds all related task information in the current session and is only required to read and write
@@ -14,15 +14,15 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class LocalMemory {
+class LocalMemory {
 	
 	//Private variables
 	private ArrayList<Task> mLocalMem = new ArrayList<Task>();
-	private MyTasksStorage mStore;
+	private IStorage mStore;
 	
 	//Constructor
-	public LocalMemory() {
-		mStore = new MyTasksStorage();
+	public LocalMemory(IStorage store) {
+		mStore = store;
 	}
 	
 	public void loadLocalMemory() {
