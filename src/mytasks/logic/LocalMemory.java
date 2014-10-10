@@ -98,45 +98,61 @@ class LocalMemory {
 			}			
 		}
 	}
-	
-	
+
+
 	public boolean search(Task userRequest){
 		boolean isFound = false;
 
-		for (int i=0; i < mLocalMem.size(); i++){
-			if (haveDesc(userRequest, i) && haveLabels(userRequest, i)){
-				System.out.println(mLocalMem.get(i).toString());
-				isFound = true;
+		if (userRequest.getDescription() != null && userRequest.getLabels() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameDesc(userRequest, i) && haveSameLabels(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}
 			}
-		}	
+		}
+		else if (userRequest.getDescription() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameDesc(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}	
+			}
+		}
+		else if (userRequest.getLabels() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameLabels(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}	
+			}		
+		}
+		
 		return isFound;
 	}
 
-	private boolean haveDesc(Task userRequest, int index){
-		try{
-			String desc = userRequest.getDescription();
+	private boolean haveSameDesc(Task userRequest, int index){
+		String desc = userRequest.getDescription();
 
-			if (mLocalMem.get(index).getDescription().contains(desc)){
-				return true;
-			}	
-		}catch(NoSuchElementException e){
-			//TODO: what is the purpose of catch function?
+		if (mLocalMem.get(index).getDescription() != null && mLocalMem.get(index).getDescription().contains(desc)){
+			return true;
 		}
 		return false;
 	}
-	
-	//TODO: comments
-	private boolean haveLabels(Task userRequest, int index){
+
+	private boolean haveSameLabels(Task userRequest, int index){
 		String userRequestedTaskLabelsToString = "";
 		String mLocalMemTaskLabelsToString = "";
-		try{
+		
+		if (userRequest.getLabels() != null){
 			for (String s : userRequest.getLabels()){
 				userRequestedTaskLabelsToString += s; 
 			}
+		}
+		if (mLocalMem.get(index).getLabels() != null){
 			for (String s : mLocalMem.get(index).getLabels()){
 				mLocalMemTaskLabelsToString += s; 
 			}
-		}catch (NullPointerException e){
 		}
 
 		if (mLocalMemTaskLabelsToString.equals(userRequestedTaskLabelsToString)){

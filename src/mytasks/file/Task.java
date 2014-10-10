@@ -84,9 +84,9 @@ public class Task {
 		}
 		String result = "";
 		if (dateFromString.equals("")){
-			result = String.format("%s %s", mDescription, labelsToString);
+			result = String.format("%s %s ", mDescription, labelsToString).trim();
 		} else if (dateToString.equals("")){
-			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString);
+			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString).trim();
 		} else {
 			result = String.format("%s from %s to %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
 		}

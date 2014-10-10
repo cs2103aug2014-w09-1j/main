@@ -2,6 +2,7 @@ package mytasks.logic;
 
 import static org.junit.Assert.*;
 import mytasks.file.Task;
+import mytasks.parser.MyTasksParser;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,13 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Date;
 
-<<<<<<< HEAD
 public class LogicTest {
-=======
-
-class LogicTest {
->>>>>>> 641958d8ca2c8972348f90c583ae2eafb9022a40
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -25,7 +22,7 @@ class LogicTest {
 	@Test
 	public void testAddCommand() {
 		assertEquals("meeting 22.09.2014 #important added", taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-		//assertEquals("meeting 22.09.2014 #important", taskLogic.obtainPrintableOutput());
+		assertEquals("meeting on 22.09.2014 #important" + "\n", taskLogic.obtainPrintableOutput());
 	} 
 	
 	@Test
@@ -65,27 +62,21 @@ class LogicTest {
 	    System.setOut(null);
 	}
 	
-	//TODO: what is the purpose of this function?
-	private void initTestCases(){
-		//test 1
-		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
-		//test 2
-		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
-	}
-	
 	@Test
 	public void testSearchCommand(){
 		//test 1
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
-		initTestCases();
+		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
 		assertEquals("task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
-		assertEquals("CS2103T meeting 22.09.2014 #important" + "\n"
-		            + "CS2101 meeting 29.09.2014", outContent.toString());
+		assertEquals("CS2103T meeting on 22.09.2014 #important" + "\n" 
+				     + "CS2101 meeting on 29.09.2014", outContent.toString());
 		//test 2
 		assertEquals("task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
-		assertEquals("CS2103T meeting 22.09.2014 #important", outContent.toString());
+		assertEquals("CS2103T meeting on 22.09.2014 #important", outContent.toString());
 
 	}
+	
 	
 	
 	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1
