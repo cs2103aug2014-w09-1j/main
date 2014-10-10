@@ -12,7 +12,7 @@ import mytasks.file.MyTasks;
  * @author Wilson
  *
  */
-public class MemorySnapshotHandler {
+class MemorySnapshotHandler {
 	
 	private String[] currentSettings;
 	private static ArrayList<String> month = new ArrayList<String>();

@@ -62,13 +62,6 @@ public class Task {
 	@Override
 	public String toString(){
 		String dateToString = "";
-<<<<<<< HEAD
-		if (mFromDateTime != null){			
-			dateToString = dateTimeFormat.format(mFromDateTime);
-		}
-		if (dateToString.contains("00:00")){
-			dateToString = dateFormat.format(mFromDateTime);
-=======
 		String dateFromString = "";
 		if (mFromDateTime != null){			
 			dateFromString = MyTasksParser.dateFormats.get(1).format(mFromDateTime);
@@ -81,7 +74,6 @@ public class Task {
 		}
 		if (dateToString.contains("00:00")){
 			dateToString = MyTasksParser.dateFormats.get(0).format(mToDateTime);
->>>>>>> 181d5aa7ad302143087b0deff39175f32dd1ed6a
 		}
 		
 		String labelsToString = "";

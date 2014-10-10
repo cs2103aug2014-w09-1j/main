@@ -11,7 +11,7 @@ import mytasks.parser.MyTasksParser;
 
 import org.junit.Test;
 
-public class StorageTest {
+class StorageTest {
 	
 	ArrayList<Task> mem1;
 	String test1;

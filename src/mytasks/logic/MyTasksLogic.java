@@ -1,7 +1,9 @@
 package mytasks.logic;
 
 import mytasks.file.CommandInfo;
+import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
+import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
 
 /**
@@ -10,13 +12,12 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class MyTasksLogic{
+public class MyTasksLogic implements ILogic{
 	
-	//Private variables
-	MyTasksParser mParser;
-	MyTasksStorage mStorage;
-	LocalMemory mLocalMem;
-	MemorySnapshotHandler mViewHandler;
+	private IParser mParser;
+	private IStorage mStorage;
+	private LocalMemory mLocalMem;
+	private MemorySnapshotHandler mViewHandler;
 	boolean isDeveloper;
 	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
@@ -33,7 +34,7 @@ public class MyTasksLogic{
 		isDeveloper = isDev;
 		mParser = new MyTasksParser();
 		mStorage = new MyTasksStorage();
-		mLocalMem = new LocalMemory();
+		mLocalMem = new LocalMemory(mStorage);
 		if (!isDeveloper) {
 			mLocalMem.loadLocalMemory();	
 		}
@@ -143,5 +144,9 @@ public class MyTasksLogic{
 	 */
 	public String obtainPrintableOutput() {
 		return mViewHandler.getSnapshot(mLocalMem);
+	}
+	
+	public LocalMemory getMemory(){
+		return mLocalMem;
 	}
 }

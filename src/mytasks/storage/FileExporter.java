@@ -5,6 +5,6 @@ package mytasks.storage;
  * @author Wilson
  *
  */
-public class FileExporter {
+class FileExporter {
 	//TODO implement this capability later on
 }

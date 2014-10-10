@@ -32,10 +32,10 @@ public class LocalMemoryTest {
 		
 		newTask = new Task("meeting", date1, date2, labels); 
 		
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 	
 	@Test
@@ -54,10 +54,10 @@ public class LocalMemoryTest {
 		System.out.println(date1.toString());
 		newTask = new Task("meeting two", date1, date2, labels);
 		
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 	
 	@Test
@@ -77,10 +77,10 @@ public class LocalMemoryTest {
 		
 		newTask = new Task("meeting two", date1, date2, labels); 
 
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 	
 	@Test
@@ -100,10 +100,10 @@ public class LocalMemoryTest {
 		
 		newTask = new Task("meeting two", date1, date2, labels); 
 
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 	
 	@Test
@@ -123,10 +123,10 @@ public class LocalMemoryTest {
 		
 		newTask = new Task("meeting", date1, date2, labels); 
 
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 	
 	@Test
@@ -146,9 +146,9 @@ public class LocalMemoryTest {
 		
 		newTask = new Task("meeting", date1, date2, labels); 
 
-		assertEquals(newTask.getDescription(), taskLogic.mLocalMem.getLocalMem().get(0).getDescription());
-		assertEquals(newTask.getFromDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getFromDateTime());
-		assertEquals(newTask.getToDateTime(), taskLogic.mLocalMem.getLocalMem().get(0).getToDateTime());
-		assertEquals(newTask.getLabels().get(0), taskLogic.mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		assertEquals(newTask.getDescription(), taskLogic.getMemory().getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), taskLogic.getMemory().getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
 	} 
 }

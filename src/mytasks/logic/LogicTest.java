@@ -12,7 +12,12 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+<<<<<<< HEAD
 public class LogicTest {
+=======
+
+class LogicTest {
+>>>>>>> 641958d8ca2c8972348f90c583ae2eafb9022a40
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
