@@ -72,10 +72,18 @@ public class LogicTest {
 		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
 				     + "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
 		//test 2
+		outContent.reset();
 		assertEquals("task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
+		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n", outContent.toString());
+		//test 3
+		outContent.reset();
+		taskLogic.executeCommand("add important date 1.10.2014 #meeting");
+		assertEquals("task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
+		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n", outContent.toString());
+		outContent.reset();
+		assertEquals("task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
 		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
-			     + "CS2101 meeting on 29.09.2014\r\n"
-				 + "CS2103T meeting on 22.09.2014 #important\r\n", outContent.toString());
+				     + "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
 	}
 	
 	
