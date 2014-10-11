@@ -2,6 +2,8 @@ package mytasks.logic;
 
 import java.util.ArrayList;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
 import mytasks.file.MyTasks;
 
 /**
@@ -32,7 +34,7 @@ class MemorySnapshotHandler {
 		
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
 			String result = LocalMem.getLocalMem().get(i).toString();
-			snapshot+=result + "\n";
+			snapshot += result + "\n";
 		}	
 		return snapshot;
 	}	
