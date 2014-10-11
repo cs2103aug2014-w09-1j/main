@@ -1,9 +1,6 @@
 package mytasks.logic;
 
-import java.util.Date;
 import java.util.ArrayList;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
@@ -26,25 +23,21 @@ class MemorySnapshotHandler {
 	protected void setView(ArrayList<String> newSettings) {
 		currentSettings = (String[]) newSettings.toArray();
 	}
-	
+
 	/**
 	 * getSnapshot takes looks at local memory and organizes it according to currentSettings. 
 	 * @return data structure that is read and printed by UI
 	 */
-<<<<<<< HEAD
 	public String getSnapshot(LocalMemory LocalMem) {
 		/*
-=======
 	protected String getSnapshot(LocalMemory LocalMem) {
->>>>>>> 222435c3a7af96b45cf6b175012d476ae472f871
 		String snapshot = "";
-		
+
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
 			String result = LocalMem.getLocalMem().get(i).toString();
 			snapshot += result + "\n";
 		}	
 		return snapshot;
-<<<<<<< HEAD
 		 */
 
 		return sortByDate(LocalMem);
@@ -55,10 +48,10 @@ class MemorySnapshotHandler {
 
 		for (int i = 0; i < LocalMem.getLocalMem().size()-1; i++){
 			int index = i;
-
 			for (int j=i+1; j < LocalMem.getLocalMem().size(); j++){
-				if (LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
-						LocalMem.getLocalMem().get(j).getFromDateTime().compareTo(LocalMem.getLocalMem().get(i).getFromDateTime()) < 0){
+				if (LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null ||
+					LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+					LocalMem.getLocalMem().get(j).getFromDateTime().compareTo(LocalMem.getLocalMem().get(i).getFromDateTime()) < 0){
 					index = j;
 				}				
 			}
@@ -74,9 +67,6 @@ class MemorySnapshotHandler {
 		}	
 
 		return snapshot;
-	}
-	
-=======
+
 	}	
->>>>>>> 222435c3a7af96b45cf6b175012d476ae472f871
 }

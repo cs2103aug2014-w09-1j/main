@@ -96,7 +96,14 @@ public class LogicTest {
 		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
 				     + "CS2100 Midterm on 25.09.2014\n"
 				     + "CS2101 meeting on 29.09.2014\n", taskLogic.obtainPrintableOutput());
-		
+		// sort by date - test 2
+		taskLogic.executeCommand("add play badminton");
+		taskLogic.executeCommand("add medical check up 1.10.2014 13:00");
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
+			     + "CS2100 Midterm on 25.09.2014\n"
+			     + "CS2101 meeting on 29.09.2014\n"
+			     + "medical check up on 01.10.2014 13:00\n"
+			     + "play badminton\n", taskLogic.obtainPrintableOutput());
 	}
 	
 	
