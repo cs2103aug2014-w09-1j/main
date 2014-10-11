@@ -1,10 +1,12 @@
 package mytasks.logic;
 
+import java.util.Date;
 import java.util.ArrayList;
 
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 import mytasks.file.MyTasks;
+import mytasks.file.Task;
 
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
@@ -30,12 +32,42 @@ class MemorySnapshotHandler {
 	 * @return data structure that is read and printed by UI
 	 */
 	public String getSnapshot(LocalMemory LocalMem) {
+		/*
 		String snapshot = "";
 		
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
 			String result = LocalMem.getLocalMem().get(i).toString();
 			snapshot += result + "\n";
 		}	
+		return snapshot;
+		 */
+
+		return sortByDate(LocalMem);
+	}
+
+	private String sortByDate(LocalMemory LocalMem){
+		String snapshot = "";
+
+		for (int i = 0; i < LocalMem.getLocalMem().size()-1; i++){
+			int index = i;
+
+			for (int j=i+1; j < LocalMem.getLocalMem().size(); j++){
+				if (LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+						LocalMem.getLocalMem().get(j).getFromDateTime().compareTo(LocalMem.getLocalMem().get(i).getFromDateTime()) < 0){
+					index = j;
+				}				
+			}
+
+			Task temp = new Task(LocalMem.getLocalMem().get(index));
+			LocalMem.getLocalMem().get(index).setTask(LocalMem.getLocalMem().get(i));
+			LocalMem.getLocalMem().get(i).setTask(temp);			
+		}
+
+		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
+			String result = LocalMem.getLocalMem().get(i).toString();
+			snapshot += result + "\n";
+		}	
+
 		return snapshot;
 	}
 	

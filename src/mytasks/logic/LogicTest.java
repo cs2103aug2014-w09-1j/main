@@ -86,6 +86,18 @@ public class LogicTest {
 				     + "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
 	}
 	
+	@Test
+	public void testGetSnapshot(){
+		// sort by date - test 1
+		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("add CS2100 Midterm 25.09.2014");
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
+				     + "CS2100 Midterm on 25.09.2014\n"
+				     + "CS2101 meeting on 29.09.2014\n", taskLogic.obtainPrintableOutput());
+		
+	}
+	
 	
 	
 	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1
