@@ -56,7 +56,7 @@ public class MyTasksStorage implements IStorage {
 		return result;
 	}
 	
-	public ArrayList<Task> convertToTasks(String memString) {
+	protected ArrayList<Task> convertToTasks(String memString) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		if (memString == null) {
 			return result;
@@ -119,7 +119,7 @@ public class MyTasksStorage implements IStorage {
 		printOutput(output, MyTasks.DEFAULT_FILENAME);
 	}
 	
-	public String determineOutput(ArrayList<Task> localMem){
+	protected String determineOutput(ArrayList<Task> localMem){
 		String result = "";
 		for (int i = 0; i<localMem.size(); i++){
 			Task currentTask = localMem.get(i);
@@ -163,13 +163,5 @@ public class MyTasksStorage implements IStorage {
 		} catch (IOException e) {
 			System.out.println(MESSAGE_FILEERROR);
 		}
-	}
-	
-	/**
-	 * {@inheritDoc} //Does not need to be implemented in v0.1 as of yet
-	 */
-	public String exportFile(String fileName) {
-		// TODO for humans to read
-		return null;
 	}
 }

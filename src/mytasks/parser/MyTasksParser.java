@@ -104,7 +104,7 @@ public class MyTasksParser implements IParser {
 	 * @param words
 	 * @return arraylist of strings that represent labels
 	 */
-	public ArrayList<String> locateLabels(String[] words) {
+	protected ArrayList<String> locateLabels(String[] words) {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<words.length; i++){
 			String curWord = words[i];
@@ -120,7 +120,7 @@ public class MyTasksParser implements IParser {
 		return null;
 	}
 	
-	public String[] removeLabels(String[] words) {
+	protected String[] removeLabels(String[] words) {
 		String result = "";
 		for (int i = 0; i<words.length; i++){
 			String curWord = words[i];
@@ -138,7 +138,7 @@ public class MyTasksParser implements IParser {
 	 * @param words arrays
 	 * @return Date(object) of the task
 	 */
-	public DoubleDate extractDate(String[] words) {
+	protected DoubleDate extractDate(String[] words) {
 		Date dateTimeObj1 = null;
 		Date dateTimeObj2 = null;
 		int indexOfFrom = -1;
@@ -316,7 +316,7 @@ public class MyTasksParser implements IParser {
 		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels, toUpdateFrom);
 	}
 	
-	public class DoubleDate {
+	protected class DoubleDate {
 		
 		private Date mDate1;
 		private Date mDate2;

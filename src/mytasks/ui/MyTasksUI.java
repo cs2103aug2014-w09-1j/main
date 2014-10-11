@@ -29,9 +29,9 @@ public class MyTasksUI extends Frame implements ActionListener {
 	private JTextField commandInput;
 	
 	
-	public boolean isRunning;
+	private boolean isRunning;
 	private Scanner sc;
-	ILogic mLogic;
+	private ILogic mLogic;
 	
 	//Constructor
 	public MyTasksUI(){
@@ -104,9 +104,11 @@ public class MyTasksUI extends Frame implements ActionListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * printToUI updates the UI of both feedback from actions performed, as well as the up-to-date
+	 * tasks that are recorded
+	 * @param feedback
 	 */
-	public void printToUI(String feedback) {
+	private void printToUI(String feedback) {
 		System.out.print(mLogic.obtainPrintableOutput());
 		if (feedback!=null){
 			System.out.println(feedback);

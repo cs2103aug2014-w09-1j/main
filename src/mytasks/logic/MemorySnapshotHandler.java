@@ -15,11 +15,11 @@ class MemorySnapshotHandler {
 	private String[] currentSettings;
 	
 	//Constructor
-	public MemorySnapshotHandler() {
+	protected MemorySnapshotHandler() {
 		currentSettings = MyTasks.DEFAULT_VIEW;
 	}
 	
-	public void setView(ArrayList<String> newSettings) {
+	protected void setView(ArrayList<String> newSettings) {
 		currentSettings = (String[]) newSettings.toArray();
 	}
 	
@@ -27,7 +27,7 @@ class MemorySnapshotHandler {
 	 * getSnapshot takes looks at local memory and organizes it according to currentSettings. 
 	 * @return data structure that is read and printed by UI
 	 */
-	public String getSnapshot(LocalMemory LocalMem) {
+	protected String getSnapshot(LocalMemory LocalMem) {
 		String snapshot = "";
 		
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
@@ -35,6 +35,5 @@ class MemorySnapshotHandler {
 			snapshot+=result + "\n";
 		}	
 		return snapshot;
-	}
-	
+	}	
 }
