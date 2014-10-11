@@ -14,11 +14,12 @@ import mytasks.storage.MyTasksStorage;
 
 public class MyTasksLogic implements ILogic{
 	
+	//Private variables
 	private IParser mParser;
 	private IStorage mStorage;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
-	boolean isDeveloper;
+	private boolean isDeveloper;
 	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
 	
@@ -92,7 +93,7 @@ public class MyTasksLogic implements ILogic{
 		}
 	}
 
-	private static String removeFirstWord(String input) {
+	private String removeFirstWord(String input) {
 		int i = input.indexOf(' ');
 		return input.substring(i).trim();
 	}
@@ -106,9 +107,6 @@ public class MyTasksLogic implements ILogic{
 	}
 
 	private void updateCommand(CommandInfo commandObject) {
-		//TODO fix update command 30Sep14. Refer to v0.1 for official syntax. Remember, task2 (in ur syntax)
-		// can be non existent BUT that does not mean that i want to make task1 null. I simply just want
-		// to add labels/dates
 		mLocalMem.update(commandObject.getToUpdateTaskDesc(), commandObject.getTask());
 	}
 
@@ -134,7 +132,7 @@ public class MyTasksLogic implements ILogic{
 	 * @param userInput
 	 * @return CommandType object that contains the relevant fields
 	 */
-	public CommandInfo parseInput(String userInput) {
+	private CommandInfo parseInput(String userInput) {
 		CommandInfo input = mParser.parseInput(userInput);
 		return input;
 	}
@@ -146,7 +144,7 @@ public class MyTasksLogic implements ILogic{
 		return mViewHandler.getSnapshot(mLocalMem);
 	}
 	
-	public LocalMemory getMemory(){
+	protected LocalMemory getMemory(){
 		return mLocalMem;
 	}
 }

@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
 public class LogicTest {
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);

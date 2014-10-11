@@ -21,27 +21,27 @@ class LocalMemory {
 	private IStorage mStore;
 	
 	//Constructor
-	public LocalMemory(IStorage store) {
+	protected LocalMemory(IStorage store) {
 		mStore = store;
 	}
 	
-	public void loadLocalMemory() {
+	protected void loadLocalMemory() {
 		mLocalMem = mStore.readExtMem(MyTasks.DEFAULT_FILENAME);
 	}
 	
-	public void saveLocalMemory() {
+	protected void saveLocalMemory() {
 		mStore.writeExtMem(mLocalMem);
 	}
 	
-	public ArrayList<Task> getLocalMem() {
+	protected ArrayList<Task> getLocalMem() {
 		return mLocalMem;
 	}
 	
-	public void add(Task userRequest) {
+	protected void add(Task userRequest) {
 		mLocalMem.add(userRequest);
 	}
 	
-	public void remove(Task userRequest) {
+	protected void remove(Task userRequest) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
 				mLocalMem.remove(i);
@@ -49,8 +49,7 @@ class LocalMemory {
 		}
 	}
 
-	
-	public void update(String mToUpdateTaskDesc, Task userUpdate) {
+	protected void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
 				if(userUpdate.getDescription() != null) {
@@ -72,12 +71,11 @@ class LocalMemory {
 		
 	}	
 	
-	public void sort(Task userRequest){
+	protected void sort(Task userRequest){
 		
 	}
 	
-	
-	public void print() {
+	protected void print() {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			System.out.println("i: " + i);
 			if(mLocalMem.get(i).getDescription() != null) {
@@ -100,7 +98,7 @@ class LocalMemory {
 	}
 
 
-	public boolean search(Task userRequest){
+	protected boolean search(Task userRequest){
 		boolean isFound = false;
 		
 		if (userRequest.getDescription() != null && userRequest.getLabels() != null){
