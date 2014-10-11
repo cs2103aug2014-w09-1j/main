@@ -15,7 +15,6 @@ import mytasks.file.MyTasks;
 class MemorySnapshotHandler {
 	
 	private String[] currentSettings;
-	private static ArrayList<String> month = new ArrayList<String>();
 	
 	//Constructor
 	public MemorySnapshotHandler() {

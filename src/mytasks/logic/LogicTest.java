@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
+
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
@@ -12,13 +13,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Date;
 
 public class LogicTest {
 	
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-	
+
 	@Test
 	public void testAddCommand() {
 		assertEquals("meeting 22.09.2014 #important added", taskLogic.executeCommand("add meeting 22.09.2014 #important"));
@@ -53,7 +53,7 @@ public class LogicTest {
 	}	
 	
 	@Before
-	public void setUpStreams() {
+	public void setUpStreams(){
 	    System.setOut(new PrintStream(outContent));
 	}
 
@@ -61,7 +61,7 @@ public class LogicTest {
 	public void cleanUpStreams() {
 	    System.setOut(null);
 	}
-	
+;
 	@Test
 	public void testSearchCommand(){
 		//test 1
@@ -69,12 +69,13 @@ public class LogicTest {
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
 		assertEquals("task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important" + "\n" 
-				     + "CS2101 meeting on 29.09.2014", outContent.toString());
+		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
+				     + "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
 		//test 2
 		assertEquals("task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important", outContent.toString());
-
+		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
+			     + "CS2101 meeting on 29.09.2014\r\n"
+				 + "CS2103T meeting on 22.09.2014 #important\r\n", outContent.toString());
 	}
 	
 	

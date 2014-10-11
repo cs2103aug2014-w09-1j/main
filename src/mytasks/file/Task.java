@@ -79,18 +79,18 @@ public class Task {
 		String labelsToString = "";
 		if (mLabels!= null) {
 			for (String s : mLabels){
-				labelsToString += "#" + s + " ";
+				labelsToString += " " + "#" + s;
 			}
 		}
 		String result = "";
 		if (dateFromString.equals("")){
-			result = String.format("%s %s ", mDescription, labelsToString).trim();
+			result = String.format("%s%s ", mDescription, labelsToString);
 		} else if (dateToString.equals("")){
-			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString).trim();
+			result = String.format("%s on %s%s", mDescription, dateFromString, labelsToString);
 		} else {
-			result = String.format("%s from %s to %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
+			result = String.format("%s from %s to %s%s", mDescription, dateFromString, dateToString, labelsToString);
 		}
-		return result;
+		return result.trim();
 	}
 	
 	@Override

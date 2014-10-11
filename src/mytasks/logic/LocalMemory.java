@@ -102,7 +102,7 @@ class LocalMemory {
 
 	public boolean search(Task userRequest){
 		boolean isFound = false;
-
+		
 		if (userRequest.getDescription() != null && userRequest.getLabels() != null){
 			for (int i=0; i < mLocalMem.size(); i++){
 				if (haveSameDesc(userRequest, i) && haveSameLabels(userRequest, i)){
