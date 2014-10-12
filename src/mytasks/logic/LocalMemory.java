@@ -1,8 +1,6 @@
 package mytasks.logic;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
-
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.storage.IStorage;
@@ -68,10 +66,6 @@ class LocalMemory {
 				}
 			} 
 		}
-		
-	}	
-	
-	protected void sort(Task userRequest){
 		
 	}
 	

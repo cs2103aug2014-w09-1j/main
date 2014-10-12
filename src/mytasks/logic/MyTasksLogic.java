@@ -136,7 +136,7 @@ public class MyTasksLogic implements ILogic{
 		CommandInfo input = mParser.parseInput(userInput);
 		return input;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
