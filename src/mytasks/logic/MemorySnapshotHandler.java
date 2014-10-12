@@ -45,28 +45,35 @@ class MemorySnapshotHandler {
 	}
 
 	private String sortByDate(LocalMemory LocalMem){
-		ArrayList<Task> s = new ArrayList<Task>();
-		s.addAll(Collections.nCopies(LocalMem.getLocalMem().size(), new Task(null, null, null, null)));
+		ArrayList<Task> snapshotList = new ArrayList<Task>();
+		snapshotList.addAll(Collections.nCopies(LocalMem.getLocalMem().size(), new Task(null, null, null, null)));
 
 		for (int i = 0; i < LocalMem.getLocalMem().size(); i++){
-			int smaller = 0;
+			int rank = 0;
 			for (int j = 0; j < LocalMem.getLocalMem().size(); j++){
-				if ((LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null) ||
-						(LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
-						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) > 0)){
-					smaller++;
+				if ((LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null) 
+						|| LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) > 0
+						|| LocalMem.getLocalMem().get(i).getFromDateTime() != null && LocalMem.getLocalMem().get(j).getFromDateTime() != null &&
+						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) == 0 && 
+						LocalMem.getLocalMem().get(i).getToDateTime() != null && LocalMem.getLocalMem().get(j).getToDateTime() != null &&
+						LocalMem.getLocalMem().get(i).getToDateTime().compareTo(LocalMem.getLocalMem().get(j).getToDateTime()) > 0
+						|| LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+					    LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) == 0 &&
+					    LocalMem.getLocalMem().get(i).getToDateTime() == null && LocalMem.getLocalMem().get(j).getToDateTime() == null && i > j){
+					rank++;
 				}
 			}
-			s.set(smaller, LocalMem.getLocalMem().get(i));
+			
+			snapshotList.set(rank, LocalMem.getLocalMem().get(i));
 		}
-		return convertSnapshotToString(s);
+		return convertSnapshotToString(snapshotList);
 	}
 
-
-	private String convertSnapshotToString(ArrayList<Task> s){
+	private String convertSnapshotToString(ArrayList<Task> snapshotList){
 		String snapshot = "";
-		for (int i=0; i < s.size(); i++){
-			String result = s.get(i).toString();
+		for (int i=0; i < snapshotList.size(); i++){
+			String result = snapshotList.get(i).toString();
 			snapshot += result + "\n";
 		}	
 		return snapshot;

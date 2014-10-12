@@ -107,8 +107,10 @@ public class LogicTest {
 		// sort by date - test 3
 		taskLogic.executeCommand("add pay acceptance fee from 28.09.2014 to 8.10.2014");
 		taskLogic.executeCommand("add do PS4 from 28.09.2014 to 5.10.2014");
+		taskLogic.executeCommand("add MA1101R Midterm 25.09.2014");
 		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
 			     + "CS2100 Midterm on 25.09.2014\n"
+				 + "MA1101R Midterm on 25.09.2014\n"
 				 + "do PS4 from 28.09.2014 to 05.10.2014\n"
 			     + "pay acceptance fee from 28.09.2014 to 08.10.2014\n"
 			     + "CS2101 meeting on 29.09.2014\n"
