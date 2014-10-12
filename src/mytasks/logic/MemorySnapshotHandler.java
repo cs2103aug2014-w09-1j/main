@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
@@ -30,7 +31,7 @@ class MemorySnapshotHandler {
 	 */
 	public String getSnapshot(LocalMemory LocalMem) {
 		/*
-	protected String getSnapshot(LocalMemory LocalMem) {
+	    protected String getSnapshot(LocalMemory LocalMem) {
 		String snapshot = "";
 
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
@@ -44,29 +45,31 @@ class MemorySnapshotHandler {
 	}
 
 	private String sortByDate(LocalMemory LocalMem){
-		String snapshot = "";
+		ArrayList<Task> s = new ArrayList<Task>();
+		s.addAll(Collections.nCopies(LocalMem.getLocalMem().size(), new Task(null, null, null, null)));
 
-		for (int i = 0; i < LocalMem.getLocalMem().size()-1; i++){
-			int index = i;
-			for (int j=i+1; j < LocalMem.getLocalMem().size(); j++){
-				if (LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null ||
-					LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
-					LocalMem.getLocalMem().get(j).getFromDateTime().compareTo(LocalMem.getLocalMem().get(i).getFromDateTime()) < 0){
-					index = j;
-				}				
+		for (int i = 0; i < LocalMem.getLocalMem().size(); i++){
+			int smaller = 0;
+			for (int j = 0; j < LocalMem.getLocalMem().size(); j++){
+				if ((LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null) ||
+						(LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) > 0)){
+					smaller++;
+				}
 			}
-
-			Task temp = new Task(LocalMem.getLocalMem().get(index));
-			LocalMem.getLocalMem().get(index).setTask(LocalMem.getLocalMem().get(i));
-			LocalMem.getLocalMem().get(i).setTask(temp);			
+			s.set(smaller, LocalMem.getLocalMem().get(i));
 		}
+		return convertSnapshotToString(s);
+	}
 
-		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
-			String result = LocalMem.getLocalMem().get(i).toString();
+
+	private String convertSnapshotToString(ArrayList<Task> s){
+		String snapshot = "";
+		for (int i=0; i < s.size(); i++){
+			String result = s.get(i).toString();
 			snapshot += result + "\n";
 		}	
-
 		return snapshot;
+	}
 
-	}	
 }
