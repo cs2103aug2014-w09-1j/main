@@ -52,13 +52,14 @@ class MemorySnapshotHandler {
 			int rank = 0;
 			for (int j = 0; j < LocalMem.getLocalMem().size(); j++){
 				if ((LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() != null) 
-						|| LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+						|| LocalMem.getLocalMem().get(i).getFromDateTime() == null && LocalMem.getLocalMem().get(j).getFromDateTime() == null && i > j
+						|| LocalMem.getLocalMem().get(i).getFromDateTime() != null && LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
 						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) > 0
 						|| LocalMem.getLocalMem().get(i).getFromDateTime() != null && LocalMem.getLocalMem().get(j).getFromDateTime() != null &&
 						LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) == 0 && 
 						LocalMem.getLocalMem().get(i).getToDateTime() != null && LocalMem.getLocalMem().get(j).getToDateTime() != null &&
 						LocalMem.getLocalMem().get(i).getToDateTime().compareTo(LocalMem.getLocalMem().get(j).getToDateTime()) > 0
-						|| LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
+						|| LocalMem.getLocalMem().get(i).getFromDateTime() != null && LocalMem.getLocalMem().get(j).getFromDateTime() != null && 
 					    LocalMem.getLocalMem().get(i).getFromDateTime().compareTo(LocalMem.getLocalMem().get(j).getFromDateTime()) == 0 &&
 					    LocalMem.getLocalMem().get(i).getToDateTime() == null && LocalMem.getLocalMem().get(j).getToDateTime() == null && i > j){
 					rank++;
