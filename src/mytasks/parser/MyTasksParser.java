@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import mytasks.file.CommandInfo;
 import mytasks.file.Logger;
+import mytasks.logic.Command;
+import mytasks.logic.RedoCommand;
+import mytasks.logic.UndoCommand;
 
 /**
  * MyTasksParser interprets userinput to useable data structures to work with in
@@ -38,7 +40,7 @@ public class MyTasksParser implements IParser {
 	/**
 	 * {@inheritDoc}
 	 */
-	public CommandInfo parseInput(String input) {
+	public Command parseInput(String input) {
 		String[] words = input.split("\\s+");
 		if (words.length != 0) {
 			String comdType = words[0];
@@ -47,16 +49,20 @@ public class MyTasksParser implements IParser {
 			case "add":
 			case "search":
 			case "delete":
-				CommandInfo temp = convertStandard(withoutComdType, comdType);
+				Command temp = convertStandard(withoutComdType, comdType);
 				return temp;
 			case "undo":
+				if (words.length != 1) { // Checks if there are any extra input
+					return null;
+				}
+				return new UndoCommand(comdType, null, null, null, null, null);
 			case "redo":
 				if (words.length != 1) { // Checks if there are any extra input
 					return null;
 				}
-				return new CommandInfo(comdType, null, null, null, null, null);
+				return new RedoCommand(comdType, null, null, null, null, null);
 			case "update":
-				CommandInfo temp2 = convertUpdate(withoutComdType, comdType);
+				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
 			default:
 				return null;
@@ -79,7 +85,7 @@ public class MyTasksParser implements IParser {
 	 * @param comdType
 	 * @return
 	 */
-	private CommandInfo convertStandard(String message, String comdType) {
+	private Command convertStandard(String message, String comdType) {
 		String[] words = message.trim().split("\\s+");
 		ArrayList<String> labels = locateLabels(words);
 		String[] withoutLabels = removeLabels(words);
@@ -91,7 +97,7 @@ public class MyTasksParser implements IParser {
 																// description
 			return null;
 		}
-		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels,
+		return new Command(comdType, taskDesc, dateFrom, dateTo, labels,
 				null);
 	}
 
@@ -398,7 +404,7 @@ public class MyTasksParser implements IParser {
 	 * @param comdType
 	 * @return CommandInfo
 	 */
-	private CommandInfo convertUpdate(String message, String comdType) {
+	private Command convertUpdate(String message, String comdType) {
 
 		String delims = "[-]+";
 		String[] messageSplit = message.split(delims);
@@ -417,7 +423,7 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
 		}
-		return new CommandInfo(comdType, taskDesc, dateFrom, dateTo, labels,
+		return new Command(comdType, taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
 	}
 
