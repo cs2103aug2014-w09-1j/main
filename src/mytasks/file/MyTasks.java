@@ -18,10 +18,12 @@ public class MyTasks {
 	
 	//Constructor
 	public MyTasks(){
-		MyTasksUI uiCompo = new MyTasksUI();  //Creates ui. Ui will run in its constructor
+		//MyTasksUI uiCompo = new MyTasksUI();  //Creates ui. Ui will run in its constructor
 	}
 	
 	public static void main(String[] args){
 		MyTasks runningProgram = new MyTasks();	
+		MyTasksUI uiCompo = new MyTasksUI();
+		uiCompo.run();
 	}
 }
