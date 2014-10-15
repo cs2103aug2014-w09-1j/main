@@ -26,6 +26,13 @@ public class Task {
 		mLabels = labels;
 	}
 	
+	public Task(Task newTask){
+		mDescription = newTask.getDescription();
+		mFromDateTime = newTask.getFromDateTime();
+		mToDateTime = newTask.getToDateTime();
+		mLabels = newTask.getLabels();
+	}
+	
 	public String getDescription() {
 		return mDescription;
 	}
@@ -57,6 +64,13 @@ public class Task {
 	public void setLabels(ArrayList<String> labels) {
 		mLabels = new ArrayList<String>(); // for resetting after every update
 		mLabels = labels;
+	}
+	
+	public void setTask(Task newTask){
+		setDescription(newTask.getDescription());
+		setFromDateTime(newTask.getFromDateTime());
+		setToDateTime(newTask.getToDateTime());
+		setLabels(newTask.getLabels());
 	}
 	
 	@Override
