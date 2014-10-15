@@ -23,6 +23,9 @@ public class MyTasksLogic implements ILogic{
 	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
 	
+	//TODO: introduce get Instance to all classes. This included. Read notes/google this
+	//Difference between creating a public getInstance for checking yourself, 
+	//and getinstance for your member variables 
 	//Constructor
 	public MyTasksLogic(boolean isDeveloper){
 		initLogic(isDeveloper);
