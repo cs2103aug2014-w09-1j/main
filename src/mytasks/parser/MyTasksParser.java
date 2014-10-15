@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import mytasks.file.CommandInfo;
+import mytasks.file.Logger;
 
 /**
  * MyTasksParser interprets userinput to useable data structures to work with in
@@ -68,7 +69,16 @@ public class MyTasksParser implements IParser {
 		String messageAndDateAndLabels = input.substring(comdType.length());
 		return messageAndDateAndLabels;
 	}
-
+	
+	/**
+	 * convertStandard parses the parameters and returns the corresponding 
+	 * CommandInfo object. This is only used for standard command types 
+	 * that are not update
+	 * 
+	 * @param message
+	 * @param comdType
+	 * @return
+	 */
 	private CommandInfo convertStandard(String message, String comdType) {
 		String[] words = message.trim().split("\\s+");
 		ArrayList<String> labels = locateLabels(words);
@@ -121,17 +131,18 @@ public class MyTasksParser implements IParser {
 		return result.split("\\s+");
 	}
 
-	// TODO: remove all incorrect usage of exception handling
 	/**
 	 * extractDate checks if the given array of words contains a date/time that
 	 * complies with the current useable formats and returns the date object if
 	 * so.
 	 * 
-	 * @param words arrays
+	 * @param words
+	 *            arrays
 	 * @return DoubleDate(object) of the task
 	 */
 	protected DoubleDate extractDate(String[] words) {
-		//Reinitialize usedWords because it should be empty for a new function call.
+		// Reinitialize usedWords because it should be empty for a new function
+		// call.
 		usedWords = new ArrayList<Integer>();
 
 		int[] indexFromTo = checkFromAndTo(words);
@@ -146,11 +157,11 @@ public class MyTasksParser implements IParser {
 		DoubleDate result = null;
 
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
-			result = handleTimedTask(words, indexOfDate1,
-					indexOfDate2, indexOfFrom, indexOfTo, indexOfFormat);
+			result = handleTimedTask(words, indexOfDate1, indexOfDate2,
+					indexOfFrom, indexOfTo, indexOfFormat);
 		} else {
-			result = handleUntimedTask( words, indexOfDate1,
-					indexOfDate2, indexOfFrom, indexOfTo, indexOfFormat);
+			result = handleUntimedTask(words, indexOfDate1, indexOfDate2,
+					indexOfFrom, indexOfTo, indexOfFormat);
 		}
 		return result;
 	}
@@ -217,10 +228,25 @@ public class MyTasksParser implements IParser {
 		return result;
 	}
 
+	/**
+	 * handleTimedTask uses the variables provided to parse a word array into
+	 * the corresponding two date objects. usedWords is also updated here to
+	 * that it can be used later for removal of all date related words
+	 * individual date objects are null when no date(s) are found
+	 * 
+	 * @param words
+	 * @param indexOfDate1
+	 * @param indexOfDate2
+	 * @param indexOfFrom
+	 * @param indexOfTo
+	 * @param indexOfFormat
+	 * @return DoubleDate object representing DateFrom and DateTo respectively
+	 */
 	private DoubleDate handleTimedTask(String[] words, int indexOfDate1,
 			int indexOfDate2, int indexOfFrom, int indexOfTo, int indexOfFormat) {
 		Date dateTimeObj1 = null;
 		Date dateTimeObj2 = null;
+		boolean noTime = false;
 		if (indexOfDate2 == -1) {
 			try {
 				String date = words[indexOfDate1];
@@ -238,9 +264,11 @@ public class MyTasksParser implements IParser {
 				usedWords.add((Integer) indexOfFrom + 1);
 				usedWords.add((Integer) indexOfTo + 1);
 			} catch (IndexOutOfBoundsException e) {
-				// Implying no date/time found
+				Logger logger = Logger.getInstance();
+				logger.log("Parser: Unexpected error: No time found after 'to'");
 			} catch (ParseException e) {
-				System.out.println("Unexpected error1");
+				Logger logger = Logger.getInstance();
+				logger.log("Parser: Unexpected error: Invalid indexes");
 			}
 		} else {
 			try {
@@ -261,7 +289,12 @@ public class MyTasksParser implements IParser {
 				usedWords.add((Integer) indexOfDate1 + 1);
 				usedWords.add((Integer) indexOfDate2 + 1);
 			} catch (IndexOutOfBoundsException e) {
-				// Implying no time found
+				noTime = true;
+			} catch (ParseException e) {
+				Logger logger = Logger.getInstance();
+				logger.log("Parser: Unexpected error: Invalid indexes");
+			}
+			if (noTime) {
 				try {
 					String date1 = words[indexOfDate1];
 					String date2 = words[indexOfDate2];
@@ -274,39 +307,43 @@ public class MyTasksParser implements IParser {
 					usedWords.add((Integer) indexOfDate1);
 					usedWords.add((Integer) indexOfDate2);
 				} catch (ParseException e1) {
-					System.out.println("Unexpected error2");
+					Logger logger = Logger.getInstance();
+					logger.log("Parser: Unexpected error: Invalid indexes");
 				} catch (IndexOutOfBoundsException e1) {
-					// Implying no date found
+					Logger logger = Logger.getInstance();
+					logger.log("Parser: Unexpected error: No date/time found after 'to'");
 				}
-			} catch (ParseException e) {
-				System.out.println("Unexpected error2");
 			}
 		}
 		return new DoubleDate(dateTimeObj1, dateTimeObj2);
 	}
-	
+
+	/**
+	 * handleUntimedTask uses the variables provided to parse a word array into
+	 * the corresponding date object. usedWords is also updated here to that it
+	 * can be used later for removal of all date related words individual date
+	 * objects are null when no date(s) are found
+	 * 
+	 * @param words
+	 * @param indexOfDate1
+	 * @param indexOfDate2
+	 * @param indexOfFrom
+	 * @param indexOfTo
+	 * @param indexOfFormat
+	 * @return DoubleDate object representing DateFrom and DateTo respectively
+	 */
 	private DoubleDate handleUntimedTask(String[] words, int indexOfDate1,
 			int indexOfDate2, int indexOfFrom, int indexOfTo, int indexOfFormat) {
 		Date dateTimeObj1 = null;
-		Date dateTimeObj2 = null;
+		boolean noTime = false;
 		if (indexOfDate1 != words.length - 1 && indexOfDate1 > -1) {
-			String temp = words[indexOfDate1] + " "
-					+ words[indexOfDate1 + 1];
+			String temp = words[indexOfDate1] + " " + words[indexOfDate1 + 1];
 			try {
 				dateTimeObj1 = dateFormats.get(1).parse(temp);
 				usedWords.add((Integer) indexOfDate1);
 				usedWords.add((Integer) indexOfDate1 + 1);
 			} catch (ParseException ne) {
-				try {
-					SimpleDateFormat dateForm = dateFormats
-							.get(indexOfFormat);
-					dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
-					usedWords.add((Integer) indexOfDate1);
-				} catch (ParseException e) {
-					System.out.println("Unexpected error3");
-				} catch (IndexOutOfBoundsException e) {
-					// Implying no date found
-				}
+				noTime = true;
 			}
 		} else {
 			try {
@@ -315,12 +352,25 @@ public class MyTasksParser implements IParser {
 				dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
 				usedWords.add((Integer) indexOfDate1);
 			} catch (ParseException e) {
-				System.out.println("Unexpected error4");
+				Logger logger = Logger.getInstance();
+				logger.log("Parser: Unexpected error: Invalid indexes");
 			} catch (IndexOutOfBoundsException e) {
-				// Implying no date found
+				// Implying no date found and should return null objects
 			}
 		}
-		return new DoubleDate(dateTimeObj1, dateTimeObj2);
+		if (noTime){
+			try {
+				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
+				dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
+				usedWords.add((Integer) indexOfDate1);
+			} catch (ParseException e) {
+				Logger logger = Logger.getInstance();
+				logger.log("Parser: Unexpected error: Invalid indexes");
+			} catch (IndexOutOfBoundsException e) {
+				// Implying no date found and should return null objects
+			}
+		}
+		return new DoubleDate(dateTimeObj1, null);
 	}
 
 	private boolean isTimedTask(int indexFrom, int indexTo) {
@@ -339,7 +389,15 @@ public class MyTasksParser implements IParser {
 		}
 		return result.trim();
 	}
-
+	
+	/**
+	 * convertUpdate returns a commandInfo object representing the input strings.
+	 * This is only used when update is the comdType
+	 * 
+	 * @param message
+	 * @param comdType
+	 * @return CommandInfo
+	 */
 	private CommandInfo convertUpdate(String message, String comdType) {
 
 		String delims = "[-]+";
