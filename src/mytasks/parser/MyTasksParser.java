@@ -7,9 +7,13 @@ import java.util.Date;
 import java.util.List;
 
 import mytasks.file.Logger;
+import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
+import mytasks.logic.DeleteCommand;
 import mytasks.logic.RedoCommand;
+import mytasks.logic.SearchCommand;
 import mytasks.logic.UndoCommand;
+import mytasks.logic.UpdateCommand;
 
 /**
  * MyTasksParser interprets userinput to useable data structures to work with in
@@ -64,6 +68,9 @@ public class MyTasksParser implements IParser {
 			case "update":
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
+			case "sort":
+				//TODO: implement this
+				break;
 			default:
 				return null;
 			}
@@ -93,12 +100,21 @@ public class MyTasksParser implements IParser {
 		Date dateFrom = dates.getDate1();
 		Date dateTo = dates.getDate2();
 		String taskDesc = removeDate(withoutLabels);
-		if (taskDesc.equals("") || taskDesc.length() == 0) { // Ie. no task
-																// description
+		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			return null;
 		}
-		return new Command(comdType, taskDesc, dateFrom, dateTo, labels,
+		switch(comdType) {
+		case "add":
+			return new AddCommand(comdType, taskDesc, dateFrom, dateTo, labels,
 				null);
+		case "search":
+			return new SearchCommand(comdType, taskDesc, dateFrom, dateTo, labels,
+					null);
+		case "delete":
+			return new DeleteCommand(comdType, taskDesc, dateFrom, dateTo, labels,
+					null);
+		}
+		return null;
 	}
 
 	/**
@@ -423,7 +439,7 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
 		}
-		return new Command(comdType, taskDesc, dateFrom, dateTo, labels,
+		return new UpdateCommand(comdType, taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
 	}
 
