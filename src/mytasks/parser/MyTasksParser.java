@@ -12,6 +12,7 @@ import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
+import mytasks.logic.SortCommand;
 import mytasks.logic.UndoCommand;
 import mytasks.logic.UpdateCommand;
 
@@ -69,8 +70,8 @@ public class MyTasksParser implements IParser {
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
 			case "sort":
-				//TODO: implement this
-				break;
+				Command temp3 = convertSort(withoutComdType, comdType);
+				return temp3;
 			default:
 				return null;
 			}
@@ -82,11 +83,11 @@ public class MyTasksParser implements IParser {
 		String messageAndDateAndLabels = input.substring(comdType.length());
 		return messageAndDateAndLabels;
 	}
-	
+
 	/**
-	 * convertStandard parses the parameters and returns the corresponding 
-	 * CommandInfo object. This is only used for standard command types 
-	 * that are not update
+	 * convertStandard parses the parameters and returns the corresponding
+	 * CommandInfo object. This is only used for standard command types that are
+	 * not update
 	 * 
 	 * @param message
 	 * @param comdType
@@ -103,16 +104,16 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			return null;
 		}
-		switch(comdType) {
+		switch (comdType) {
 		case "add":
 			return new AddCommand(comdType, taskDesc, dateFrom, dateTo, labels,
-				null);
+					null);
 		case "search":
-			return new SearchCommand(comdType, taskDesc, dateFrom, dateTo, labels,
-					null);
+			return new SearchCommand(comdType, taskDesc, dateFrom, dateTo,
+					labels, null);
 		case "delete":
-			return new DeleteCommand(comdType, taskDesc, dateFrom, dateTo, labels,
-					null);
+			return new DeleteCommand(comdType, taskDesc, dateFrom, dateTo,
+					labels, null);
 		}
 		return null;
 	}
@@ -380,7 +381,7 @@ public class MyTasksParser implements IParser {
 				// Implying no date found and should return null objects
 			}
 		}
-		if (noTime){
+		if (noTime) {
 			try {
 				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
 				dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
@@ -411,10 +412,10 @@ public class MyTasksParser implements IParser {
 		}
 		return result.trim();
 	}
-	
+
 	/**
-	 * convertUpdate returns a commandInfo object representing the input strings.
-	 * This is only used when update is the comdType
+	 * convertUpdate returns a commandInfo object representing the input
+	 * strings. This is only used when update is the comdType
 	 * 
 	 * @param message
 	 * @param comdType
@@ -441,6 +442,23 @@ public class MyTasksParser implements IParser {
 		}
 		return new UpdateCommand(comdType, taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
+	}
+
+	/**
+	 * convertSort converts a string into a sequence of labels represented in
+	 * the task object
+	 * 
+	 * @param message
+	 * @param comdType
+	 * @return the command object representing the sortcommand
+	 */
+	private Command convertSort(String message, String comdType) {
+		ArrayList<String> labels = null;
+		String[] words = message.split("\\s+");
+		for (int i = 0; i < words.length; i++) {
+			labels.add(words[i]);
+		}
+		return new SortCommand(comdType, null, null, null, labels, null);
 	}
 
 	protected class DoubleDate {

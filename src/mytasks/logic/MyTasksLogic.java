@@ -36,8 +36,8 @@ public class MyTasksLogic implements ILogic{
 	private void initLogic(boolean isDev){
 		isDeveloper = isDev;
 		mParser = new MyTasksParser();
-		mStorage = new MyTasksStorage();
-		mLocalMem = new LocalMemory(mStorage);
+		mStorage = MyTasksStorage.getInstance();
+		mLocalMem = LocalMemory.getInstance();
 		if (!isDeveloper) {
 			mLocalMem.loadLocalMemory();	
 		}

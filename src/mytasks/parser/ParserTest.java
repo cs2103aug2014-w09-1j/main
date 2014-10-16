@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.Task;
+import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
+import mytasks.logic.DeleteCommand;
+import mytasks.logic.UpdateCommand;
 
 import org.junit.Test;
 
@@ -121,34 +124,34 @@ public class ParserTest {
 	
 	private void initAddObjects() {
 		try {
-			test1 = new Command("add", "dinner", null, null, null, null);
+			test1 = new AddCommand("add", "dinner", null, null, null, null);
 			
 			Date date2 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
-			test2 = new Command("add", "dinner", date2, null, null, null);
+			test2 = new AddCommand("add", "dinner", date2, null, null, null);
 			
 			Date date3 = MyTasksParser.dateFormats.get(1).parse("20.09.2014 12:00");
-			test3 = new Command("add", "submit assignment", date3, null, null, null);
+			test3 = new AddCommand("add", "submit assignment", date3, null, null, null);
 			
 			ArrayList<String> list4 = new ArrayList<String>();
 			list4.add("cs2103");
 			Date date4 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
-			test4 = new Command("add", "do homework", date4, null, list4, null);
+			test4 = new AddCommand("add", "do homework", date4, null, list4, null);
 			
 			ArrayList<String> list5 = new ArrayList<String>();
 			list5.add("cs2103");
 			list5.add("urgent");
 			list5.add("gg");
 			Date date5 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
-			test5 = new Command("add", "do homework", date5, null ,list5, null);
+			test5 = new AddCommand("add", "do homework", date5, null ,list5, null);
 			
 			ArrayList<String> list6 = new ArrayList<String>();
 			list6.add("notpossible");
 			Date date6 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
-			test6 = new Command("add", "have fun!", date6, null, list6, null);
+			test6 = new AddCommand("add", "have fun!", date6, null, list6, null);
 			
 			Date date121 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 12:00");
 			Date date122 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 14:00");
-			test12 = new Command("add", "code for project", date121, date122, null, null);
+			test12 = new AddCommand("add", "code for project", date121, date122, null, null);
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -156,34 +159,34 @@ public class ParserTest {
 	}
 	
 	private void initDeleteObjects() {
-		test7 = new Command("delete", "CS2103 meeting", null, null, null, null);
+		test7 = new DeleteCommand("delete", "CS2103 meeting", null, null, null, null);
 	}
 	
 	private void initUpdateObjects() {
 		try {
-			test8 = new Command("update", "CS2103 meeting", null, null, null, "meeting");
+			test8 = new UpdateCommand("update", "CS2103 meeting", null, null, null, "meeting");
 			
 			Date date9 = MyTasksParser.dateFormats.get(0).parse("20.09.2014");
-			test9 = new Command("update", null, date9, null, null, "meeting cs2103");
+			test9 = new UpdateCommand("update", null, date9, null, null, "meeting cs2103");
 			
 			ArrayList<String> list10 = new ArrayList<String>();
 			list10.add("CS2103");
-			test10 = new Command("update", null, null, null, list10, "meeting");
+			test10 = new UpdateCommand("update", null, null, null, list10, "meeting");
 			
 			ArrayList<String> list11 = new ArrayList<String>();
 			list11.add("yolo");
 			Date date11 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
-			test11 = new Command("update", "play", date11, null, list11, "meeting");
+			test11 = new UpdateCommand("update", "play", date11, null, list11, "meeting");
 			
 			ArrayList<String> list13 = new ArrayList<String>();
 			list13.add("gg");
 			Date date131 = MyTasksParser.dateFormats.get(1).parse("09.10.2014 14:00");
 			Date date132 = MyTasksParser.dateFormats.get(1).parse("10.10.2014 14:00");
-			test13 = new Command("update", "write report", date131, date132, list13, "read book");
+			test13 = new UpdateCommand("update", "write report", date131, date132, list13, "read book");
 			
 			Date date141 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
 			Date date142 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
-			test14 = new Command("update", "wake up", date141, date142, null, "sleep");
+			test14 = new UpdateCommand("update", "wake up", date141, date142, null, "sleep");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
