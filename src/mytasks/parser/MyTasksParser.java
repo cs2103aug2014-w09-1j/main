@@ -22,6 +22,7 @@ public class MyTasksParser implements IParser {
 		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
 	    add(new SimpleDateFormat("dd.MMM.yyyy"));
 		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+		add(new SimpleDateFormat("HH:mm"));
 	}};
 	private ArrayList<Integer> usedWords;
 	

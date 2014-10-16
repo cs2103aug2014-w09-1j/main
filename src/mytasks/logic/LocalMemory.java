@@ -100,6 +100,7 @@ class LocalMemory {
 
 	protected boolean search(Task userRequest){
 		boolean isFound = false;
+		assert userRequest != null;
 		
 		if (userRequest.getDescription() != null && userRequest.getLabels() != null){
 			for (int i=0; i < mLocalMem.size(); i++){
