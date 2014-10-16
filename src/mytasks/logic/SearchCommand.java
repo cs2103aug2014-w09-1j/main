@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * RedoCommand extends Command to follow OOP standard
+ * SearchCommand extends Command object to follow OOP standards
  * 
  * @author Wilson
  *
  */
-public class RedoCommand extends Command {
+public class SearchCommand extends Command {
 
-	public RedoCommand(String comdType, String comdDes, Date fromDateTime,
+	public SearchCommand(String comdType, String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
-				updateDesc);
+		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override
@@ -22,5 +21,4 @@ public class RedoCommand extends Command {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
