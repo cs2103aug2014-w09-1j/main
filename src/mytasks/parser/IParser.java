@@ -1,6 +1,6 @@
 package mytasks.parser;
 
-import mytasks.file.CommandInfo;
+import mytasks.logic.Command;
 
 public interface IParser {
 	
@@ -13,5 +13,5 @@ public interface IParser {
 	 * @param input from user
 	 * @return CommandInfo object that is used to execute input
 	 */
-	public CommandInfo parseInput (String input);
+	public Command parseInput (String input);
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,10 +23,26 @@ import mytasks.parser.MyTasksParser;
  * @author Tay Shuan Siang, Wilson
  *
  */
-public class MyTasksStorage implements IStorage {
+@SuppressWarnings("serial")
+public class MyTasksStorage implements IStorage, Serializable {
+	
+	private static MyTasksStorage INSTANCE = null;
+	private final String MESSAGE_CORPTDATA = "Corrupted data";
+	private final String MESSAGE_FILEERROR = "Error with reading existing file";
 
 	// Constructor
-	public MyTasksStorage() {
+	private MyTasksStorage() {
+	}
+	
+	public static MyTasksStorage getInstance(){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksStorage();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
 	}
 
 	/**
@@ -53,7 +70,7 @@ public class MyTasksStorage implements IStorage {
 		return result;
 	}
 	
-	public ArrayList<Task> convertToTasks(String memString) {
+	protected ArrayList<Task> convertToTasks(String memString) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		if (memString == null) {
 			return result;
@@ -66,7 +83,7 @@ public class MyTasksStorage implements IStorage {
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks%sizeBlocks != 0){
-			System.out.println("Corrupted data");
+			System.out.println(MESSAGE_CORPTDATA);
 			return result;
 		}
 		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
@@ -116,7 +133,7 @@ public class MyTasksStorage implements IStorage {
 		printOutput(output, MyTasks.DEFAULT_FILENAME);
 	}
 	
-	public String determineOutput(ArrayList<Task> localMem){
+	protected String determineOutput(ArrayList<Task> localMem){
 		String result = "";
 		for (int i = 0; i<localMem.size(); i++){
 			Task currentTask = localMem.get(i);
@@ -158,15 +175,7 @@ public class MyTasksStorage implements IStorage {
 			writer.print(output);
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Error with reading existing file");
+			System.out.println(MESSAGE_FILEERROR);
 		}
-	}
-	
-	/**
-	 * {@inheritDoc} //Does not need to be implemented in v0.1 as of yet
-	 */
-	public String exportFile(String fileName) {
-		// TODO for humans to read
-		return null;
 	}
 }

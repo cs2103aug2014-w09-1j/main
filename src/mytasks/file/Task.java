@@ -26,6 +26,13 @@ public class Task {
 		mLabels = labels;
 	}
 	
+	public Task(Task newTask){
+		mDescription = newTask.getDescription();
+		mFromDateTime = newTask.getFromDateTime();
+		mToDateTime = newTask.getToDateTime();
+		mLabels = newTask.getLabels();
+	}
+	
 	public String getDescription() {
 		return mDescription;
 	}
@@ -59,6 +66,13 @@ public class Task {
 		mLabels = labels;
 	}
 	
+	public void setTask(Task newTask){
+		setDescription(newTask.getDescription());
+		setFromDateTime(newTask.getFromDateTime());
+		setToDateTime(newTask.getToDateTime());
+		setLabels(newTask.getLabels());
+	}
+	
 	@Override
 	public String toString(){
 		String dateToString = "";
@@ -79,18 +93,18 @@ public class Task {
 		String labelsToString = "";
 		if (mLabels!= null) {
 			for (String s : mLabels){
-				labelsToString += "#" + s + " ";
+				labelsToString += " " + "#" + s;
 			}
 		}
 		String result = "";
 		if (dateFromString.equals("")){
-			result = String.format("%s %s", mDescription, labelsToString);
+			result = String.format("%s%s ", mDescription, labelsToString);
 		} else if (dateToString.equals("")){
-			result = String.format("%s on %s %s", mDescription, dateFromString, labelsToString);
+			result = String.format("%s on %s%s", mDescription, dateFromString, labelsToString);
 		} else {
-			result = String.format("%s from %s to %s %s", mDescription, dateFromString, dateToString, labelsToString).trim();
+			result = String.format("%s from %s to %s%s", mDescription, dateFromString, dateToString, labelsToString);
 		}
-		return result;
+		return result.trim();
 	}
 	
 	@Override

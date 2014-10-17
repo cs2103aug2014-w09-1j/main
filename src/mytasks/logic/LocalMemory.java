@@ -1,10 +1,11 @@
 package mytasks.logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
+import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
 
 /**
@@ -14,34 +15,47 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class LocalMemory {
+@SuppressWarnings("serial")
+class LocalMemory implements Serializable{
 	
 	//Private variables
+	private static LocalMemory INSTANCE = null;
 	private ArrayList<Task> mLocalMem = new ArrayList<Task>();
-	private MyTasksStorage mStore;
+	private IStorage mStore;
 	
 	//Constructor
-	public LocalMemory() {
-		mStore = new MyTasksStorage();
+	private LocalMemory() {
+		mStore = MyTasksStorage.getInstance();
 	}
 	
-	public void loadLocalMemory() {
+	protected static LocalMemory getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new LocalMemory();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	protected void loadLocalMemory() {
 		mLocalMem = mStore.readExtMem(MyTasks.DEFAULT_FILENAME);
 	}
 	
-	public void saveLocalMemory() {
+	protected void saveLocalMemory() {
 		mStore.writeExtMem(mLocalMem);
 	}
 	
-	public ArrayList<Task> getLocalMem() {
+	protected ArrayList<Task> getLocalMem() {
 		return mLocalMem;
 	}
 	
-	public void add(Task userRequest) {
+	protected void add(Task userRequest) {
 		mLocalMem.add(userRequest);
 	}
 	
-	public void remove(Task userRequest) {
+	protected void remove(Task userRequest) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(userRequest.getDescription().equals(mLocalMem.get(i).getDescription())) {
 				mLocalMem.remove(i);
@@ -49,7 +63,7 @@ public class LocalMemory {
 		}
 	}
 
-	public void update(String mToUpdateTaskDesc, Task userUpdate) {
+	protected void update(String mToUpdateTaskDesc, Task userUpdate) {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			if(mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
 				if(userUpdate.getDescription() != null) {
@@ -68,13 +82,10 @@ public class LocalMemory {
 				}
 			} 
 		}
-	}	
-	
-	public void sort(Task userRequest){
 		
 	}
 	
-	public void print() {
+	protected void print() {
 		for(int i = 0; i < mLocalMem.size(); i++) {
 			System.out.println("i: " + i);
 			if(mLocalMem.get(i).getDescription() != null) {
@@ -95,44 +106,62 @@ public class LocalMemory {
 			}			
 		}
 	}
-	
-	public boolean search(Task userRequest){
-		boolean isFound = false;
 
-		for (int i=0; i < mLocalMem.size(); i++){
-			if (haveDesc(userRequest, i) && haveLabels(userRequest, i)){
-				System.out.println(mLocalMem.get(i).toString());
-				isFound = true;
+
+	protected boolean search(Task userRequest){
+		boolean isFound = false;
+		assert userRequest != null;
+		
+		if (userRequest.getDescription() != null && userRequest.getLabels() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameDesc(userRequest, i) && haveSameLabels(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}
 			}
-		}	
+		}
+		else if (userRequest.getDescription() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameDesc(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}	
+			}
+		}
+		else if (userRequest.getLabels() != null){
+			for (int i=0; i < mLocalMem.size(); i++){
+				if (haveSameLabels(userRequest, i)){
+					System.out.println(mLocalMem.get(i).toString());
+					isFound = true;
+				}	
+			}		
+		}
+		
 		return isFound;
 	}
 
-	private boolean haveDesc(Task userRequest, int index){
-		try{
-			String desc = userRequest.getDescription();
+	private boolean haveSameDesc(Task userRequest, int index){
+		String desc = userRequest.getDescription();
 
-			if (mLocalMem.get(index).getDescription().contains(desc)){
-				return true;
-			}	
-		}catch(NoSuchElementException e){
-			//TODO: what is the purpose of catch function?
+		if (mLocalMem.get(index).getDescription() != null && mLocalMem.get(index).getDescription().contains(desc)){
+			return true;
 		}
 		return false;
 	}
-	
-	//TODO: comments
-	private boolean haveLabels(Task userRequest, int index){
+
+	private boolean haveSameLabels(Task userRequest, int index){
 		String userRequestedTaskLabelsToString = "";
 		String mLocalMemTaskLabelsToString = "";
-		try{
+		
+		if (userRequest.getLabels() != null){
 			for (String s : userRequest.getLabels()){
 				userRequestedTaskLabelsToString += s; 
 			}
+		}
+		if (mLocalMem.get(index).getLabels() != null){
 			for (String s : mLocalMem.get(index).getLabels()){
 				mLocalMemTaskLabelsToString += s; 
 			}
-		}catch (NullPointerException e){
 		}
 
 		if (mLocalMemTaskLabelsToString.equals(userRequestedTaskLabelsToString)){
