@@ -1,6 +1,5 @@
 package mytasks.logic;
 
-import mytasks.file.CommandInfo;
 import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
 import mytasks.storage.IStorage;
@@ -23,6 +22,9 @@ public class MyTasksLogic implements ILogic{
 	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
 	
+	//TODO: introduce get Instance to all classes. This included. Read notes/google this
+	//Difference between creating a public getInstance for checking yourself, 
+	//and getinstance for your member variables 
 	//Constructor
 	public MyTasksLogic(boolean isDeveloper){
 		initLogic(isDeveloper);
@@ -34,8 +36,8 @@ public class MyTasksLogic implements ILogic{
 	private void initLogic(boolean isDev){
 		isDeveloper = isDev;
 		mParser = new MyTasksParser();
-		mStorage = new MyTasksStorage();
-		mLocalMem = new LocalMemory(mStorage);
+		mStorage = MyTasksStorage.getInstance();
+		mLocalMem = LocalMemory.getInstance();
 		if (!isDeveloper) {
 			mLocalMem.loadLocalMemory();	
 		}
@@ -47,7 +49,7 @@ public class MyTasksLogic implements ILogic{
 	 */	
 	public String executeCommand(String input) {
 		
-		CommandInfo commandObject = parseInput(input);
+		Command commandObject = parseInput(input);
 		String output = removeFirstWord(input);
 		
 		switch(commandObject.getType()) {
@@ -98,23 +100,23 @@ public class MyTasksLogic implements ILogic{
 		return input.substring(i).trim();
 	}
 	
-	private void addCommand(CommandInfo commandObject) {
+	private void addCommand(Command commandObject) {
 		mLocalMem.add(commandObject.getTask());
 	}
 
-	private void deleteCommand(CommandInfo commandObject) {
+	private void deleteCommand(Command commandObject) {
 		mLocalMem.remove(commandObject.getTask());
 	}
 
-	private void updateCommand(CommandInfo commandObject) {
+	private void updateCommand(Command commandObject) {
 		mLocalMem.update(commandObject.getToUpdateTaskDesc(), commandObject.getTask());
 	}
 
-	private void sortCommand(CommandInfo commandObject) {
+	private void sortCommand(Command commandObject) {
 		mViewHandler.setView(commandObject.getTask().getLabels());
 	}
 
-	private boolean searchCommand(CommandInfo commandObject) {
+	private boolean searchCommand(Command commandObject) {
 		return mLocalMem.search(commandObject.getTask());				
 	}
 	
@@ -132,11 +134,11 @@ public class MyTasksLogic implements ILogic{
 	 * @param userInput
 	 * @return CommandType object that contains the relevant fields
 	 */
-	private CommandInfo parseInput(String userInput) {
-		CommandInfo input = mParser.parseInput(userInput);
+	private Command parseInput(String userInput) {
+		Command input = mParser.parseInput(userInput);
 		return input;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

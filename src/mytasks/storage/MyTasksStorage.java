@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,13 +23,26 @@ import mytasks.parser.MyTasksParser;
  * @author Tay Shuan Siang, Wilson
  *
  */
-public class MyTasksStorage implements IStorage {
+@SuppressWarnings("serial")
+public class MyTasksStorage implements IStorage, Serializable {
 	
+	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
 
 	// Constructor
-	public MyTasksStorage() {
+	private MyTasksStorage() {
+	}
+	
+	public static MyTasksStorage getInstance(){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksStorage();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
 	}
 
 	/**

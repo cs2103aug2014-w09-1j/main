@@ -15,7 +15,7 @@ public class StorageTest {
 	
 	ArrayList<Task> mem1;
 	String test1;
-	MyTasksStorage tester = new MyTasksStorage();
+	MyTasksStorage tester = MyTasksStorage.getInstance();
 
 	@Test
 	public void convertToTasksTest() {

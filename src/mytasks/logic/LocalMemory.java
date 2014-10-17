@@ -1,11 +1,12 @@
 package mytasks.logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.storage.IStorage;
+import mytasks.storage.MyTasksStorage;
 
 /**
  * LocalMemory holds all related task information in the current session and is only required to read and write
@@ -14,15 +15,28 @@ import mytasks.storage.IStorage;
  *
  */
 
-class LocalMemory {
+@SuppressWarnings("serial")
+class LocalMemory implements Serializable{
 	
 	//Private variables
+	private static LocalMemory INSTANCE = null;
 	private ArrayList<Task> mLocalMem = new ArrayList<Task>();
 	private IStorage mStore;
 	
 	//Constructor
-	protected LocalMemory(IStorage store) {
-		mStore = store;
+	private LocalMemory() {
+		mStore = MyTasksStorage.getInstance();
+	}
+	
+	protected static LocalMemory getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new LocalMemory();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
 	}
 	
 	protected void loadLocalMemory() {
@@ -68,10 +82,6 @@ class LocalMemory {
 				}
 			} 
 		}
-		
-	}	
-	
-	protected void sort(Task userRequest){
 		
 	}
 	

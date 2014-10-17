@@ -1,27 +1,35 @@
-package mytasks.file;
+package mytasks.logic;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.Task;
+
 /**
- * CommandType instance used to access different fields of a command that has been parsed.
+ * CommandType instance used to access different fields of a command that has
+ * been parsed.
  * 
- * TODO research NLP and its relevant libraries. This object may no longer be needed but will be left
- * here for the time being
+ * TODO research NLP and its relevant libraries. This object may no longer be
+ * needed but will be left here for the time being
+ * 
  * @author Wilson
  *
  */
-public class CommandInfo {
-	
-	//Private variables
-	public enum CommandType {ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID};
+public abstract class Command {
+
+	// Private variables
+	public enum CommandType {
+		ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID
+	};
+
 	private CommandType mType;
 	private Task mTask;
-	//Variable used to store task description of task to be updated (if any)
+	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
-	
-	//Constructor
-	public CommandInfo(String comdType, String comdDes, Date fromDateTime, Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
+
+	// Constructor
+	public Command(String comdType, String comdDes, Date fromDateTime,
+			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
@@ -47,21 +55,25 @@ public class CommandInfo {
 			mType = CommandType.INVALID;
 		}
 	}
-	
+
 	public CommandType getType() {
 		return mType;
 	}
-	
+
 	public Task getTask() {
 		return mTask;
 	}
-	
+
 	/**
-	 * getToUpdateTaskDesc is only used for update commands. Is null for all other command
-	 * types.
-	 * @return String of the task description of the task to be updated || old task 
+	 * getToUpdateTaskDesc is only used for update commands. Is null for all
+	 * other command types.
+	 * 
+	 * @return String of the task description of the task to be updated || old
+	 *         task
 	 */
 	public String getToUpdateTaskDesc() {
 		return mToUpdateTaskDesc;
 	}
+	
+	abstract String execute();
 }
