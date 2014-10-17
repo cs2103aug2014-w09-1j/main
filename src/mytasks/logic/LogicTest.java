@@ -111,7 +111,7 @@ public class LogicTest {
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee\n" + "do PS4\n"
-				+ "29.Sep.2014\n" + "pay acceptance fee\n" + "do PS4\n" + "CS2101 meeting\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting\n" + "pay acceptance fee\n" + "do PS4\n"
 				+ "30.Sep.2014\n" + "do PS4\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00\n"
 				+ "N.A.\n" + "play badminton\n" + "eat sushi\n", taskLogic.obtainPrintableOutput());
