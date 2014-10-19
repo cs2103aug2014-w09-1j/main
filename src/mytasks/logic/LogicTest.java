@@ -18,21 +18,15 @@ public class LogicTest {
 
 	@Test
 	public void testAddCommand() {
-<<<<<<< HEAD
-		assertEquals("meeting 22.09.2014 #important added", taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-	} 
-	
-=======
-		assertEquals("meeting 22.09.2014 #important added",
+		assertEquals("meeting 22.09.2014 #important added", 
 				taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-		assertEquals("meeting on 22.09.2014 #important" + "\n",
+		assertEquals("meeting on 22.09.2014 #important" + "\n", 
 				taskLogic.obtainPrintableOutput());
 	}
 
->>>>>>> 448e38ec689a5693ffde93051eb901fdd6ddf138
 	@Test
 	public void testUpdateCommand() {
-		assertEquals("CS2103T #important updated",
+		assertEquals("CS2103T #important updated", 
 				taskLogic.executeCommand("update meeting - CS2103T #important"));
 	}
 
@@ -43,7 +37,7 @@ public class LogicTest {
 			method = MyTasksLogic.class.getDeclaredMethod("removeFirstWord",
 					String.class);
 			method.setAccessible(true);
-			String result = (String) method.invoke(taskLogic,
+			String result = (String) method.invoke(taskLogic, 
 					"add meeting 22sep #important added");
 			assertEquals("meeting 22sep #important added", result);
 		} catch (NoSuchMethodException e) {
@@ -69,6 +63,7 @@ public class LogicTest {
 		System.setOut(null);
 	};
 
+	
 	@Test
 	public void testSearchCommand() {
 		// test 1
@@ -99,6 +94,7 @@ public class LogicTest {
 		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
 				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
 	}
+	
 	
 	@Test
 	public void testGetSnapshot(){
@@ -131,7 +127,5 @@ public class LogicTest {
 				+ "N.A.\n" + "play badminton\n" + "eat sushi\n", taskLogic.obtainPrintableOutput());
 	}
 
-	
-	
 	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1
 }
