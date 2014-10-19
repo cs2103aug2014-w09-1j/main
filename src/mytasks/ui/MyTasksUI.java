@@ -5,9 +5,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -25,7 +27,10 @@ public class MyTasksUI extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
     protected JTextArea textArea;
+    protected JTextArea textAreaFeedback;
    	private ILogic mLogic;
+   	private JSplitPane splitPane;
+   	//private JPanel contentPane = new Jpanel(new BorderLayout());
 	
     public MyTasksUI() {
         super(new GridBagLayout());
@@ -38,18 +43,35 @@ public class MyTasksUI extends JPanel implements ActionListener {
         textArea = new JTextArea(20, 50);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
-
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        textAreaFeedback = new JTextArea(5, 50);
+        textAreaFeedback.setEditable(false);
+        JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
+        scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        //Create a split pane with the two scroll panes in it.
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        		scrollPane, scrollPaneFeedback);
+        splitPane.setOneTouchExpandable(false);
+        splitPane.setDividerLocation(0.25);
+        
+        Dimension minSize = new Dimension(0, 0);
+        scrollPane.setMinimumSize(minSize);
+        scrollPaneFeedback.setMinimumSize(minSize);
+        splitPane.setResizeWeight(1.0);
+        
         //Add Components to this panel.
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        add(textField, c);
-
+        
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        add(scrollPane, c);        
+        add(splitPane, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(textField, c);        
 	}
 	
 	/**
@@ -67,10 +89,11 @@ public class MyTasksUI extends JPanel implements ActionListener {
     
     public void actionPerformed(ActionEvent evt) {
         String text = textField.getText();
-        mLogic.executeCommand(text);
-        textArea.setText(mLogic.obtainPrintableOutput());
+        textAreaFeedback.setText(mLogic.executeCommand(text));
+        textArea.setText(mLogic.obtainPrintableOutput());        
         //textArea.append(mLogic.obtainPrintableOutput() + "\n");
         textField.selectAll();
+        //textField.setText("");
 
         //Make sure the new text is visible, even if there
         //was a selection in the text area.
