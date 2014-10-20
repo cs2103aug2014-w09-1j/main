@@ -20,7 +20,7 @@ public class LogicTest {
 	public void testAddCommand() {
 		assertEquals("meeting 22.09.2014 #important added", 
 				taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-		assertEquals("meeting on 22.09.2014 #important" + "\n", 
+		assertEquals("22.Sep.2014\n" + "meeting #important\n", 
 				taskLogic.obtainPrintableOutput());
 	}
 
@@ -63,7 +63,6 @@ public class LogicTest {
 		System.setOut(null);
 	};
 
-	
 	@Test
 	public void testSearchCommand() {
 		// test 1
@@ -92,7 +91,8 @@ public class LogicTest {
 		assertEquals("task(s) with keyword 'meeting' searched",
 				taskLogic.executeCommand("search meeting"));
 		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
-				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
+				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());		
+		taskLogic.getMemory().clearMemory();
 	}
 	
 	
@@ -125,6 +125,7 @@ public class LogicTest {
 				+ "30.Sep.2014\n" + "do PS4\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00\n"
 				+ "N.A.\n" + "play badminton\n" + "eat sushi\n", taskLogic.obtainPrintableOutput());
+		taskLogic.getMemory().clearMemory();
 	}
 
 	//TODO: add test cases for the working functions. Ie. search and update. Follow conventions stated in v0.1

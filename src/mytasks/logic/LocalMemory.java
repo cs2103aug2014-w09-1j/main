@@ -55,6 +55,10 @@ class LocalMemory implements Serializable {
 	protected ArrayList<Task> getLocalMem() {
 		return mLocalMem;
 	}
+	
+	protected void clearMemory(){
+		mLocalMem.clear();
+	}
 
 	protected void add(Task userRequest) {
 		mLocalMem.add(userRequest);
