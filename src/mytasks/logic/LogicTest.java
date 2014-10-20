@@ -18,18 +18,12 @@ public class LogicTest {
 
 	@Test
 	public void testAddCommand() {
-<<<<<<< HEAD
-		assertEquals("meeting 22.09.2014 #important added", taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-	} 
-	
-=======
 		assertEquals("meeting 22.09.2014 #important added",
 				taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		assertEquals("meeting on 22.09.2014 #important" + "\n",
 				taskLogic.obtainPrintableOutput());
 	}
-
->>>>>>> 448e38ec689a5693ffde93051eb901fdd6ddf138
+	
 	@Test
 	public void testUpdateCommand() {
 		assertEquals("CS2103T #important updated",

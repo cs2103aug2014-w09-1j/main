@@ -59,6 +59,8 @@ public class MyTasksLogic implements ILogic {
 
 		switch (commandObject.getType()) {
 			case ADD :
+				// a boolean to make sure that commandobject will only be
+				// put into stack only if it is not an undo operation
 				addCommand(commandObject);
 				putToUndoStack(commandObject);
 				if (!isDeveloper) {
@@ -73,8 +75,8 @@ public class MyTasksLogic implements ILogic {
 				}
 				return output + " deleted";
 			case UPDATE :
-				updateCommand(commandObject);
 				putToUndoStack(commandObject);
+				updateCommand(commandObject);
 				if (!isDeveloper) {
 					mLocalMem.saveLocalMemory();
 				}
@@ -111,26 +113,44 @@ public class MyTasksLogic implements ILogic {
 		}
 	}
 
+	// TODO confused to make stack of command type or string type
 	private void putToUndoStack(Command commandObject) {
 		// TODO Auto-generated method stub
 		Command commandToUndo;
+
 		switch (commandObject.getType()) {
 			case ADD :
-				commandToUndo = new DeleteCommand("delete", commandObject.getTask().getDescription(), null, null, null, null);
+				commandToUndo = new DeleteCommand(null, null, null, null, null,
+								commandObject.getTask().getDescription());
 				mLocalMem.push(commandToUndo);
 				return;
 			case DELETE :
-				for (int i=0; i<mLocalMem.getLocalMem().size(); i++) {
-					if (mLocalMem.getLocalMem().get(i).getDescription().equals(commandObject.getTask().getDescription())) {
-						Task tempTask = mLocalMem.getLocalMem().get(i);
-						commandToUndo = new AddCommand("add", commandObject.getTask().getDescription(), tempTask.getFromDateTime(), tempTask.getToDateTime(), tempTask.getLabels(), null);
+				for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+					if (mLocalMem.getLocalMem().get(i).getDescription()
+									.equals(commandObject.getTask()	.getDescription())) {
+						commandToUndo = new AddCommand("add", commandObject.getTask().getDescription(),
+										mLocalMem.getLocalMem().get(i).getFromDateTime(),
+										mLocalMem.getLocalMem().get(i).getToDateTime(),
+										mLocalMem.getLocalMem().get(i).getLabels(), null);
 						mLocalMem.push(commandToUndo);
 						break;
 					}
 				}
 				return;
 			case UPDATE :
-				
+				for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+					if (mLocalMem.getLocalMem().get(i).getDescription()
+									.equals(commandObject.getToUpdateTaskDesc())) {
+						commandToUndo = new UpdateCommand(null, mLocalMem
+										.getLocalMem().get(i).getDescription(),
+										mLocalMem.getLocalMem().get(i).getFromDateTime(),
+										mLocalMem.getLocalMem().get(i).getToDateTime(),
+										mLocalMem.getLocalMem().get(i).getLabels(),
+										commandObject.getTask().getDescription());
+						mLocalMem.push(commandToUndo);
+						break;
+					}
+				}
 				return;
 			default:
 				return;
