@@ -23,4 +23,10 @@ public class RedoCommand extends Command {
 		return null;
 	}
 
+	@Override
+	String undo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -21,14 +21,12 @@ public class AddCommand extends Command {
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
 				updateDesc);
-		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
-		mTask = thisTask;
+		mLocalMem = LocalMemory.getInstance();
 		
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
 		mLocalMem.add(super.getTask());
 		AddCommand commandToUndo = new AddCommand(null, null, null, null, null, mTask.getDescription());
 		mLocalMem.push(commandToUndo);

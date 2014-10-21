@@ -58,59 +58,57 @@ public class MyTasksLogic implements ILogic {
 		String output = removeFirstWord(input);
 
 		switch (commandObject.getType()) {
-			case ADD :
-				// a boolean to make sure that commandobject will only be
-				// put into stack only if it is not an undo operation
-//				addCommand(commandObject);
-				commandObject.execute();
-//				putToUndoStack(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return output + " added";
-			case DELETE :
-//				putToUndoStack(commandObject);
-				deleteCommand(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return output + " deleted";
-			case UPDATE :
-//				putToUndoStack(commandObject);
-				updateCommand(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				output = input.replace(input.trim().split("[-]+")[0], "")
-								.trim();
-				output = output.replace(output.trim().split("\\s+")[0], "")
-								.trim();
-				// mLocalMem.print();
-				return output + " updated";
-			case SORT :
-				sortCommand(commandObject);
-				return output + " sorted";
-			case SEARCH :
-				boolean isFound = searchCommand(commandObject);
-				if (isFound) {
-					return String.format(MESSAGE_SEARCH_SUCCESS, output);
-				} else {
-					return String.format(MESSAGE_SEARCH_FAIL, output);
-				}
-			case UNDO :
-				undoCommand();
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return "";
-			case REDO :
-				redoCommand();
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return "";
-			default:
-				return "invalid command";
+		case ADD:
+			// a boolean to make sure that commandobject will only be
+			// put into stack only if it is not an undo operation
+			// addCommand(commandObject);
+			commandObject.execute();
+			// putToUndoStack(commandObject);
+			if (!isDeveloper) {
+				mLocalMem.saveLocalMemory();
+			}
+			return output + " added";
+		case DELETE:
+			// putToUndoStack(commandObject);
+			deleteCommand(commandObject);
+			if (!isDeveloper) {
+				mLocalMem.saveLocalMemory();
+			}
+			return output + " deleted";
+		case UPDATE:
+			// putToUndoStack(commandObject);
+			updateCommand(commandObject);
+			if (!isDeveloper) {
+				mLocalMem.saveLocalMemory();
+			}
+			output = input.replace(input.trim().split("[-]+")[0], "").trim();
+			output = output.replace(output.trim().split("\\s+")[0], "").trim();
+			// mLocalMem.print();
+			return output + " updated";
+		case SORT:
+			sortCommand(commandObject);
+			return output + " sorted";
+		case SEARCH:
+			boolean isFound = searchCommand(commandObject);
+			if (isFound) {
+				return String.format(MESSAGE_SEARCH_SUCCESS, output);
+			} else {
+				return String.format(MESSAGE_SEARCH_FAIL, output);
+			}
+		case UNDO:
+			undoCommand();
+			if (!isDeveloper) {
+				mLocalMem.saveLocalMemory();
+			}
+			return "";
+		case REDO:
+			redoCommand();
+			if (!isDeveloper) {
+				mLocalMem.saveLocalMemory();
+			}
+			return "";
+		default:
+			return "invalid command";
 		}
 	}
 
@@ -120,41 +118,42 @@ public class MyTasksLogic implements ILogic {
 		Command commandToUndo;
 
 		switch (commandObject.getType()) {
-			case ADD :
-				commandToUndo = new DeleteCommand(null, null, null, null, null,
-								commandObject.getTask().getDescription());
-				mLocalMem.push(commandToUndo);
-				return;
-			case DELETE :
-				for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-					if (mLocalMem.getLocalMem().get(i).getDescription()
-									.equals(commandObject.getTask()	.getDescription())) {
-						commandToUndo = new AddCommand("add", commandObject.getTask().getDescription(),
-										mLocalMem.getLocalMem().get(i).getFromDateTime(),
-										mLocalMem.getLocalMem().get(i).getToDateTime(),
-										mLocalMem.getLocalMem().get(i).getLabels(), null);
-						mLocalMem.push(commandToUndo);
-						break;
-					}
+		case ADD:
+			commandToUndo = new DeleteCommand(null, null, null, null, null,
+					commandObject.getTask().getDescription());
+			mLocalMem.push(commandToUndo);
+			return;
+		case DELETE:
+			for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+				if (mLocalMem.getLocalMem().get(i).getDescription()
+						.equals(commandObject.getTask().getDescription())) {
+					commandToUndo = new AddCommand("add", commandObject
+							.getTask().getDescription(), mLocalMem
+							.getLocalMem().get(i).getFromDateTime(), mLocalMem
+							.getLocalMem().get(i).getToDateTime(), mLocalMem
+							.getLocalMem().get(i).getLabels(), null);
+					mLocalMem.push(commandToUndo);
+					break;
 				}
-				return;
-			case UPDATE :
-				for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-					if (mLocalMem.getLocalMem().get(i).getDescription()
-									.equals(commandObject.getToUpdateTaskDesc())) {
-						commandToUndo = new UpdateCommand(null, mLocalMem
-										.getLocalMem().get(i).getDescription(),
-										mLocalMem.getLocalMem().get(i).getFromDateTime(),
-										mLocalMem.getLocalMem().get(i).getToDateTime(),
-										mLocalMem.getLocalMem().get(i).getLabels(),
-										commandObject.getTask().getDescription());
-						mLocalMem.push(commandToUndo);
-						break;
-					}
+			}
+			return;
+		case UPDATE:
+			for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+				if (mLocalMem.getLocalMem().get(i).getDescription()
+						.equals(commandObject.getToUpdateTaskDesc())) {
+					commandToUndo = new UpdateCommand(null, mLocalMem
+							.getLocalMem().get(i).getDescription(), mLocalMem
+							.getLocalMem().get(i).getFromDateTime(), mLocalMem
+							.getLocalMem().get(i).getToDateTime(), mLocalMem
+							.getLocalMem().get(i).getLabels(), commandObject
+							.getTask().getDescription());
+					mLocalMem.push(commandToUndo);
+					break;
 				}
-				return;
-			default:
-				return;
+			}
+			return;
+		default:
+			return;
 		}
 	}
 
@@ -173,7 +172,7 @@ public class MyTasksLogic implements ILogic {
 
 	private void updateCommand(Command commandObject) {
 		mLocalMem.update(commandObject.getToUpdateTaskDesc(),
-						commandObject.getTask());
+				commandObject.getTask());
 	}
 
 	private void sortCommand(Command commandObject) {

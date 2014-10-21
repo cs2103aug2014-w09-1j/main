@@ -149,24 +149,6 @@ class LocalMemory implements Serializable {
 		return isFound;
 	}
 
-	protected void undo() {
-		// TODO Auto-generated method stub
-		Command commandToRevert = undoStack.pop();
-		switch (commandToRevert.getType()) {
-			case ADD :
-				add(commandToRevert.getTask());
-				return;
-			case DELETE :
-				remove(commandToRevert.getTask());
-				return;
-			case UPDATE :
-				
-				return;
-			default:
-				return;
-		}
-	}
-
 	protected void redo() {
 		// TODO Auto-generated method stub
 

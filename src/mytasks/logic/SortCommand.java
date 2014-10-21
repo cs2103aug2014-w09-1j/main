@@ -21,4 +21,10 @@ public class SortCommand extends Command {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	String undo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
