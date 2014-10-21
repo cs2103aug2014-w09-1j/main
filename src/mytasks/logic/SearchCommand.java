@@ -33,7 +33,6 @@ public class SearchCommand extends Command {
 
 	@Override
 	String undo() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Search does not have an undo function");
 	}
 }
