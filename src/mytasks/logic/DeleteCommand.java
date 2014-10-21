@@ -25,9 +25,15 @@ public class DeleteCommand extends Command {
 
 	@Override
 	String execute() {
-		mLocalMem.remove(super.getTask());
-		DeleteCommand commandToUndo = new DeleteCommand(null, null, null, null, super.getTask().getDescription());
-		mLocalMem.undoPush(commandToUndo);
+		for (int i=0; i<mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTask().getDescription())) {
+				DeleteCommand commandToUndo = new DeleteCommand(mLocalMem.getLocalMem().get(i).getDescription(), mLocalMem.getLocalMem().get(i).getFromDateTime(), mLocalMem.getLocalMem().get(i).getToDateTime(), mLocalMem.getLocalMem().get(i).getLabels(), null);
+				mLocalMem.undoPush(commandToUndo);
+				mLocalMem.remove(super.getTask());
+				break;
+			}
+		}
+		
 		return super.getTaskDetails() + " deleted";
 	}
 
