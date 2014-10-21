@@ -161,6 +161,10 @@ class LocalMemory implements Serializable {
 		redoStack.push(commandToUndo);
 	}
 	
+	protected Stack<Command> getRedoStack() {
+		return redoStack;
+	}
+	
 	private boolean haveSameDesc(Task userRequest, int index) {
 		String desc = userRequest.getDescription();
 
@@ -190,6 +194,11 @@ class LocalMemory implements Serializable {
 			return true;
 		}
 		return false;
+	}
+	
+	//Backdoor function to use for testing
+	protected void clearMemory() {
+		mLocalMem.clear();
 	}
 
 }

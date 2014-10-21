@@ -10,16 +10,20 @@ import java.util.Date;
  *
  */
 public class RedoCommand extends Command {
-
+	
+	LocalMemory mLocalMem = null;
+	
 	public RedoCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
-		return null;
+		Command commandToRevert = mLocalMem.getRedoStack().pop();
+		String feedback = commandToRevert.undo();
+		return feedback;
 	}
 
 	@Override
@@ -27,5 +31,4 @@ public class RedoCommand extends Command {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

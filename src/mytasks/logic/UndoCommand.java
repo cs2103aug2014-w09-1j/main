@@ -22,7 +22,6 @@ public class UndoCommand extends Command {
 
 	@Override
 	String execute() {
-		// TODO: implement this
 		Command commandToRevert = mLocalMem.getUndoStack().pop();
 		String feedback = commandToRevert.undo();
 		return feedback;
