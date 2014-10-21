@@ -18,47 +18,51 @@ import mytasks.file.Task;
 public abstract class Command {
 
 	// Private variables
-	public enum CommandType {
-		ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID
-	};
-
-	private CommandType mType;
+	// public enum CommandType {
+	// ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID
+	// };
+	//
+	// private CommandType mType;
 	private Task mTask;
 	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
 
 	// Constructor
-	public Command(String comdType, String comdDes, Date fromDateTime,
+	public Command(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		determineCommandType(comdType);
+		//determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;
 	}
-
-	private void determineCommandType(String comdType) {
-		if (comdType.equals("add")) {
-			mType = CommandType.ADD;
-		} else if (comdType.equals("delete")) {
-			mType = CommandType.DELETE;
-		} else if (comdType.equals("sort")) {
-			mType = CommandType.SORT;
-		} else if (comdType.equals("search")) {
-			mType = CommandType.SEARCH;
-		} else if (comdType.equals("update")) {
-			mType = CommandType.UPDATE;
-		} else if (comdType.equals("undo")) {
-			mType = CommandType.UNDO;
-		} else if (comdType.equals("redo")) {
-			mType = CommandType.REDO;
-		} else {
-			mType = CommandType.INVALID;
-		}
+	
+	protected String getTaskDetails(){
+		return mTask.getDescription();
 	}
 
-	public CommandType getType() {
-		return mType;
-	}
+	// private void determineCommandType(String comdType) {
+	// if (comdType.equals("add")) {
+	// mType = CommandType.ADD;
+	// } else if (comdType.equals("delete")) {
+	// mType = CommandType.DELETE;
+	// } else if (comdType.equals("sort")) {
+	// mType = CommandType.SORT;
+	// } else if (comdType.equals("search")) {
+	// mType = CommandType.SEARCH;
+	// } else if (comdType.equals("update")) {
+	// mType = CommandType.UPDATE;
+	// } else if (comdType.equals("undo")) {
+	// mType = CommandType.UNDO;
+	// } else if (comdType.equals("redo")) {
+	// mType = CommandType.REDO;
+	// } else {
+	// mType = CommandType.INVALID;
+	// }
+	// }
+
+	// public CommandType getType() {
+	// return mType;
+	// }
 
 	public Task getTask() {
 		return mTask;
@@ -74,6 +78,8 @@ public abstract class Command {
 	public String getToUpdateTaskDesc() {
 		return mToUpdateTaskDesc;
 	}
-	
+
 	abstract String execute();
+
+	abstract String undo();
 }

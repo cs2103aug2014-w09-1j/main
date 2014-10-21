@@ -153,33 +153,22 @@ class LocalMemory implements Serializable {
 		return isFound;
 	}
 
-	protected void undo() {
-		// TODO Auto-generated method stub
-		Command commandToRevert = undoStack.pop();
-		switch (commandToRevert.getType()) {
-			case ADD :
-				add(commandToRevert.getTask());
-				return;
-			case DELETE :
-				remove(commandToRevert.getTask());
-				return;
-			case UPDATE :
-				
-				return;
-			default:
-				return;
-		}
-	}
-
-	protected void redo() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void push(Command commandToUndo) {
+	protected void undoPush(Command commandToUndo) {
 		undoStack.push(commandToUndo);
 	}
 
+	protected Stack<Command> getUndoStack() {
+		return undoStack;
+	}
+	
+	protected void redoPush(Command commandToUndo) {
+		redoStack.push(commandToUndo);
+	}
+	
+	protected Stack<Command> getRedoStack() {
+		return redoStack;
+	}
+	
 	private boolean haveSameDesc(Task userRequest, int index) {
 		String desc = userRequest.getDescription();
 
@@ -209,6 +198,11 @@ class LocalMemory implements Serializable {
 			return true;
 		}
 		return false;
+	}
+	
+	//Backdoor function to use for testing
+	protected void clearMemory() {
+		mLocalMem.clear();
 	}
 
 }

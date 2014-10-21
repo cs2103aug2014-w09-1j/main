@@ -55,124 +55,95 @@ public class MyTasksLogic implements ILogic {
 	public String executeCommand(String input) {
 
 		Command commandObject = parseInput(input);
-		String output = removeFirstWord(input);
+		// String output = removeFirstWord(input);
 
-		switch (commandObject.getType()) {
-			case ADD :
-				addCommand(commandObject);
-				putToUndoStack(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return output + " added";
-			case DELETE :
-				putToUndoStack(commandObject);
-				deleteCommand(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return output + " deleted";
-			case UPDATE :
-				updateCommand(commandObject);
-				putToUndoStack(commandObject);
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				output = input.replace(input.trim().split("[-]+")[0], "")
-								.trim();
-				output = output.replace(output.trim().split("\\s+")[0], "")
-								.trim();
-				// mLocalMem.print();
-				return output + " updated";
-			case SORT :
-				sortCommand(commandObject);
-				return output + " sorted";
-			case SEARCH :
-				boolean isFound = searchCommand(commandObject);
-				if (isFound) {
-					return String.format(MESSAGE_SEARCH_SUCCESS, output);
-				} else {
-					return String.format(MESSAGE_SEARCH_FAIL, output);
-				}
-			case UNDO :
-				undoCommand();
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return "";
-			case REDO :
-				redoCommand();
-				if (!isDeveloper) {
-					mLocalMem.saveLocalMemory();
-				}
-				return "";
-			default:
-				return "invalid command";
+		if (commandObject == null) {
+			return "Invalid input";
 		}
+		String feedback = commandObject.execute();
+		return feedback;
+		
+		// Don't remove this chunk yet. Useful for adding into individual command sections
+		// switch (commandObject.getType()) {
+		// case ADD:
+		// // a boolean to make sure that commandobject will only be
+		// // put into stack only if it is not an undo operation
+		// // addCommand(commandObject);
+		// commandObject.execute();
+		// // putToUndoStack(commandObject);
+		// if (!isDeveloper) {
+		// mLocalMem.saveLocalMemory();
+		// }
+		// return output + " added";
+		// case DELETE:
+		// // putToUndoStack(commandObject);
+		// deleteCommand(commandObject);
+		// if (!isDeveloper) {
+		// mLocalMem.saveLocalMemory();
+		// }
+		// return output + " deleted";
+		// case UPDATE:
+		// // putToUndoStack(commandObject);
+		// updateCommand(commandObject);
+		// if (!isDeveloper) {
+		// mLocalMem.saveLocalMemory();
+		// }
+		// output = input.replace(input.trim().split("[-]+")[0], "").trim();
+		// output = output.replace(output.trim().split("\\s+")[0], "").trim();
+		// // mLocalMem.print();
+		// return output + " updated";
+		// case SORT:
+		// sortCommand(commandObject);
+		// return output + " sorted";
+		// case SEARCH:
+		// boolean isFound = searchCommand(commandObject);
+		// if (isFound) {
+		// return String.format(MESSAGE_SEARCH_SUCCESS, output);
+		// } else {
+		// return String.format(MESSAGE_SEARCH_FAIL, output);
+		// }
+		// case UNDO:
+		// commandObject.execute();
+		// if (!isDeveloper) {
+		// mLocalMem.saveLocalMemory();
+		// }
+		// return "";
+		// case REDO:
+		// commandObject.execute();
+		// if (!isDeveloper) {
+		// mLocalMem.saveLocalMemory();
+		// }
+		// return "";
+		// default:
+		// return "invalid command";
+		// }
 	}
 
-	private void putToUndoStack(Command commandObject) {
-		// TODO Auto-generated method stub
-		Command commandToUndo;
-		switch (commandObject.getType()) {
-			case ADD :
-				commandToUndo = new DeleteCommand("delete", commandObject.getTask().getDescription(), null, null, null, null);
-				mLocalMem.push(commandToUndo);
-				return;
-			case DELETE :
-				for (int i=0; i<mLocalMem.getLocalMem().size(); i++) {
-					if (mLocalMem.getLocalMem().get(i).getDescription().equals(commandObject.getTask().getDescription())) {
-						Task tempTask = mLocalMem.getLocalMem().get(i);
-						commandToUndo = new AddCommand("add", commandObject.getTask().getDescription(), tempTask.getFromDateTime(), tempTask.getToDateTime(), tempTask.getLabels(), null);
-						mLocalMem.push(commandToUndo);
-						break;
-					}
-				}
-				return;
-			case UPDATE :
-				
-				return;
-			default:
-				return;
-		}
-	}
+	// private String removeFirstWord(String input) {
+	// int i = input.indexOf(' ');
+	// return input.substring(i).trim();
+	// }
 
-	private String removeFirstWord(String input) {
-		int i = input.indexOf(' ');
-		return input.substring(i).trim();
-	}
-
-	private void addCommand(Command commandObject) {
-		mLocalMem.add(commandObject.getTask());
-	}
-
-	private void deleteCommand(Command commandObject) {
-		mLocalMem.remove(commandObject.getTask());
-	}
-
-	private void updateCommand(Command commandObject) {
-		mLocalMem.update(commandObject.getToUpdateTaskDesc(),
-						commandObject.getTask());
-	}
-
-	private void sortCommand(Command commandObject) {
-		mViewHandler.setView(commandObject.getTask().getLabels());
-	}
-
-	private boolean searchCommand(Command commandObject) {
-		return mLocalMem.search(commandObject.getTask());
-	}
-
-	private void undoCommand() {
-		// TODO Auto-generated method stub
-		mLocalMem.undo();
-	}
-
-	private void redoCommand() {
-		// TODO Auto-generated method stub
-		mLocalMem.redo();
-
-	}
+	// private void addCommand(Command commandObject) {
+	// mLocalMem.add(commandObject.getTask());
+	// }
+	//
+	// private void deleteCommand(Command commandObject) {
+	// mLocalMem.remove(commandObject.getTask());
+	// }
+	//
+	// private void updateCommand(Command commandObject) {
+	// mLocalMem.update(commandObject.getToUpdateTaskDesc(),
+	// commandObject.getTask());
+	// }
+	//
+	// private void sortCommand(Command commandObject) {
+	// mViewHandler.setView(commandObject.getTask().getLabels());
+	// }
+	//
+	// private boolean searchCommand(Command commandObject) {
+	// return mLocalMem.search(commandObject.getTask());
+	// }
 
 	/**
 	 * parseInput calls the parser to read and understand user input

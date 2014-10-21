@@ -27,6 +27,7 @@ public class MyTasksParser implements IParser {
 
 	// Date and Time formats that are currently useable.
 	@SuppressWarnings("serial")
+<<<<<<< HEAD
 	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
 		add(new SimpleDateFormat("dd.MM.yyyy"));
 		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -34,6 +35,18 @@ public class MyTasksParser implements IParser {
 		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
 		add(new SimpleDateFormat("HH:mm"));
 	}};
+=======
+	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
+		{
+			add(new SimpleDateFormat("dd.MM.yyyy"));
+			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
+			add(new SimpleDateFormat("dd.MMM.yyyy"));
+			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+			add(new SimpleDateFormat("HH:mm"));
+		}
+	};
+
+>>>>>>> 8c19fb21125e0fd16cebaabfa9f69a78f93bc30a
 	private ArrayList<Integer> usedWords;
 
 	// Constructor
@@ -59,12 +72,12 @@ public class MyTasksParser implements IParser {
 				if (words.length != 1) { // Checks if there are any extra input
 					return null;
 				}
-				return new UndoCommand(comdType, null, null, null, null, null);
+				return new UndoCommand(null, null, null, null, null);
 			case "redo":
 				if (words.length != 1) { // Checks if there are any extra input
 					return null;
 				}
-				return new RedoCommand(comdType, null, null, null, null, null);
+				return new RedoCommand(null, null, null, null, null);
 			case "update":
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
@@ -105,14 +118,11 @@ public class MyTasksParser implements IParser {
 		}
 		switch (comdType) {
 		case "add":
-			return new AddCommand(comdType, taskDesc, dateFrom, dateTo, labels,
-					null);
+			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
 		case "search":
-			return new SearchCommand(comdType, taskDesc, dateFrom, dateTo,
-					labels, null);
+			return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
 		case "delete":
-			return new DeleteCommand(comdType, taskDesc, dateFrom, dateTo,
-					labels, null);
+			return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
 		}
 		return null;
 	}
@@ -170,7 +180,7 @@ public class MyTasksParser implements IParser {
 		int[] indexFromTo = checkFromAndTo(words);
 		int indexOfFrom = indexFromTo[0];
 		int indexOfTo = indexFromTo[1];
-
+		
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
 		int indexOfDate1 = indexDatesFormat[0];
 		int indexOfDate2 = indexDatesFormat[1];
@@ -230,8 +240,9 @@ public class MyTasksParser implements IParser {
 		int indexDate1 = -1;
 		int indexDate2 = -1;
 		int indexFormat = -1;
+		//Don't try format 4 which is for HH:mm
 		for (int i = 0; i < words.length; i++) {
-			for (int j = 0; j < dateFormats.size(); j++) {
+			for (int j = 0; j < dateFormats.size()-1; j++) {
 				SimpleDateFormat dateForm = dateFormats.get(j);
 				try {
 					dateForm.setLenient(false);
@@ -439,7 +450,7 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
 		}
-		return new UpdateCommand(comdType, taskDesc, dateFrom, dateTo, labels,
+		return new UpdateCommand(taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
 	}
 
@@ -454,10 +465,13 @@ public class MyTasksParser implements IParser {
 	private Command convertSort(String message, String comdType) {
 		ArrayList<String> labels = new ArrayList<String>();
 		String[] words = message.split("\\s+");
-		for (int i = 0; i < words.length; i++) {
-			labels.add(words[i]);
+		if (words.length>0) {
+			labels = new ArrayList<String>();
+			for (int i = 0; i < words.length; i++) {
+				labels.add(words[i]);
+			}
 		}
-		return new SortCommand(comdType, null, null, null, labels, null);
+		return new SortCommand(null, null, null, labels, null);
 	}
 
 	protected class DoubleDate {

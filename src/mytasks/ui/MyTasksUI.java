@@ -91,9 +91,11 @@ public class MyTasksUI extends JPanel implements ActionListener {
         String text = textField.getText();
         textAreaFeedback.setText(mLogic.executeCommand(text));
         textArea.setText(mLogic.obtainPrintableOutput());        
-        //textArea.append(mLogic.obtainPrintableOutput() + "\n");
+        
         textField.selectAll();
+        
         //textField.setText("");
+        //textArea.append(mLogic.obtainPrintableOutput() + "\n");
 
         //Make sure the new text is visible, even if there
         //was a selection in the text area.

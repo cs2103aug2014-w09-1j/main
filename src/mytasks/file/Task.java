@@ -1,5 +1,7 @@
 package mytasks.file;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -71,6 +73,27 @@ public class Task {
 		setFromDateTime(newTask.getFromDateTime());
 		setToDateTime(newTask.getToDateTime());
 		setLabels(newTask.getLabels());
+	}
+	
+	public Task getClone(){
+		SimpleDateFormat form = MyTasksParser.dateFormats.get(1);
+		Date newDate1 = null;
+		Date newDate2 = null;
+		try {
+			if (mFromDateTime!=null) {
+				newDate1 = form.parse(form.format(mFromDateTime));
+			}
+			if (mToDateTime!=null) {
+				newDate2 = form.parse(form.format(mToDateTime));
+			}
+		} catch (ParseException e) {
+			Logger.getInstance().log("Task: Unexpected Error");
+		}
+		ArrayList<String> newLabels = null;
+		if (mLabels!=null){
+			newLabels = new ArrayList<String>(mLabels);
+		}
+		return new Task(mDescription, newDate1, newDate2, newLabels);
 	}
 	
 	@Override
