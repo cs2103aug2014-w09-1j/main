@@ -139,6 +139,15 @@ public class LogicTest {
 		assertEquals("play deleted", taskLogic.executeCommand("delete play"));
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
+	
+	@Test
+	public void testUndoRedoDelete() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add play");
+		taskLogic.executeCommand("delete play");
+		assertEquals("play added", taskLogic.executeCommand("undo"));
+		assertEquals("play deleted", taskLogic.executeCommand("redo"));
+	}
 
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1

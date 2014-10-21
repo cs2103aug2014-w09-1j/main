@@ -42,7 +42,7 @@ public class AddCommand extends Command {
 				break;
 			}
 		}
-		Command toRedo = new DeleteCommand(prevState.getDescription(),
+		Command toRedo = new AddCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);
 		mLocalMem.saveLocalMemory();

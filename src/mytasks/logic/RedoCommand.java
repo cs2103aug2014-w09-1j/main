@@ -22,7 +22,7 @@ public class RedoCommand extends Command {
 	@Override
 	String execute() {
 		Command commandToRevert = mLocalMem.getRedoStack().pop();
-		String feedback = commandToRevert.undo();
+		String feedback = commandToRevert.execute();
 		return feedback;
 	}
 

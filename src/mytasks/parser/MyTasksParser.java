@@ -104,9 +104,6 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			return null;
 		}
-		System.out.println(taskDesc);
-		System.out.println(dates.getDate1());
-		System.out.println(dates.getDate2());
 		switch (comdType) {
 		case "add":
 			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
