@@ -117,8 +117,8 @@ class LocalMemory implements Serializable {
 		}
 	}
 
-	protected boolean search(Task userRequest) {
-		boolean isFound = false;
+	protected String search(Task userRequest) {
+		String searchedTasks = "";
 		assert userRequest != null;
 
 		if (userRequest.getDescription() != null
@@ -126,27 +126,24 @@ class LocalMemory implements Serializable {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameDesc(userRequest, i)
 								&& haveSameLabels(userRequest, i)) {
-					System.out.println(mLocalMem.get(i).toString());
-					isFound = true;
+			        searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
 			}
 		} else if (userRequest.getDescription() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameDesc(userRequest, i)) {
-					System.out.println(mLocalMem.get(i).toString());
-					isFound = true;
+					searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
 			}
 		} else if (userRequest.getLabels() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameLabels(userRequest, i)) {
-					System.out.println(mLocalMem.get(i).toString());
-					isFound = true;
+					searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
 			}
 		}
 
-		return isFound;
+		return searchedTasks;
 	}
 
 	protected void undoPush(Command commandToUndo) {

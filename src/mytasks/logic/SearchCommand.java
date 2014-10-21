@@ -23,12 +23,13 @@ public class SearchCommand extends Command {
 
 	@Override
 	String execute() {
-		boolean isFound = mLocalMem.search(super.getTask());
-		if (isFound) {
-			return String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
+		String searchedTasks = mLocalMem.search(super.getTask());
+		if (!searchedTasks.isEmpty()) {
+			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
 		} else {
-			return String.format(MESSAGE_SEARCH_FAIL, super.getTask());
+			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
 		}
+		return searchedTasks;
 	}
 
 	@Override

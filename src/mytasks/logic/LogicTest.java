@@ -17,7 +17,6 @@ public class LogicTest {
 
 	private MyTasksLogic taskLogic = new MyTasksLogic(true);
 
-	//private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
 	@Test
 	public void testAddCommand() {
@@ -40,50 +39,29 @@ public class LogicTest {
 		assertEquals("meeting added", taskLogic.executeCommand("redo"));
 	}
 
-    /***
-	@Before
-	public void setUpStreams() {
-		System.setOut(new PrintStream(outContent));
-	}
-
-	@After
-	public void cleanUpStreams() {
-		System.setOut(null);
-	};
 
 	@Test
 	public void testSearchCommand() {
 		taskLogic.getMemory().clearMemory();
 		// test 1
-		assertEquals("unable to find task with keyword 'meeting'",
-				taskLogic.executeCommand("search meeting"));
+		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
-		assertEquals("task(s) with keyword 'meeting' searched",
-				taskLogic.executeCommand("search meeting"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
-				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
+				+ "CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
 		// test 2
-		outContent.reset();
-		assertEquals("task(s) with keyword 'meeting #important' searched",
-				taskLogic.executeCommand("search meeting #important"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n",
-				outContent.toString());
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
+				+ "task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
 		// test 3
-		outContent.reset();
 		taskLogic.executeCommand("add important date 1.10.2014 #meeting");
-		assertEquals("task(s) with keyword 'meeting #important' searched",
-				taskLogic.executeCommand("search meeting #important"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n",
-				outContent.toString());
-		outContent.reset();
-		assertEquals("task(s) with keyword 'meeting' searched",
-				taskLogic.executeCommand("search meeting"));
-		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
-				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());		
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
+				+ "task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
+		assertEquals("CS2103T meeting on 22.09.2014 #important\n" 
+				+ "CS2101 meeting on 29.09.2014\n"
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
 	}
-	***/
-	
+
 	@Test
 	public void testGetSnapshot(){
 		taskLogic.getMemory().clearMemory();
@@ -94,7 +72,7 @@ public class LogicTest {
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n", taskLogic.obtainPrintableOutput());
-		// sort by date - test 2 - tasks without date & time
+		// sort by date - test 2 - tasks without date & time and task with date & time
 		taskLogic.executeCommand("add play badminton #anytime");
 		taskLogic.executeCommand("add medical check up 1.10.2014 13:00 #$100");
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
@@ -102,7 +80,7 @@ public class LogicTest {
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
 				+ "N.A.\n" + "play badminton #anytime\n", taskLogic.obtainPrintableOutput());
-		// sort by date - test 3 - tasks with same fromDateTime
+		// sort by date - test 3 - tasks with same fromDate
 		taskLogic.executeCommand("add pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
 		taskLogic.executeCommand("add do PS4 from 28.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("add MA1101R Midterm 25.09.2014");
@@ -114,7 +92,7 @@ public class LogicTest {
 				+ "30.Sep.2014\n" + "do PS4\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
-		// sort by date - test 4 - tasks with from and to dateTime
+		// sort by date - test 4 - tasks with from and to DateTime
 		taskLogic.executeCommand("add work from 10.10.2014 10:00 to 12.10.2014 13:00");
 		taskLogic.executeCommand("add gaming 3.10.2014 from 10:00 to 15:00");
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
