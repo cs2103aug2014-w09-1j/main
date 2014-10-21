@@ -69,6 +69,7 @@ class MemorySnapshotHandler {
 			for (int i=0; i < snapshotList.size(); i++){
 				snapshot += snapshotList.get(i).toString() + "\n";
 			}
+			snapshot += labelsInSortedOrder.get(0);
 			return snapshot;
 		}
 
@@ -137,9 +138,19 @@ class MemorySnapshotHandler {
 				Date startDate = snapshotList.get(i).getFromDateTime();
 				Date endDate = snapshotList.get(i).getToDateTime();
 				Date date = startDate;
+				if (MyTasksParser.dateFormats.get(2).format(startDate).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
+					snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, endDate, snapshotList.get(i).getLabels()));
+					continue;
+				}
+				
 				while (!MyTasksParser.dateFormats.get(2).format(date).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
 					date = incrementDate(date);
-					snapshotList.add(new Task(snapshotList.get(i).getDescription(), date, null, snapshotList.get(i).getLabels()));
+					if (MyTasksParser.dateFormats.get(2).format(date).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
+						snapshotList.add(new Task(snapshotList.get(i).getDescription(), endDate, endDate, snapshotList.get(i).getLabels()));
+					}
+					else{
+						snapshotList.add(new Task(snapshotList.get(i).getDescription(), getDate(date), null, snapshotList.get(i).getLabels()));
+					}
 				}
 				snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, null, snapshotList.get(i).getLabels()));
 			}
@@ -171,10 +182,27 @@ class MemorySnapshotHandler {
 			timeToString += MyTasksParser.dateFormats.get(4).format(task.getFromDateTime());
 		}
 		if (task.getToDateTime() != null && !MyTasksParser.dateFormats.get(4).format(task.getToDateTime()).equals("00:00")){
-			timeToString += MyTasksParser.dateFormats.get(4).format(task.getToDateTime());
+			String startTime = timeToString;
+			String endTime = MyTasksParser.dateFormats.get(4).format(task.getToDateTime());
+			if (startTime.equals(endTime)){
+				timeToString = "till " + endTime;
+			}else{
+				timeToString = "from " + startTime + " to " + endTime;
+			}
 		}
 
 		return timeToString;
+	}
+
+	private Date getDate(Date date){
+		String dateToString = MyTasksParser.dateFormats.get(2).format(date);
+		Date dateWithoutTime = null;
+		try {
+			dateWithoutTime = MyTasksParser.dateFormats.get(2).parse(dateToString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}	
+		return dateWithoutTime;
 	}
 
 	private boolean haveLabels(int index){
