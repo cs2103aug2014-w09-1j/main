@@ -22,7 +22,7 @@ public class MyTasks {
 	}
 	
 	public static void main(String[] args){
-		MyTasks runningProgram = new MyTasks();	
+		//MyTasks runningProgram = new MyTasks();	
 		MyTasksUI uiCompo = new MyTasksUI();
 		uiCompo.run();
 	}

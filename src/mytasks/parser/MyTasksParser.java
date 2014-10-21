@@ -170,7 +170,7 @@ public class MyTasksParser implements IParser {
 		int[] indexFromTo = checkFromAndTo(words);
 		int indexOfFrom = indexFromTo[0];
 		int indexOfTo = indexFromTo[1];
-
+		
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
 		int indexOfDate1 = indexDatesFormat[0];
 		int indexOfDate2 = indexDatesFormat[1];
@@ -230,8 +230,9 @@ public class MyTasksParser implements IParser {
 		int indexDate1 = -1;
 		int indexDate2 = -1;
 		int indexFormat = -1;
+		//Don't try format 4 which is for HH:mm
 		for (int i = 0; i < words.length; i++) {
-			for (int j = 0; j < dateFormats.size(); j++) {
+			for (int j = 0; j < dateFormats.size()-1; j++) {
 				SimpleDateFormat dateForm = dateFormats.get(j);
 				try {
 					dateForm.setLenient(false);
@@ -454,8 +455,11 @@ public class MyTasksParser implements IParser {
 	private Command convertSort(String message, String comdType) {
 		ArrayList<String> labels = null;
 		String[] words = message.split("\\s+");
-		for (int i = 0; i < words.length; i++) {
-			labels.add(words[i]);
+		if (words.length>0) {
+			labels = new ArrayList<String>();
+			for (int i = 0; i < words.length; i++) {
+				labels.add(words[i]);
+			}
 		}
 		return new SortCommand(null, null, null, labels, null);
 	}

@@ -195,7 +195,11 @@ public class ParserTest {
 	private void assertObjFields(Command testCase, Command result){
 		Task testCaseTask = testCase.getTask();
 		Task resultTask = result.getTask();
-
+		// System.out.println(testCaseTask.getDescription());
+		// System.out.println(resultTask.getDescription());
+		// System.out.println(resultTask.getFromDateTime());
+		// System.out.println(resultTask.getToDateTime());
+		assertEquals(testCase.getToUpdateTaskDesc(),result.getToUpdateTaskDesc());
 		assertEquals(testCaseTask, resultTask);
 	}
 
