@@ -27,7 +27,6 @@ public class MyTasksParser implements IParser {
 
 	// Date and Time formats that are currently useable.
 	@SuppressWarnings("serial")
-<<<<<<< HEAD
 	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
 		add(new SimpleDateFormat("dd.MM.yyyy"));
 		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -35,18 +34,7 @@ public class MyTasksParser implements IParser {
 		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
 		add(new SimpleDateFormat("HH:mm"));
 	}};
-=======
-	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
-		{
-			add(new SimpleDateFormat("dd.MM.yyyy"));
-			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-			add(new SimpleDateFormat("dd.MMM.yyyy"));
-			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
-			add(new SimpleDateFormat("HH:mm"));
-		}
-	};
 
->>>>>>> 8c19fb21125e0fd16cebaabfa9f69a78f93bc30a
 	private ArrayList<Integer> usedWords;
 
 	// Constructor
