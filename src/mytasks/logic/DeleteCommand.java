@@ -28,36 +28,29 @@ public class DeleteCommand extends Command {
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getTask().getDescription())) {
-				DeleteCommand commandToUndo = new DeleteCommand(mLocalMem
-						.getLocalMem().get(i).getDescription(), mLocalMem
-						.getLocalMem().get(i).getFromDateTime(), mLocalMem
-						.getLocalMem().get(i).getToDateTime(), mLocalMem
-						.getLocalMem().get(i).getLabels(), null);
+				Task currentTask = mLocalMem.getLocalMem().get(i);
+				Command commandToUndo = new DeleteCommand(
+						currentTask.getDescription(),
+						currentTask.getFromDateTime(),
+						currentTask.getToDateTime(), currentTask.getLabels(),
+						null);
 				mLocalMem.undoPush(commandToUndo);
 				mLocalMem.remove(super.getTask());
 				break;
 			}
 		}
-
+		mLocalMem.saveLocalMemory();
 		return super.getTaskDetails() + " deleted";
 	}
 
 	@Override
 	String undo() {
-		Task prevState = null;
-//		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-//			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
-//				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				mLocalMem.getLocalMem().add(this.getTask());
-//				break;
-//			}
-//		}
-				
-//		Command toRedo = new AddCommand(prevState.getDescription(),
-//				prevState.getFromDateTime(), prevState.getToDateTime(),
-//				prevState.getLabels(), null);
-//		mLocalMem.redoPush(toRedo);
+		Task prevState = super.getTask();
+		Command toRedo = new DeleteCommand(prevState.getDescription(), null,
+				null, null, null);
+		mLocalMem.add(prevState);
+		mLocalMem.redoPush(toRedo);
+		mLocalMem.saveLocalMemory();
 		return this.getTask().getDescription() + " added";
 	}
-
 }
