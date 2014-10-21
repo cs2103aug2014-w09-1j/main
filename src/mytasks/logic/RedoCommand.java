@@ -33,8 +33,8 @@ public class RedoCommand extends Command {
 	}
 
 	@Override
-	String undo() {
-		// TODO Auto-generated method stub
-		return null;
+	String undo(){
+		// Unimplemented method
+		throw new UnsupportedOperationException("RedoCommand does not have an undo function");
 	}
 }

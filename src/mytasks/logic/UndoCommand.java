@@ -35,8 +35,7 @@ public class UndoCommand extends Command {
 
 	@Override
 	String undo() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("UndoCommand does not have an undo function");
 	}
 
 }
