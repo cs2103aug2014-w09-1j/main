@@ -26,7 +26,7 @@ public class DeleteCommand extends Command {
 	@Override
 	String execute() {
 		for (int i=0; i<mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTask().getDescription())) {
+			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())) {
 				DeleteCommand commandToUndo = new DeleteCommand(mLocalMem.getLocalMem().get(i).getDescription(), mLocalMem.getLocalMem().get(i).getFromDateTime(), mLocalMem.getLocalMem().get(i).getToDateTime(), mLocalMem.getLocalMem().get(i).getLabels(), null);
 				mLocalMem.undoPush(commandToUndo);
 				mLocalMem.remove(super.getTask());
@@ -39,11 +39,13 @@ public class DeleteCommand extends Command {
 
 	@Override
 	String undo() {
+		
+		
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				mLocalMem.add(prevState);
+				mLocalMem.add(this.getTask());
 				break;
 			}
 		}
@@ -51,7 +53,7 @@ public class DeleteCommand extends Command {
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);
 		mLocalMem.redoPush(toRedo);
-		return this.getToUpdateTaskDesc() + " added";
+		return this.getTask().getDescription() + " added";
 	}
 
 }

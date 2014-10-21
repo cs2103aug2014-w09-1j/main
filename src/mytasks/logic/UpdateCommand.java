@@ -61,6 +61,7 @@ public class UpdateCommand extends Command {
 	@Override
 	String undo() {
 		// TODO Auto-generated method stub
+		// undo is currently just deleteing (FIX)
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
