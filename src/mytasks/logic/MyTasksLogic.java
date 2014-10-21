@@ -195,4 +195,5 @@ public class MyTasksLogic implements ILogic {
 	protected LocalMemory getMemory() {
 		return mLocalMem;
 	}
+
 }
