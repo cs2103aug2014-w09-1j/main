@@ -31,20 +31,21 @@ public class LogicTest {
 //				taskLogic.obtainPrintableOutput());
 //	}
 
-	@Test
-	public void testUndoRedoAdd() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("add meeting 22.09.2014 #important");
-		assertEquals("meeting deleted", taskLogic.executeCommand("undo"));
-		// The following essentially tests undo function for delete
-		assertEquals("meeting added", taskLogic.executeCommand("redo"));
-	}
-
 //	@Test
-//	public void testUpdateCommand() {
-//		taskLogic = new MyTasksLogic(true);
-//		assertEquals("CS2103T #important updated", taskLogic.executeCommand("update meeting - CS2103T #important"));
+//	public void testUndoRedoAdd() {
+//		taskLogic.getMemory().clearMemory();
+//		taskLogic.executeCommand("add meeting 22.09.2014 #important");
+//		assertEquals("meeting deleted", taskLogic.executeCommand("undo"));
+//		// The following essentially tests undo function for delete
+//		assertEquals("meeting added", taskLogic.executeCommand("redo"));
 //	}
+
+	@Test
+	public void testUpdateCommand() {
+		taskLogic = new MyTasksLogic(true);
+		taskLogic.executeCommand("add meeting");
+		assertEquals("CS2103T updated", taskLogic.executeCommand("update meeting - CS2103T #important"));
+	}
 //
 //	@Before
 //	public void setUpStreams() {
