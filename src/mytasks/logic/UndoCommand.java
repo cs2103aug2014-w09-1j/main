@@ -13,11 +13,10 @@ public class UndoCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	
-	public UndoCommand(String comdType, String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
-				updateDesc);
+
+	public UndoCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override

@@ -149,17 +149,16 @@ class LocalMemory implements Serializable {
 		return isFound;
 	}
 
-	protected void redo() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void push(Command commandToUndo) {
+	protected void undoPush(Command commandToUndo) {
 		undoStack.push(commandToUndo);
 	}
 
-	public Stack<Command> getUndoStack() {
+	protected Stack<Command> getUndoStack() {
 		return undoStack;
+	}
+	
+	protected void redoPush(Command commandToUndo) {
+		redoStack.push(commandToUndo);
 	}
 	
 	private boolean haveSameDesc(Task userRequest, int index) {

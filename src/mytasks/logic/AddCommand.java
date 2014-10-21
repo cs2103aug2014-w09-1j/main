@@ -15,32 +15,37 @@ public class AddCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private Task mTask;
 
-	public AddCommand(String comdType, String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
-				updateDesc);
+	public AddCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mLocalMem = LocalMemory.getInstance();
-		
 	}
 
 	@Override
 	String execute() {
 		mLocalMem.add(super.getTask());
-		AddCommand commandToUndo = new AddCommand(null, null, null, null, null, mTask.getDescription());
-		mLocalMem.push(commandToUndo);
-		return "add completed";
+		AddCommand commandToUndo = new AddCommand(null, null, null, null, super
+				.getTask().getDescription());
+		mLocalMem.undoPush(commandToUndo);
+		return super.getTaskDetails() + " added";
 	}
 
+	@Override
 	String undo() {
-		for (int i=0; i<mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
+		Task prevState = null;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(this.getToUpdateTaskDesc())) {
+				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				mLocalMem.getLocalMem().remove(i);
 				break;
 			}
 		}
-		
-		return "undo complete";
+		Command toRedo = new DeleteCommand(prevState.getDescription(),
+				prevState.getFromDateTime(), prevState.getToDateTime(),
+				prevState.getLabels(), null);
+		mLocalMem.redoPush(toRedo);
+		return this.getToUpdateTaskDesc() + " deleted";
 	}
 }

@@ -11,9 +11,9 @@ import java.util.Date;
  */
 public class SearchCommand extends Command {
 
-	public SearchCommand(String comdType, String comdDes, Date fromDateTime,
+	public SearchCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override

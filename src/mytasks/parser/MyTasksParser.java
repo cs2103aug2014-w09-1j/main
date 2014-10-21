@@ -33,9 +33,10 @@ public class MyTasksParser implements IParser {
 			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
 			add(new SimpleDateFormat("dd.MMM.yyyy"));
 			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+			add(new SimpleDateFormat("HH:mm"));
 		}
 	};
-	
+
 	private ArrayList<Integer> usedWords;
 
 	// Constructor
@@ -61,12 +62,12 @@ public class MyTasksParser implements IParser {
 				if (words.length != 1) { // Checks if there are any extra input
 					return null;
 				}
-				return new UndoCommand(comdType, null, null, null, null, null);
+				return new UndoCommand(null, null, null, null, null);
 			case "redo":
 				if (words.length != 1) { // Checks if there are any extra input
 					return null;
 				}
-				return new RedoCommand(comdType, null, null, null, null, null);
+				return new RedoCommand(null, null, null, null, null);
 			case "update":
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
@@ -107,14 +108,11 @@ public class MyTasksParser implements IParser {
 		}
 		switch (comdType) {
 		case "add":
-			return new AddCommand(comdType, taskDesc, dateFrom, dateTo, labels,
-					null);
+			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
 		case "search":
-			return new SearchCommand(comdType, taskDesc, dateFrom, dateTo,
-					labels, null);
+			return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
 		case "delete":
-			return new DeleteCommand(comdType, taskDesc, dateFrom, dateTo,
-					labels, null);
+			return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
 		}
 		return null;
 	}
@@ -441,7 +439,7 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
 		}
-		return new UpdateCommand(comdType, taskDesc, dateFrom, dateTo, labels,
+		return new UpdateCommand(taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
 	}
 
@@ -459,7 +457,7 @@ public class MyTasksParser implements IParser {
 		for (int i = 0; i < words.length; i++) {
 			labels.add(words[i]);
 		}
-		return new SortCommand(comdType, null, null, null, labels, null);
+		return new SortCommand(null, null, null, labels, null);
 	}
 
 	protected class DoubleDate {

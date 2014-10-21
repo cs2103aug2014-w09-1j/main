@@ -11,10 +11,9 @@ import java.util.Date;
  */
 public class DeleteCommand extends Command {
 
-	public DeleteCommand(String comdType, String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
-				updateDesc);
+	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override

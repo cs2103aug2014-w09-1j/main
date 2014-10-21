@@ -11,10 +11,9 @@ import java.util.Date;
  */
 public class UpdateCommand extends Command {
 
-	public UpdateCommand(String comdType, String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		super(comdType, comdDes, fromDateTime, toDateTime, comdLabels,
-				updateDesc);
+	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override
