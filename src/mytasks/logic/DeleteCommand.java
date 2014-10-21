@@ -9,17 +9,24 @@ import java.util.Date;
  * @author Wilson
  *
  */
-public class DeleteCommand extends Command {
 
+public class DeleteCommand extends Command {
+	
+	// private variables
+	private LocalMemory mLocalMem;
+		
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
+		
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
-		return null;
+		mLocalMem.remove(super.getTask());
+		DeleteCommand commandToUndo = new DeleteCommand(null, null, null, null, super.getTask().getDescription());
+		mLocalMem.undoPush(commandToUndo);
+		return super.getTaskDetails() + " added";
 	}
 
 	@Override

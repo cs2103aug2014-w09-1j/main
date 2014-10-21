@@ -39,6 +39,22 @@ public class LogicTest {
 		// The following essentially tests undo function for delete
 		assertEquals("meeting added", taskLogic.executeCommand("redo"));
 	}
+//
+//	@Test
+//	public void testUpdateCommand() {
+//		taskLogic = new MyTasksLogic(true);
+//		assertEquals("CS2103T #important updated", taskLogic.executeCommand("update meeting - CS2103T #important"));
+//	}
+//
+//	@Before
+//	public void setUpStreams() {
+//		System.setOut(new PrintStream(outContent));
+//	}
+//
+//	@After
+//	public void cleanUpStreams() {
+//		System.setOut(null);
+//	};
 
 	@Test
 	public void testUpdateCommand() {
