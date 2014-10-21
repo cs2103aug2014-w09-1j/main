@@ -45,7 +45,6 @@ public class LogicTest {
 	public void setUpStreams() {
 		System.setOut(new PrintStream(outContent));
 	}
->>>>>>> FETCH_HEAD
 
 	@After
 	public void cleanUpStreams() {
@@ -54,6 +53,7 @@ public class LogicTest {
 
 	@Test
 	public void testSearchCommand() {
+		taskLogic.getMemory().clearMemory();
 		// test 1
 		assertEquals("unable to find task with keyword 'meeting'",
 				taskLogic.executeCommand("search meeting"));
@@ -81,12 +81,12 @@ public class LogicTest {
 				taskLogic.executeCommand("search meeting"));
 		assertEquals("CS2103T meeting on 22.09.2014 #important\r\n"
 				+ "CS2101 meeting on 29.09.2014\r\n", outContent.toString());		
-		taskLogic.getMemory().clearMemory();
 	}
 	***/
 	
 	@Test
 	public void testGetSnapshot(){
+		taskLogic.getMemory().clearMemory();
 		// sort by date - test 1
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("add CS2101 meeting 29.09.2014 #important");
@@ -107,14 +107,26 @@ public class LogicTest {
 		taskLogic.executeCommand("add do PS4 from 28.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("add MA1101R Midterm 25.09.2014");
 		taskLogic.executeCommand("add eat sushi #KentRidge");
-		//taskLogic.executeCommand("add work from 10.10.2014 10:00 to 13.10.2014 13:00");
-		//taskLogic.executeCommand("add gaming 3.10.2014 from 10:00 to 15:00");
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n" + "pay acceptance fee #$200\n" + "do PS4\n"
 				+ "30.Sep.2014\n" + "do PS4\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
+				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
+		// sort by date - test 4 - tasks with from and to dateTime
+		taskLogic.executeCommand("add work from 10.10.2014 10:00 to 12.10.2014 13:00");
+		taskLogic.executeCommand("add gaming 3.10.2014 from 10:00 to 15:00");
+		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
+				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting #important\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "30.Sep.2014\n" + "do PS4\n"
+				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
+				+ "03.Oct.2014\n" + "gaming from 10:00 to 15:00\n"
+				+ "10.Oct.2014\n" + "work 10:00\n"
+				+ "11.Oct.2014\n" + "work\n"
+				+ "12.Oct.2014\n" + "work till 13:00\n"
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
 		// sort by labels - test 1
 		taskLogic.executeCommand("sort important");
@@ -127,7 +139,6 @@ public class LogicTest {
 				+ "do PS4 from 28.09.2014 to 30.09.2014\n" 
 				+ "MA1101R Midterm on 25.09.2014\n" 
 				+ "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
-		taskLogic.getMemory().clearMemory();
 	}
 	
 	@Test
