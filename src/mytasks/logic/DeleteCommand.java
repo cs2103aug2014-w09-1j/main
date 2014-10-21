@@ -49,10 +49,10 @@ public class DeleteCommand extends Command {
 				break;
 			}
 		}
-		Command toRedo = new AddCommand(prevState.getDescription(),
-				prevState.getFromDateTime(), prevState.getToDateTime(),
-				prevState.getLabels(), null);
-		mLocalMem.redoPush(toRedo);
+//		Command toRedo = new AddCommand(prevState.getDescription(),
+//				prevState.getFromDateTime(), prevState.getToDateTime(),
+//				prevState.getLabels(), null);
+//		mLocalMem.redoPush(toRedo);
 		return this.getTask().getDescription() + " added";
 	}
 

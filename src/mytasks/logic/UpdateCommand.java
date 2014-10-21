@@ -54,19 +54,18 @@ public class UpdateCommand extends Command {
 			}
 		}
 		
-		// incorrect output
-		return super.getTaskDetails() + " updated";
+		return super.getToUpdateTaskDesc() + " updated";
 	}
 
 	@Override
 	String undo() {
 		// TODO Auto-generated method stub
-		// undo is currently just deleteing (FIX)
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				mLocalMem.getLocalMem().remove(i);
+				mLocalMem.getLocalMem().add(prevState);
 				break;
 			}
 		}
@@ -75,8 +74,7 @@ public class UpdateCommand extends Command {
 				prevState.getLabels(), null);
 		mLocalMem.redoPush(toRedo);
 
-		// incorrect output
-		return this.getToUpdateTaskDesc() + " deleted";
+		return this.getToUpdateTaskDesc() + " reverted";
 	}
 
 }
