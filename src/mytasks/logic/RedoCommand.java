@@ -24,17 +24,17 @@ public class RedoCommand extends Command {
 		String feedback;
 
 		if (mLocalMem.getRedoStack().isEmpty()) {
-			feedback = "No reverts yet";
+			feedback = "No commands to undo";
 		} else {
 			Command commandToRevert = mLocalMem.getRedoStack().pop();
-			feedback = commandToRevert.undo();
+			feedback = commandToRevert.execute();
 		}
 		return feedback;
 	}
 
 	@Override
-	String undo() {
-		// TODO Auto-generated method stub
-		return null;
+	String undo(){
+		// Unimplemented method
+		throw new UnsupportedOperationException("RedoCommand does not have an undo function");
 	}
 }

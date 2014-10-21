@@ -38,6 +38,7 @@ public class LogicTest {
 		// The following essentially tests undo function for delete
 		assertEquals("meeting added", taskLogic.executeCommand("redo"));
 	}
+	
 
 
 	@Test
@@ -133,6 +134,8 @@ public class LogicTest {
 		taskLogic.executeCommand("add play");
 		taskLogic.executeCommand("update play - do homework");
 		assertEquals("do homework reverted", taskLogic.executeCommand("undo"));
+		assertEquals("play updated", taskLogic.executeCommand("redo"));
+		assertEquals("do homework reverted", taskLogic.executeCommand("undo"));
 	}
 	
 	@Test
@@ -149,6 +152,9 @@ public class LogicTest {
 		taskLogic.executeCommand("add play");
 		taskLogic.executeCommand("delete play");
 		assertEquals("play added", taskLogic.executeCommand("undo"));
+		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
+		assertEquals("play deleted", taskLogic.executeCommand("redo"));
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 
 	// TODO: add test cases for the working functions. Ie. search and update.
