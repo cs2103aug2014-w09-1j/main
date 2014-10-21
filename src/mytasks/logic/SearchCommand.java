@@ -10,16 +10,25 @@ import java.util.Date;
  *
  */
 public class SearchCommand extends Command {
+	
+	private LocalMemory mLocalMem;
+	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
+	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
 
 	public SearchCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
-		return null;
+		boolean isFound = mLocalMem.search(super.getTask());
+		if (isFound) {
+			return String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
+		} else {
+			return String.format(MESSAGE_SEARCH_FAIL, super.getTask());
+		}
 	}
 
 	@Override
