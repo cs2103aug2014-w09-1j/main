@@ -1,5 +1,6 @@
 package mytasks.logic;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -14,24 +15,32 @@ import mytasks.parser.MyTasksParser;
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
  * It is required to be able to categorize by labels that is listed in the currentSettings
- * @author Wilson
+ * @author Michael
  *
  */
 class MemorySnapshotHandler {
 	
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
+	private ArrayList<String> labelsInSortedOrder;
 	
 	//Constructor
 	protected MemorySnapshotHandler() {
 		currentSettings = MyTasks.DEFAULT_VIEW;
-		snapshotList = new ArrayList<Task>();
 		assert currentSettings[0] == "date" : "wrong default setting";
 	}
 	
 	protected void setView(ArrayList<String> newSettings) {
 		currentSettings = newSettings.toArray((new String[newSettings.size()]));
 		assert currentSettings != null : "invalid setting";
+	}
+	
+	private void initSnapshotList(LocalMemory LocalMem){
+		snapshotList = new ArrayList<Task>();
+		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
+			snapshotList.add(LocalMem.getLocalMem().get(i));
+		}
+		labelsInSortedOrder = new ArrayList<String>();
 	}
 
 	/**
@@ -40,47 +49,59 @@ class MemorySnapshotHandler {
 	 */
 	public String getSnapshot(LocalMemory LocalMem) {
 		assert currentSettings != null : "invalid setting";
-
-		if (currentSettings[0].equals("date")){
-			snapshotList = new ArrayList<Task>();
-			for (int i=0; i < LocalMem.getLocalMem().size(); i++){
-				snapshotList.add(LocalMem.getLocalMem().get(i));
+		initSnapshotList(LocalMem);
+		assert !snapshotList.isEmpty() : "initialize fail";  
+		
+		for (int i=0; i < currentSettings.length; i++){
+			if (currentSettings[i].equals("date")){
+				timedTaskToNormalTask();		
+				sortByDate();
 			}
-
-			timedTaskToNormalTask();		
-			return sortByDate();
+			else{
+				labelsInSortedOrder.add(currentSettings[i]);
+			}
+		}
+		
+		if (!labelsInSortedOrder.isEmpty()){
+			sortByLabels();
+			
+			String snapshot = "";
+			for (int i=0; i < snapshotList.size(); i++){
+				snapshot += snapshotList.get(i).toString() + "\n";
+			}
+			return snapshot;
 		}
 
-		return null;
+		return convertSnapshotListToString(snapshotList);
 	}
 
-	private String sortByDate(){
+	private void sortByDate(){
 		for (int i=0; i < snapshotList.size()-1; i++){
-			Date date = snapshotList.get(i).getFromDateTime();
-			if (date == null){
-				for (int j=i; j < snapshotList.size()-1; j++){
+			for (int j=0; j < snapshotList.size()-1-i; j++){
+				Date currentDate = snapshotList.get(j).getFromDateTime();
+				Date nextDate = snapshotList.get(j+1).getFromDateTime();
+				if (currentDate == null && nextDate != null || nextDate != null && currentDate.after(nextDate)){
 					Task temp = snapshotList.get(j);
 					snapshotList.set(j, snapshotList.get(j+1));
 					snapshotList.set(j+1, temp);
 				}
 			}
-			else{
-				for (int j=0; j < snapshotList.size()-1-i; j++){
-					date = snapshotList.get(j).getFromDateTime();
-					if (date == null || snapshotList.get(j+1).getFromDateTime() != null && date.after(snapshotList.get(j+1).getFromDateTime())){
-						Task temp = snapshotList.get(j);
-						snapshotList.set(j, snapshotList.get(j+1));
-						snapshotList.set(j+1, temp);
-					}
+		}
+	}
+	
+	private void sortByLabels(){
+		for (int i=0; i < snapshotList.size()-1; i++){
+			for (int j=0; j < snapshotList.size()-1-i; j++){
+				if (!haveLabels(j) && haveLabels(j+1)){
+					Task temp = snapshotList.get(j);
+					snapshotList.set(j, snapshotList.get(j+1));
+					snapshotList.set(j+1, temp);
 				}
 			}
 		}
-		
-		return convertSnapshotListToString(snapshotList);
 	}
 
 	private String convertSnapshotListToString(ArrayList<Task> snapshotList){	
-
 		String snapshot = "";
 
 		for (int i=0; i < snapshotList.size(); i++){
@@ -116,7 +137,7 @@ class MemorySnapshotHandler {
 				Date startDate = snapshotList.get(i).getFromDateTime();
 				Date endDate = snapshotList.get(i).getToDateTime();
 				Date date = startDate;
-				while (!date.equals(endDate)){
+				while (!MyTasksParser.dateFormats.get(2).format(date).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
 					date = incrementDate(date);
 					snapshotList.add(new Task(snapshotList.get(i).getDescription(), date, null, snapshotList.get(i).getLabels()));
 				}
@@ -144,6 +165,8 @@ class MemorySnapshotHandler {
 
 	private String getTime(Task task){		
 		String timeToString = "";
+		assert task.getFromDateTime() != null;
+		
 		if (!MyTasksParser.dateFormats.get(4).format(task.getFromDateTime()).equals("00:00")){
 			timeToString += MyTasksParser.dateFormats.get(4).format(task.getFromDateTime());
 		}
@@ -152,6 +175,22 @@ class MemorySnapshotHandler {
 		}
 
 		return timeToString;
+	}
+
+	private boolean haveLabels(int index){
+		if (snapshotList.get(index).getLabels() == null){
+			return false;
+		}
+		
+		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
+			for (int j=0; j < labelsInSortedOrder.size(); j++){
+				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	private Date incrementDate(Date date){
