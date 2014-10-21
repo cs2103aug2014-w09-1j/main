@@ -27,15 +27,13 @@ public class MyTasksParser implements IParser {
 
 	// Date and Time formats that are currently useable.
 	@SuppressWarnings("serial")
-	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
-		{
-			add(new SimpleDateFormat("dd.MM.yyyy"));
-			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-			add(new SimpleDateFormat("dd.MMM.yyyy"));
-			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
-			add(new SimpleDateFormat("HH:mm"));
-		}
-	};
+	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
+		add(new SimpleDateFormat("dd.MM.yyyy"));
+		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
+	    add(new SimpleDateFormat("dd.MMM.yyyy"));
+		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+		add(new SimpleDateFormat("HH:mm"));
+	}};
 
 	private ArrayList<Integer> usedWords;
 
@@ -453,7 +451,7 @@ public class MyTasksParser implements IParser {
 	 * @return the command object representing the sortcommand
 	 */
 	private Command convertSort(String message, String comdType) {
-		ArrayList<String> labels = null;
+		ArrayList<String> labels = new ArrayList<String>();
 		String[] words = message.split("\\s+");
 		if (words.length>0) {
 			labels = new ArrayList<String>();
