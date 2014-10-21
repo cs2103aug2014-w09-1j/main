@@ -72,6 +72,8 @@ public class MyTasksUI extends JPanel implements ActionListener {
         
         c.fill = GridBagConstraints.HORIZONTAL;
         add(textField, c);        
+        
+        textArea.setText(mLogic.obtainPrintableOutput());  
 	}
 	
 	/**
@@ -87,18 +89,17 @@ public class MyTasksUI extends JPanel implements ActionListener {
         });
 	}
     
-    public void actionPerformed(ActionEvent evt) {
+    public void actionPerformed(ActionEvent evt) {    	
         String text = textField.getText();
         textAreaFeedback.setText(mLogic.executeCommand(text));
-        textArea.setText(mLogic.obtainPrintableOutput());        
-        
+        textArea.setText(mLogic.obtainPrintableOutput());  
         textField.selectAll();
         
-        //textField.setText("");
-        //textArea.append(mLogic.obtainPrintableOutput() + "\n");
+//        textField.setText("");
+//        textArea.append(mLogic.obtainPrintableOutput() + "\n");
 
-        //Make sure the new text is visible, even if there
-        //was a selection in the text area.
+//        Make sure the new text is visible, even if there
+//        was a selection in the text area.
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
@@ -117,6 +118,6 @@ public class MyTasksUI extends JPanel implements ActionListener {
 
         //Display the window.
         frame.pack();
-        frame.setVisible(true);
+        frame.setVisible(true);  
     }
 }
