@@ -76,4 +76,5 @@ public abstract class Command {
 	}
 	
 	abstract String execute();
+	abstract String undo();
 }

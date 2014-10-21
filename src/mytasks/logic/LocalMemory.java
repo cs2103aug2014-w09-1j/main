@@ -176,6 +176,10 @@ class LocalMemory implements Serializable {
 		undoStack.push(commandToUndo);
 	}
 
+	public Stack<Command> getUndoStack() {
+		return undoStack;
+	}
+	
 	private boolean haveSameDesc(Task userRequest, int index) {
 		String desc = userRequest.getDescription();
 

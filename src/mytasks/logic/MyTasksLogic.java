@@ -61,21 +61,22 @@ public class MyTasksLogic implements ILogic {
 			case ADD :
 				// a boolean to make sure that commandobject will only be
 				// put into stack only if it is not an undo operation
-				addCommand(commandObject);
-				putToUndoStack(commandObject);
+//				addCommand(commandObject);
+				commandObject.execute();
+//				putToUndoStack(commandObject);
 				if (!isDeveloper) {
 					mLocalMem.saveLocalMemory();
 				}
 				return output + " added";
 			case DELETE :
-				putToUndoStack(commandObject);
+//				putToUndoStack(commandObject);
 				deleteCommand(commandObject);
 				if (!isDeveloper) {
 					mLocalMem.saveLocalMemory();
 				}
 				return output + " deleted";
 			case UPDATE :
-				putToUndoStack(commandObject);
+//				putToUndoStack(commandObject);
 				updateCommand(commandObject);
 				if (!isDeveloper) {
 					mLocalMem.saveLocalMemory();
