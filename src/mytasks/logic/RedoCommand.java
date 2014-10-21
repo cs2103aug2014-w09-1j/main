@@ -21,8 +21,14 @@ public class RedoCommand extends Command {
 
 	@Override
 	String execute() {
-		Command commandToRevert = mLocalMem.getRedoStack().pop();
-		String feedback = commandToRevert.execute();
+		String feedback;
+
+		if (mLocalMem.getRedoStack().isEmpty()) {
+			feedback = "No commands to undo";
+		} else {
+			Command commandToRevert = mLocalMem.getRedoStack().pop();
+			feedback = commandToRevert.execute();
+		}
 		return feedback;
 	}
 

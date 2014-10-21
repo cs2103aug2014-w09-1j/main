@@ -8,82 +8,85 @@ import java.util.Date;
 import mytasks.parser.MyTasksParser;
 
 /**
- * Task object represents a single task with all the relevant fields that is essential to a task
+ * Task object represents a single task with all the relevant fields that is
+ * essential to a task
+ * 
  * @author Wilson
  *
  */
 public class Task {
-	
-	//Private local variables
+
+	// Private local variables
 	private String mDescription;
 	private Date mFromDateTime = null;
 	private Date mToDateTime = null;
 	private ArrayList<String> mLabels;
-	
-	//Constructor
-	public Task(String details, Date fromDateTime, Date toDateTime, ArrayList<String> labels) {
+
+	// Constructor
+	public Task(String details, Date fromDateTime, Date toDateTime,
+					ArrayList<String> labels) {
 		mDescription = details;
 		mFromDateTime = fromDateTime;
 		mToDateTime = toDateTime;
 		mLabels = labels;
 	}
-	
-	public Task(Task newTask){
+
+	public Task(Task newTask) {
 		mDescription = newTask.getDescription();
 		mFromDateTime = newTask.getFromDateTime();
 		mToDateTime = newTask.getToDateTime();
 		mLabels = newTask.getLabels();
 	}
-	
+
 	public String getDescription() {
 		return mDescription;
 	}
-	
+
 	public void setDescription(String updateDesc) {
 		mDescription = updateDesc;
 	}
-	
+
 	public Date getFromDateTime() {
 		return mFromDateTime;
 	}
-	
+
 	public Date getToDateTime() {
 		return mToDateTime;
 	}
-	
+
 	public void setFromDateTime(Date dateTime) {
 		mFromDateTime = dateTime;
 	}
-	
+
 	public void setToDateTime(Date dateTime) {
 		mToDateTime = dateTime;
 	}
-	
+
 	public ArrayList<String> getLabels() {
 		return mLabels;
 	}
-	
+
 	public void setLabels(ArrayList<String> labels) {
 		mLabels = new ArrayList<String>(); // for resetting after every update
 		mLabels = labels;
 	}
-	
-	public void setTask(Task newTask){
+
+	public void setTask(Task newTask) {
 		setDescription(newTask.getDescription());
 		setFromDateTime(newTask.getFromDateTime());
 		setToDateTime(newTask.getToDateTime());
 		setLabels(newTask.getLabels());
 	}
-	
-	public Task getClone(){
+
+	public Task getClone() {
 		SimpleDateFormat form = MyTasksParser.dateFormats.get(1);
 		Date newDate1 = null;
 		Date newDate2 = null;
 		try {
-			if (mFromDateTime!=null) {
+			if (mFromDateTime != null) {
 				newDate1 = form.parse(form.format(mFromDateTime));
 			}
-			if (mToDateTime!=null) {
+			if (mToDateTime != null) {
 				newDate2 = form.parse(form.format(mToDateTime));
 			}
 		} catch (ParseException e) {
@@ -95,52 +98,56 @@ public class Task {
 		}
 		return new Task(mDescription, newDate1, newDate2, newLabels);
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		String dateToString = "";
 		String dateFromString = "";
-		if (mFromDateTime != null){			
-			dateFromString = MyTasksParser.dateFormats.get(1).format(mFromDateTime);
+		if (mFromDateTime != null) {
+			dateFromString = MyTasksParser.dateFormats.get(1).format(
+							mFromDateTime);
 		}
-		if (dateFromString.contains("00:00")){
-			dateFromString = MyTasksParser.dateFormats.get(0).format(mFromDateTime);
+		if (dateFromString.contains("00:00")) {
+			dateFromString = MyTasksParser.dateFormats.get(0).format(
+							mFromDateTime);
 		}
-		if (mToDateTime != null){			
+		if (mToDateTime != null) {
 			dateToString = MyTasksParser.dateFormats.get(1).format(mToDateTime);
 		}
-		if (dateToString.contains("00:00")){
+		if (dateToString.contains("00:00")) {
 			dateToString = MyTasksParser.dateFormats.get(0).format(mToDateTime);
 		}
-		
+
 		String labelsToString = "";
-		if (mLabels!= null) {
-			for (String s : mLabels){
+		if (mLabels != null) {
+			for (String s : mLabels) {
 				labelsToString += " " + "#" + s;
 			}
 		}
 		String result = "";
-		if (dateFromString.equals("")){
+		if (dateFromString.equals("")) {
 			result = String.format("%s%s ", mDescription, labelsToString);
-		} else if (dateToString.equals("")){
-			result = String.format("%s on %s%s", mDescription, dateFromString, labelsToString);
+		} else if (dateToString.equals("")) {
+			result = String.format("%s on %s%s", mDescription, dateFromString,
+							labelsToString);
 		} else {
-			result = String.format("%s from %s to %s%s", mDescription, dateFromString, dateToString, labelsToString);
+			result = String.format("%s from %s to %s%s", mDescription,
+							dateFromString, dateToString, labelsToString);
 		}
 		return result.trim();
 	}
-	
+
 	@Override
 	public boolean equals(Object otherTask) {
 		if (otherTask == this) {
 			return true;
 		}
-		
+
 		if (!(otherTask instanceof Task)) {
 			return false;
 		} else {
-			Task other = (Task)otherTask;
-			if (other.getDescription()==null){
+			Task other = (Task) otherTask;
+			if (other.getDescription() == null) {
 				if (mDescription != null) {
 					return false;
 				}
@@ -148,13 +155,12 @@ public class Task {
 				if (mDescription == null) {
 					return false;
 				}
-				if (!other.getDescription().equals(mDescription)){
+				if (!other.getDescription().equals(mDescription)) {
 					return false;
 				}
 			}
-			
-			
-			if (other.getFromDateTime() == null){
+
+			if (other.getFromDateTime() == null) {
 				if (mFromDateTime != null) {
 					return false;
 				}
@@ -166,8 +172,8 @@ public class Task {
 					return false;
 				}
 			}
-			
-			if (other.getToDateTime() == null){
+
+			if (other.getToDateTime() == null) {
 				if (mToDateTime != null) {
 					return false;
 				}
@@ -179,7 +185,7 @@ public class Task {
 					return false;
 				}
 			}
-			
+
 			if (other.getLabels() == null) {
 				if (mLabels != null) {
 					return false;
@@ -191,7 +197,7 @@ public class Task {
 				if (other.getLabels().size() != mLabels.size()) {
 					return false;
 				}
-				for(int i = 0; i<mLabels.size(); i++) {
+				for (int i = 0; i < mLabels.size(); i++) {
 					if (!mLabels.get(i).equals(other.getLabels().get(i))) {
 						return false;
 					}

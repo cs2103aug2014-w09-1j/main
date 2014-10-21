@@ -30,6 +30,7 @@ public class LogicTest {
 				taskLogic.obtainPrintableOutput());
 	}
 
+
 	@Test
 	public void testUndoRedoAdd() {
 		taskLogic.getMemory().clearMemory();
@@ -44,6 +45,7 @@ public class LogicTest {
 	public void setUpStreams() {
 		System.setOut(new PrintStream(outContent));
 	}
+>>>>>>> FETCH_HEAD
 
 	@After
 	public void cleanUpStreams() {
@@ -127,11 +129,23 @@ public class LogicTest {
 				+ "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
 		taskLogic.getMemory().clearMemory();
 	}
+	
+	@Test
 	public void testUpdateCommand() {
-		assertEquals("CS2103T updated",
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add meeting");
+		assertEquals("meeting updated",
 				taskLogic.executeCommand("update meeting - CS2103T #important"));
 	}
 
+	@Test
+	public void testUndoRedoUpdate() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add play");
+		taskLogic.executeCommand("update play - do homework");
+		assertEquals("do homework reverted", taskLogic.executeCommand("undo"));
+	}
+	
 	@Test
 	public void testDeleteCommand() {
 		taskLogic.getMemory().clearMemory();
