@@ -92,7 +92,10 @@ public class Task {
 		} catch (ParseException e) {
 			Logger.getInstance().log("Task: Unexpected Error");
 		}
-		ArrayList<String> newLabels = new ArrayList<String>(mLabels);
+		ArrayList<String> newLabels = null;
+		if (mLabels!=null){
+			newLabels = new ArrayList<String>(mLabels);
+		}
 		return new Task(mDescription, newDate1, newDate2, newLabels);
 	}
 

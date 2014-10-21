@@ -17,19 +17,19 @@ public class LogicTest {
 
 	// private final ByteArrayOutputStream outContent = new
 	// ByteArrayOutputStream();
-//
-//	@Test
-//	public void testAddCommand() {
-//		taskLogic.getMemory().clearMemory();
-//		// assertEquals("meeting 22.09.2014 #important added",
-//		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-//		assertEquals("meeting added",
-//				taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-//		// assertEquals("meeting on 22.09.2014 #important" + "\n",
-//		// taskLogic.obtainPrintableOutput());
-//		assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
-//				taskLogic.obtainPrintableOutput());
-//	}
+
+	@Test
+	public void testAddCommand() {
+		taskLogic.getMemory().clearMemory();
+		// assertEquals("meeting 22.09.2014 #important added",
+		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
+		assertEquals("meeting added",
+				taskLogic.executeCommand("add meeting 22.09.2014 #important"));
+		// assertEquals("meeting on 22.09.2014 #important" + "\n",
+		// taskLogic.obtainPrintableOutput());
+		assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
+				taskLogic.obtainPrintableOutput());
+	}
 
 //	@Test
 //	public void testUndoRedoAdd() {
@@ -40,13 +40,6 @@ public class LogicTest {
 //		assertEquals("meeting added", taskLogic.executeCommand("redo"));
 //	}
 
-	@Test
-	public void testUpdateCommand() {
-		taskLogic = new MyTasksLogic(true);
-		taskLogic.executeCommand("add meeting");
-		assertEquals("CS2103T updated", taskLogic.executeCommand("update meeting - CS2103T #important"));
-	}
-//
 //	@Before
 //	public void setUpStreams() {
 //		System.setOut(new PrintStream(outContent));
@@ -57,20 +50,20 @@ public class LogicTest {
 //		System.setOut(null);
 //	};
 
-//	@Test
-//	public void testUpdateCommand() {
-//		assertEquals("CS2103T updated",
-//				taskLogic.executeCommand("update meeting - CS2103T #important"));
-//		//Check if fields are correct
-//	}
-//
-//	@Test
-//	public void testDeleteCommand() {
-//		taskLogic.getMemory().clearMemory();
-//		taskLogic.executeCommand("add play");
-//		assertEquals("play deleted", taskLogic.executeCommand("delete play"));
-//		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
-//	}
+	@Test
+	public void testUpdateCommand() {
+		assertEquals("CS2103T updated",
+				taskLogic.executeCommand("update meeting - CS2103T #important"));
+		//Check if fields are correct
+	}
+
+	@Test
+	public void testDeleteCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add play");
+		assertEquals("play deleted", taskLogic.executeCommand("delete play"));
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
+	}
 
 	/*
 	 * @Before public void setUpStreams() { System.setOut(new

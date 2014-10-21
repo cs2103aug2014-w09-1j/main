@@ -28,6 +28,7 @@ public class AddCommand extends Command {
 		AddCommand commandToUndo = new AddCommand(null, null, null, null, super
 				.getTask().getDescription());
 		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.saveLocalMemory();
 		return super.getTaskDetails() + " added";
 	}
 
@@ -44,6 +45,7 @@ public class AddCommand extends Command {
 		Command toRedo = new DeleteCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);
+		mLocalMem.saveLocalMemory();
 		mLocalMem.redoPush(toRedo);
 		return this.getToUpdateTaskDesc() + " deleted";
 	}
