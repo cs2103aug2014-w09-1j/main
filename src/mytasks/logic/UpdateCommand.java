@@ -17,66 +17,73 @@ public class UpdateCommand extends Command {
 	private LocalMemory mLocalMem;
 
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
-					ArrayList<String> comdLabels, String updateDesc) {
+			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getToUpdateTaskDesc())) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(super.getToUpdateTaskDesc())) {
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				break;
 			}
 		}
-		UpdateCommand commandToUndo = new UpdateCommand(prevState.getDescription(), prevState.getFromDateTime(), prevState.getToDateTime(), prevState.getLabels(), super.getTaskDetails());
+		UpdateCommand commandToUndo = new UpdateCommand(
+				prevState.getDescription(), prevState.getFromDateTime(),
+				prevState.getToDateTime(), prevState.getLabels(),
+				super.getTaskDetails());
 		mLocalMem.undoPush(commandToUndo);
-		
+
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (super.getToUpdateTaskDesc().equals(mLocalMem.getLocalMem().get(i).getDescription())) {
-				if (super.getTask().getDescription() != null) {
-					mLocalMem.getLocalMem().get(i).setDescription(super.getTask().getDescription());
+			if (super.getToUpdateTaskDesc().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				Task currentTask = super.getTask();
+				if (currentTask.getDescription() != null) {
+					mLocalMem.getLocalMem().get(i)
+							.setDescription(currentTask.getDescription());
 				}
-				if (super.getTask().getFromDateTime() != null) {
-					mLocalMem.getLocalMem().get(i).setFromDateTime(super.getTask().getFromDateTime());
+				if (currentTask.getFromDateTime() != null) {
+					mLocalMem.getLocalMem().get(i)
+							.setFromDateTime(currentTask.getFromDateTime());
 				}
-				if (super.getTask().getToDateTime() != null) {
-					mLocalMem.getLocalMem().get(i).setToDateTime(super.getTask().getToDateTime());
+				if (currentTask.getToDateTime() != null) {
+					mLocalMem.getLocalMem().get(i)
+							.setToDateTime(currentTask.getToDateTime());
 				}
-				if (super.getTask().getLabels() != null) {
+				if (currentTask.getLabels() != null) {
 					if (!super.getTask().getLabels().isEmpty()) {
-						mLocalMem.getLocalMem().get(i).setLabels(super.getTask().getLabels());
+						mLocalMem.getLocalMem().get(i)
+								.setLabels(currentTask.getLabels());
 					}
 				}
 			}
 		}
-		
+		mLocalMem.saveLocalMemory();
 		return super.getToUpdateTaskDesc() + " updated";
 	}
 
 	@Override
 	String undo() {
-		// TODO Auto-generated method stub
-//		mLocalMem.print();
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(this.getToUpdateTaskDesc())) {
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				mLocalMem.getLocalMem().remove(i);
 				mLocalMem.getLocalMem().add(this.getTask());
 				break;
 			}
 		}
-//		mLocalMem.print();
 
 		Command toRedo = new UpdateCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
-				prevState.getLabels(), null);
+				prevState.getLabels(), this.getTask().getDescription());
 		mLocalMem.redoPush(toRedo);
-
+		mLocalMem.saveLocalMemory();
 		return this.getToUpdateTaskDesc() + " reverted";
 	}
 
