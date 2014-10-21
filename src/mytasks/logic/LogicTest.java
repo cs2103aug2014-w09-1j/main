@@ -30,9 +30,8 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoAdd(){
-		System.out.println("hi");
 		taskLogic.executeCommand("add meeting 22.09.2014 #important");
-		taskLogic.getMemory().print();
+		assertEquals("meeting deleted", taskLogic.executeCommand("undo"));
 	}
 
 	@Test

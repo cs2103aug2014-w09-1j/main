@@ -17,6 +17,7 @@ public class UndoCommand extends Command {
 	public UndoCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
