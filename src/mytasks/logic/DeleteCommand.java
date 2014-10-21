@@ -39,16 +39,15 @@ public class DeleteCommand extends Command {
 
 	@Override
 	String undo() {
-		
-		
 		Task prevState = null;
-		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
-				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				mLocalMem.add(this.getTask());
-				break;
-			}
-		}
+//		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+//			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
+//				prevState = mLocalMem.getLocalMem().get(i).getClone();
+				mLocalMem.getLocalMem().add(this.getTask());
+//				break;
+//			}
+//		}
+				
 //		Command toRedo = new AddCommand(prevState.getDescription(),
 //				prevState.getFromDateTime(), prevState.getToDateTime(),
 //				prevState.getLabels(), null);

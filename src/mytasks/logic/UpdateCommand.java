@@ -60,15 +60,18 @@ public class UpdateCommand extends Command {
 	@Override
 	String undo() {
 		// TODO Auto-generated method stub
+//		mLocalMem.print();
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				mLocalMem.getLocalMem().remove(i);
-				mLocalMem.getLocalMem().add(prevState);
+				mLocalMem.getLocalMem().add(this.getTask());
 				break;
 			}
 		}
+//		mLocalMem.print();
+
 		Command toRedo = new UpdateCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);
