@@ -32,10 +32,18 @@ public class UpdateCommand extends Command {
 				break;
 			}
 		}
-		UpdateCommand commandToUndo = new UpdateCommand(
-				prevState.getDescription(), prevState.getFromDateTime(),
-				prevState.getToDateTime(), prevState.getLabels(),
-				super.getTaskDetails());
+		UpdateCommand commandToUndo = null;
+		if (this.getTaskDetails()==null) {
+			commandToUndo = new UpdateCommand(
+					prevState.getDescription(), prevState.getFromDateTime(),
+					prevState.getToDateTime(), prevState.getLabels(),
+					super.getToUpdateTaskDesc());
+		} else {
+			commandToUndo = new UpdateCommand(
+					prevState.getDescription(), prevState.getFromDateTime(),
+					prevState.getToDateTime(), prevState.getLabels(),
+					super.getTaskDetails());
+		}
 		mLocalMem.undoPush(commandToUndo);
 
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
@@ -78,7 +86,6 @@ public class UpdateCommand extends Command {
 				break;
 			}
 		}
-
 		Command toRedo = new UpdateCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), this.getTask().getDescription());
