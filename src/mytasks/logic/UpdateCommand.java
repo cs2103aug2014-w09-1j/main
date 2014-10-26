@@ -33,16 +33,14 @@ public class UpdateCommand extends Command {
 			}
 		}
 		UpdateCommand commandToUndo = null;
-		if (this.getTaskDetails()==null) {
-			commandToUndo = new UpdateCommand(
-					prevState.getDescription(), prevState.getFromDateTime(),
-					prevState.getToDateTime(), prevState.getLabels(),
-					super.getToUpdateTaskDesc());
+		if (this.getTaskDetails() == null) {
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), super.getToUpdateTaskDesc());
 		} else {
-			commandToUndo = new UpdateCommand(
-					prevState.getDescription(), prevState.getFromDateTime(),
-					prevState.getToDateTime(), prevState.getLabels(),
-					super.getTaskDetails());
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), super.getTaskDetails());
 		}
 		mLocalMem.undoPush(commandToUndo);
 
@@ -54,13 +52,18 @@ public class UpdateCommand extends Command {
 					mLocalMem.getLocalMem().get(i)
 							.setDescription(currentTask.getDescription());
 				}
-				if (currentTask.getFromDateTime() != null) {
+				if (currentTask.getFromDateTime() != null
+						&& currentTask.getToDateTime() != null) {
 					mLocalMem.getLocalMem().get(i)
 							.setFromDateTime(currentTask.getFromDateTime());
-				}
-				if (currentTask.getToDateTime() != null) {
 					mLocalMem.getLocalMem().get(i)
 							.setToDateTime(currentTask.getToDateTime());
+				}
+				if (currentTask.getFromDateTime() != null
+						&& currentTask.getToDateTime() == null) {
+					mLocalMem.getLocalMem().get(i)
+							.setFromDateTime(currentTask.getFromDateTime());
+					mLocalMem.getLocalMem().get(i).setToDateTime(null);
 				}
 				if (currentTask.getLabels() != null) {
 					if (!super.getTask().getLabels().isEmpty()) {
