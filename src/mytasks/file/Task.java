@@ -79,7 +79,7 @@ public class Task {
 	}
 
 	public Task getClone() {
-		SimpleDateFormat form = MyTasksParser.dateFormats.get(1);
+		SimpleDateFormat form = MyTasksParser.dateTimeFormats.get(1);
 		Date newDate1 = null;
 		Date newDate2 = null;
 		try {
