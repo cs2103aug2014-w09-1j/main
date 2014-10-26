@@ -452,7 +452,7 @@ public class MyTasksParser implements IParser {
 	 */
 	private Command convertSort(String message, String comdType) {
 		ArrayList<String> labels = new ArrayList<String>();
-		String[] words = message.split("\\s+");
+		String[] words = message.trim().split("\\s+");
 		if (words.length>0) {
 			labels = new ArrayList<String>();
 			for (int i = 0; i < words.length; i++) {
