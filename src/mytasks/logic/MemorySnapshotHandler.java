@@ -66,6 +66,8 @@ class MemorySnapshotHandler {
 				sortByDate();
 			}
 			else{
+				if (currentSettings[i].equals(""))
+					continue;
 				labelsInSortedOrder.add(currentSettings[i]);
 			}
 		}
@@ -77,7 +79,6 @@ class MemorySnapshotHandler {
 			for (int i=0; i < snapshotList.size(); i++){
 				snapshot += snapshotList.get(i).toString() + "\n";
 			}
-			snapshot += labelsInSortedOrder.get(0);
 			return snapshot;
 		}
 
