@@ -50,6 +50,9 @@ public class MyTasksParser implements IParser {
 		if (words.length != 0) {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
+			if (withoutComdType.trim().length() == 0) {
+				return null;
+			}
 			switch (comdType) {
 			case "add":
 			case "search":
