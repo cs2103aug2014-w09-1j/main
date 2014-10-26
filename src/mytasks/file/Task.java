@@ -104,7 +104,7 @@ public class Task {
 		String dateToString = "";
 		String dateFromString = "";
 		if (mFromDateTime != null) {
-			dateFromString = MyTasksParser.dateFormats.get(1).format(
+			dateFromString = MyTasksParser.dateTimeFormats.get(0).format(
 							mFromDateTime);
 		}
 		if (dateFromString.contains("00:00")) {
@@ -112,7 +112,7 @@ public class Task {
 							mFromDateTime);
 		}
 		if (mToDateTime != null) {
-			dateToString = MyTasksParser.dateFormats.get(1).format(mToDateTime);
+			dateToString = MyTasksParser.dateTimeFormats.get(0).format(mToDateTime);
 		}
 		if (dateToString.contains("00:00")) {
 			dateToString = MyTasksParser.dateFormats.get(0).format(mToDateTime);
