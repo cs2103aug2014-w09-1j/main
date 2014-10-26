@@ -60,10 +60,10 @@ public class ParserTest {
 	public void testTimedTask(){
 		initAddObjects();
 		initUpdateObjects();
-		//assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12pm to 2pm"));
-		//assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
-		//assertObjFields(test13, tester.parseInput("update read book - write report from 09.10.2014 2pm to 10.Oct.2014 14:00  #gg"));
-		assertObjFields(test17, tester.parseInput("add do homework next tuesday from 2am to 3am"));
+		assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12pm to 2pm"));
+		assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+		assertObjFields(test13, tester.parseInput("update read book - write report from 09.10.2014 2pm to 10.Oct.2014 14:00  #gg"));
+		assertObjFields(test17, tester.parseInput("add do homework today from 2am to 3am"));
 		//assertObjFields(test18, tester.parseInput("add coding from today 2am to tomorrow 3am"));
 		
 	}
@@ -113,12 +113,12 @@ public class ParserTest {
 		Date date7 = null;
 		try {
 			date1 = MyTasksParser.dateFormats.get(0).parse("23.09.2014");
-			date2 = MyTasksParser.dateFormats.get(1).parse("30.10.2014 14:00");
-			date3 = MyTasksParser.dateFormats.get(2).parse("05.Oct.2014");
-			date4 = MyTasksParser.dateFormats.get(3).parse("29.Oct.2014 14:00");
-			date5 = MyTasksParser.dateFormats.get(3).parse("29.Oct.2014 15:00");
-			date6 = MyTasksParser.dateFormats.get(1).parse("05.10.2014 11:00");
-			date7 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 01:00");
+			date2 = MyTasksParser.dateTimeFormats.get(0).parse("30.10.2014 14:00");
+			date3 = MyTasksParser.dateFormats.get(1).parse("05.Oct.2014");
+			date4 = MyTasksParser.dateTimeFormats.get(3).parse("29.Oct.2014 14:00");
+			date5 = MyTasksParser.dateTimeFormats.get(3).parse("29.Oct.2014 15:00");
+			date6 = MyTasksParser.dateTimeFormats.get(0).parse("05.10.2014 11:00");
+			date7 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 01:00");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -183,6 +183,15 @@ public class ParserTest {
 			Date date171 = MyTasksParser.dateTimeFormats.get(1).parse(dateOnly+ " 2am");
 			Date date172 = MyTasksParser.dateTimeFormats.get(1).parse(dateOnly+ " 3am");
 			test17 = new AddCommand("do homework", date171, date172, null, null);
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			cal.add(Calendar.DATE,1);
+			String date2Only = MyTasksParser.dateFormats.get(0).format(cal.getTime());
+			Date date181 = MyTasksParser.dateTimeFormats.get(1).parse(dateOnly + "2am");
+			Date date182 = MyTasksParser.dateTimeFormats.get(1).parse(date2Only + "3am");
+			test18 = new AddCommand("coding", date181, date182, null, null);
+			
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
