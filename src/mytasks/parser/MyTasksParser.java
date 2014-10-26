@@ -195,7 +195,6 @@ public class MyTasksParser implements IParser {
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
 		int indexOfDate1 = indexDatesFormat[0];
 		int indexOfDate2 = indexDatesFormat[1];
-
 		DoubleDate result = null;
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
 			result = handleTimedTask(words, indexOfDate1, indexOfDate2,
