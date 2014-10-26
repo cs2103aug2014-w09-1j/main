@@ -107,10 +107,10 @@ public class LogicTest {
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
 		// sort by labels - test 1 - sort 1 labels
 		taskLogic.executeCommand("sort important");
-		assertEquals("CS2103T meeting on 22.09.2014 #important\n" 
+		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014 #important\n" 
 				+ "CS2101 meeting on 29.09.2014 #important\n" 
 				+ "CS2100 Midterm on 25.09.2014 #important #urgent\n" 
-				+ "play badminton #anytime\n" 
+				+ "N.A.\n" + "play badminton #anytime\n" 
 				+ "medical check up on 01.10.2014 13:00 #$100\n" 
 				+ "pay acceptance fee from 28.09.2014 to 29.09.2014 #$200\n" 
 				+ "do PS4 from 28.09.2014 to 30.09.2014\n" 
