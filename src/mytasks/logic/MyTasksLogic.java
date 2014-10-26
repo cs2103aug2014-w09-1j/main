@@ -44,7 +44,7 @@ public class MyTasksLogic implements ILogic {
 		if (!isDeveloper) {
 			mLocalMem.loadLocalMemory();
 		}
-		mViewHandler = new MemorySnapshotHandler();
+		mViewHandler = MemorySnapshotHandler.getInstance();
 	}
 
 	/**

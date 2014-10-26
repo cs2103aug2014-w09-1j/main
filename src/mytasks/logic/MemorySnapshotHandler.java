@@ -20,14 +20,22 @@ import mytasks.parser.MyTasksParser;
  */
 class MemorySnapshotHandler {
 	
+	private static MemorySnapshotHandler INSTANCE = null;
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
 	private ArrayList<String> labelsInSortedOrder;
 	
 	//Constructor
-	protected MemorySnapshotHandler() {
+	private MemorySnapshotHandler() {
 		currentSettings = MyTasks.DEFAULT_VIEW;
 		assert currentSettings[0] == "date" : "wrong default setting";
+	}
+	
+	protected static MemorySnapshotHandler getInstance(){
+		if (INSTANCE == null){
+			INSTANCE = new MemorySnapshotHandler();
+		}
+		return INSTANCE;
 	}
 	
 	protected void setView(ArrayList<String> newSettings) {

@@ -10,15 +10,17 @@ import java.util.Date;
  *
  */
 public class SortCommand extends Command {
+	private MemorySnapshotHandler mViewHandler;
 
 	public SortCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mViewHandler = MemorySnapshotHandler.getInstance();
 	}
 
 	@Override
 	String execute() {
-		// TODO Auto-generated method stub
+		mViewHandler.setView(super.getTask().getLabels());
 		return null;
 	}
 
