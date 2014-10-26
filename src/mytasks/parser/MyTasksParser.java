@@ -30,11 +30,18 @@ public class MyTasksParser implements IParser {
 	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
 		{
 			add(new SimpleDateFormat("dd.MM.yyyy"));
-			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-			add(new SimpleDateFormat("dd.MM.yyyy hh:mm a"));
 			add(new SimpleDateFormat("dd.MMM.yyyy"));
+		}
+	};
+	
+	public static List<SimpleDateFormat> dateTimeFormats = new ArrayList<SimpleDateFormat>() {
+		{
+			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
+			add(new SimpleDateFormat("dd.MM.yyyy hha"));
+			add(new SimpleDateFormat("dd.MM.yyyy hh:mma"));
 			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
-			add(new SimpleDateFormat("dd.MMM.yyyy hh:mm a"));
+			add(new SimpleDateFormat("dd.MMM.yyyy hha"));
+			add(new SimpleDateFormat("dd.MMM.yyyy hh:mma"));
 		}
 	};
 
@@ -241,8 +248,8 @@ public class MyTasksParser implements IParser {
 		int indexDate2 = -1;
 		int indexFormat = -1;
 		for (int i = 0; i < words.length; i++) {
-			for (int j = 0; j < dateFormats.size(); j++) {
-				SimpleDateFormat dateForm = dateFormats.get(j);
+			for (int j = 0; j < dateTimeFormats.size(); j++) {
+				SimpleDateFormat dateForm = dateTimeFormats.get(j);
 				try {
 					dateForm.setLenient(false);
 					dateForm.parse(words[i]);
@@ -258,14 +265,11 @@ public class MyTasksParser implements IParser {
 			int[] otherResults = checkForOtherFormats(words, indexDate1,
 					indexDate2, i);
 			if (otherResults[0] != -1) {
-				System.out.println(words[i]);
 				indexDate1 = otherResults[0];
 			} else if (otherResults[1] != -1) {
-				System.out.println(words[i]+ "hi");
 				indexDate2 = otherResults[1];
 			}
 		}
-		System.out.println(indexDate1 + " " + indexDate2 + " " + indexFormat);
 		int[] result = { indexDate1, indexDate2, indexFormat };
 		return result;
 	}
@@ -294,7 +298,6 @@ public class MyTasksParser implements IParser {
 				}
 			}
 		}
-		System.out.println("double" + result[0] + result[1]);
 		return result;
 	}
 
@@ -340,8 +343,10 @@ public class MyTasksParser implements IParser {
 				String date = words[indexOfDate1];
 				String time1 = words[indexOfFrom + 1];
 				String time2 = words[indexOfTo + 1];
+				DoubleDate results = getDoubleDates(date, null, time1, time2);
 				String dateTime1 = date + " " + time1;
 				String dateTime2 = date + " " + time2;
+				//TODO: try all time formats
 				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat + 1);
 				dateForm.setLenient(false);
 				dateTimeObj1 = dateForm.parse(dateTime1);
@@ -405,7 +410,26 @@ public class MyTasksParser implements IParser {
 		}
 		return new DoubleDate(dateTimeObj1, dateTimeObj2);
 	}
-
+	
+	private DoubleDate getDoubleDates(String date1, String date2, String time1, String time2) {
+		Date dateTimeObj1 = null;
+		Date dateTimeObj2 = null;
+		String dateTime1 = date1 + " " + time1;
+		String dateTime2 = date1 + " " + time2;
+		//TODO: try all time formats run 2 loops for each datetime pair
+		//TODO: add all used variables to usedwords
+		SimpleDateFormat dateForm = dateFormats.get(indexOfFormat + 1);
+		dateForm.setLenient(false);
+		dateTimeObj1 = dateForm.parse(dateTime1);
+		dateTimeObj2 = dateForm.parse(dateTime2);
+		usedWords.add((Integer) indexOfFrom);
+		usedWords.add((Integer) indexOfTo);
+		usedWords.add((Integer) indexOfDate1);
+		usedWords.add((Integer) indexOfFrom + 1);
+		usedWords.add((Integer) indexOfTo + 1);
+		return new DoubleDate(dateTimeObj1, dateTimeObj2);
+	}
+	
 	/**
 	 * handleUntimedTask uses the variables provided to parse a word array into
 	 * the corresponding date object. usedWords is also updated here to that it
