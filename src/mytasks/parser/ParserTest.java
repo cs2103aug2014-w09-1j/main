@@ -10,6 +10,7 @@ import mytasks.file.Task;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
+import mytasks.logic.SortCommand;
 import mytasks.logic.UpdateCommand;
 
 import org.junit.Test;
@@ -30,6 +31,8 @@ public class ParserTest {
 	private Command test12 = null;
 	private Command test13 = null;
 	private Command test14 = null;
+	private Command test15 = null;
+	private Command test16 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
@@ -59,6 +62,13 @@ public class ParserTest {
 		assertObjFields(test11, tester.parseInput("update meeting - play 19.09.2014 #yolo"));
 		assertObjFields(test13, tester.parseInput("update read book - write report from 09.Oct.2014 14:00 to 10.Oct.2014 14:00  #gg"));
 		assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+	}
+	
+	@Test
+	public void sortTest() {
+		initSortObjects();
+		assertObjFields(test15, tester.parseInput("sort important"));
+		assertObjFields(test16, tester.parseInput("sort CS2103 CS2106 CS2101"));
 	}
 	
 	@Test
@@ -190,6 +200,18 @@ public class ParserTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void initSortObjects(){
+		ArrayList<String> list15 = new ArrayList<String>();
+		list15.add("important");
+		test15 = new SortCommand(null, null, null, list15, null);
+		
+		ArrayList<String> list16 = new ArrayList<String>();
+		list16.add("CS2103");
+		list16.add("CS2106");
+		list16.add("CS2101");
+		test16 = new SortCommand(null, null, null, list16, null);
 	}
 	
 	private void assertObjFields(Command testCase, Command result){
