@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -24,6 +25,7 @@ class MemorySnapshotHandler {
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
 	private ArrayList<String> labelsInSortedOrder;
+	SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 	
 	//Constructor
 	private MemorySnapshotHandler() {
@@ -186,12 +188,12 @@ class MemorySnapshotHandler {
 		String timeToString = "";
 		assert task.getFromDateTime() != null;
 		
-		if (!MyTasksParser.dateFormats.get(4).format(task.getFromDateTime()).equals("00:00")){
-			timeToString += MyTasksParser.dateFormats.get(4).format(task.getFromDateTime());
+		if (!timeFormat.format(task.getFromDateTime()).equals("00:00")){
+			timeToString += timeFormat.format(task.getFromDateTime());
 		}
-		if (task.getToDateTime() != null && !MyTasksParser.dateFormats.get(4).format(task.getToDateTime()).equals("00:00")){
+		if (task.getToDateTime() != null && !timeFormat.format(task.getToDateTime()).equals("00:00")){
 			String startTime = timeToString;
-			String endTime = MyTasksParser.dateFormats.get(4).format(task.getToDateTime());
+			String endTime = timeFormat.format(task.getToDateTime());
 			if (startTime.equals(endTime)){
 				timeToString = "till " + endTime;
 			}else{

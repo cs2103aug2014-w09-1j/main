@@ -27,13 +27,21 @@ public class MyTasksParser implements IParser {
 
 	// Date and Time formats that are currently useable.
 	@SuppressWarnings("serial")
-	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {{
-		add(new SimpleDateFormat("dd.MM.yyyy"));
-		add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
-	    add(new SimpleDateFormat("dd.MMM.yyyy"));
-		add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
-		add(new SimpleDateFormat("HH:mm"));
-	}};
+	public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
+		{
+			add(new SimpleDateFormat("dd.MM.yyyy"));
+			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
+			add(new SimpleDateFormat("dd.MM.yyyy hh:mm a"));
+			add(new SimpleDateFormat("dd.MMM.yyyy"));
+			add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+			add(new SimpleDateFormat("dd.MMM.yyyy hh:mm a"));
+		}
+	};
+
+	private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
+			"last" };
+	private String[] dateWords = { "monday", "tuesday", "wednesday",
+			"thursday", "friday", "saturday", "sunday", "month", "year" };
 
 	private ArrayList<Integer> usedWords;
 
@@ -50,7 +58,8 @@ public class MyTasksParser implements IParser {
 		if (words.length != 0) {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
-			if (withoutComdType.trim().length() == 0) {
+			if (withoutComdType.trim().length() == 0 && !comdType.trim().equals("undo")
+					&& !comdType.equals("redo")) {
 				return null;
 			}
 			switch (comdType) {
@@ -171,7 +180,7 @@ public class MyTasksParser implements IParser {
 		int[] indexFromTo = checkFromAndTo(words);
 		int indexOfFrom = indexFromTo[0];
 		int indexOfTo = indexFromTo[1];
-		
+
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
 		int indexOfDate1 = indexDatesFormat[0];
 		int indexOfDate2 = indexDatesFormat[1];
@@ -231,9 +240,8 @@ public class MyTasksParser implements IParser {
 		int indexDate1 = -1;
 		int indexDate2 = -1;
 		int indexFormat = -1;
-		//Don't try format 4 which is for HH:mm
 		for (int i = 0; i < words.length; i++) {
-			for (int j = 0; j < dateFormats.size()-1; j++) {
+			for (int j = 0; j < dateFormats.size(); j++) {
 				SimpleDateFormat dateForm = dateFormats.get(j);
 				try {
 					dateForm.setLenient(false);
@@ -247,9 +255,65 @@ public class MyTasksParser implements IParser {
 				} catch (ParseException e) {
 				}
 			}
+			int[] otherResults = checkForOtherFormats(words, indexDate1,
+					indexDate2, i);
+			if (otherResults[0] != -1) {
+				System.out.println(words[i]);
+				indexDate1 = otherResults[0];
+			} else if (otherResults[1] != -1) {
+				System.out.println(words[i]+ "hi");
+				indexDate2 = otherResults[1];
+			}
 		}
+		System.out.println(indexDate1 + " " + indexDate2 + " " + indexFormat);
 		int[] result = { indexDate1, indexDate2, indexFormat };
 		return result;
+	}
+
+	private int[] checkForOtherFormats(String[] words, int indexDate1,
+			int indexDate2, int curIndex) {
+		int[] result = { -1, -1 };
+		int indexKey = checkIfIsKeyWord(words[curIndex]);
+		if (indexKey != -1) {
+			if (indexKey == 3 || indexKey == 4) {
+				if (curIndex != words.length - 1) {
+					int dateKey = checkIfIsDateWord(words[curIndex + 1]);
+					if (dateKey != -1) {
+						if (indexDate1 == -1) {
+							result[0] = curIndex;
+						} else {
+							result[1] = curIndex;
+						}
+					}
+				}
+			} else {
+				if (indexDate1 == -1) {
+					result[0] = curIndex;
+				} else {
+					result[1] = curIndex;
+				}
+			}
+		}
+		System.out.println("double" + result[0] + result[1]);
+		return result;
+	}
+
+	private int checkIfIsKeyWord(String word) {
+		for (int i = 0; i < keyWords.length; i++) {
+			if (word.equals(keyWords[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private int checkIfIsDateWord(String word) {
+		for (int i = 0; i < dateWords.length; i++) {
+			if (word.equals(dateWords[i])) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	/**
@@ -456,7 +520,7 @@ public class MyTasksParser implements IParser {
 	private Command convertSort(String message, String comdType) {
 		ArrayList<String> labels = new ArrayList<String>();
 		String[] words = message.trim().split("\\s+");
-		if (words.length>0) {
+		if (words.length > 0) {
 			labels = new ArrayList<String>();
 			for (int i = 0; i < words.length; i++) {
 				labels.add(words[i]);
