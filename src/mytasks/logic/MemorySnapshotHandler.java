@@ -25,7 +25,9 @@ class MemorySnapshotHandler {
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
 	private ArrayList<String> labelsInSortedOrder;
-	SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
+	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
 	
 	//Constructor
 	private MemorySnapshotHandler() {
@@ -126,10 +128,10 @@ class MemorySnapshotHandler {
 				break;
 			}
 			else{
-				snapshot += MyTasksParser.dateFormats.get(2).format(date) + "\n";
+				snapshot += dateFormat.format(date) + "\n";
 				int j=i;
 				Date currentDate = snapshotList.get(j).getFromDateTime();
-				while (currentDate != null && MyTasksParser.dateFormats.get(2).format(currentDate).equals(MyTasksParser.dateFormats.get(2).format(date))){
+				while (currentDate != null && dateFormat.format(currentDate).equals(dateFormat.format(date))){
 					snapshot += taskToStringWithoutDate(snapshotList.get(j)) + "\n";
 					j++;
 					if (j > snapshotList.size()-1)
@@ -149,14 +151,14 @@ class MemorySnapshotHandler {
 				Date startDate = snapshotList.get(i).getFromDateTime();
 				Date endDate = snapshotList.get(i).getToDateTime();
 				Date date = startDate;
-				if (MyTasksParser.dateFormats.get(2).format(startDate).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
+				if (dateFormat.format(startDate).equals(dateFormat.format(endDate))){
 					snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, endDate, snapshotList.get(i).getLabels()));
 					continue;
 				}
 				
-				while (!MyTasksParser.dateFormats.get(2).format(date).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
+				while (!dateFormat.format(date).equals(dateFormat.format(endDate))){
 					date = incrementDate(date);
-					if (MyTasksParser.dateFormats.get(2).format(date).equals(MyTasksParser.dateFormats.get(2).format(endDate))){
+					if (dateFormat.format(date).equals(dateFormat.format(endDate))){
 						snapshotList.add(new Task(snapshotList.get(i).getDescription(), endDate, endDate, snapshotList.get(i).getLabels()));
 					}
 					else{
@@ -206,10 +208,10 @@ class MemorySnapshotHandler {
 	}
 
 	private Date getDate(Date date){
-		String dateToString = MyTasksParser.dateFormats.get(2).format(date);
+		String dateToString = dateFormat.format(date);
 		Date dateWithoutTime = null;
 		try {
-			dateWithoutTime = MyTasksParser.dateFormats.get(2).parse(dateToString);
+			dateWithoutTime = dateFormat.parse(dateToString);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}	
