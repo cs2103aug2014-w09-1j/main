@@ -3,6 +3,7 @@ package mytasks.parser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class MyTasksParser implements IParser {
 			add(new SimpleDateFormat("dd.MMM.yyyy"));
 		}
 	};
-	
+
 	public static List<SimpleDateFormat> dateTimeFormats = new ArrayList<SimpleDateFormat>() {
 		{
 			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -44,9 +45,11 @@ public class MyTasksParser implements IParser {
 			add(new SimpleDateFormat("dd.MMM.yyyy hh:mma"));
 		}
 	};
+	private static final int DAYSINWEEK = 7;
 
 	private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
-			"last" };
+			"monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
+			"sunday" };
 	private String[] dateWords = { "monday", "tuesday", "wednesday",
 			"thursday", "friday", "saturday", "sunday", "month", "year" };
 
@@ -65,7 +68,8 @@ public class MyTasksParser implements IParser {
 		if (words.length != 0) {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
-			if (withoutComdType.trim().length() == 0 && !comdType.trim().equals("undo")
+			if (withoutComdType.trim().length() == 0
+					&& !comdType.trim().equals("undo")
 					&& !comdType.equals("redo")) {
 				return null;
 			}
@@ -119,6 +123,8 @@ public class MyTasksParser implements IParser {
 		DoubleDate dates = extractDate(withoutLabels);
 		Date dateFrom = dates.getDate1();
 		Date dateTo = dates.getDate2();
+		System.out.println(dateFrom);
+		System.out.println(dateTo);
 		String taskDesc = removeDate(withoutLabels);
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			return null;
@@ -191,16 +197,15 @@ public class MyTasksParser implements IParser {
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
 		int indexOfDate1 = indexDatesFormat[0];
 		int indexOfDate2 = indexDatesFormat[1];
-		int indexOfFormat = indexDatesFormat[2];
 
 		DoubleDate result = null;
-
+		System.out.println(indexOfDate1 + " " + indexOfDate2);
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
 			result = handleTimedTask(words, indexOfDate1, indexOfDate2,
-					indexOfFrom, indexOfTo, indexOfFormat);
+					indexOfFrom, indexOfTo);
 		} else {
 			result = handleUntimedTask(words, indexOfDate1, indexOfDate2,
-					indexOfFrom, indexOfTo, indexOfFormat);
+					indexOfFrom, indexOfTo);
 		}
 		return result;
 	}
@@ -246,47 +251,56 @@ public class MyTasksParser implements IParser {
 	private int[] updateDateIndexAndFormat(String[] words) {
 		int indexDate1 = -1;
 		int indexDate2 = -1;
-		int indexFormat = -1;
+		int toSkip = -1;
 		for (int i = 0; i < words.length; i++) {
-			for (int j = 0; j < dateTimeFormats.size(); j++) {
-				SimpleDateFormat dateForm = dateTimeFormats.get(j);
-				try {
-					dateForm.setLenient(false);
-					dateForm.parse(words[i]);
-					if (indexDate1 == -1) {
-						indexDate1 = i;
-					} else {
-						indexDate2 = i;
+			if (i!=toSkip){
+				for (int j = 0; j < dateFormats.size(); j++) {
+					SimpleDateFormat dateForm = dateFormats.get(j);
+					try {
+						dateForm.setLenient(false);
+						dateForm.parse(words[i]);
+						if (indexDate1 == -1) {
+							indexDate1 = i;
+						} else {
+							indexDate2 = i;
+						}
+					} catch (ParseException e) {
 					}
-					indexFormat = j;
-				} catch (ParseException e) {
+				}
+				int[] otherResults = checkForOtherFormats(words, indexDate1,
+						indexDate2, i);
+				if (otherResults[0] != -1) {
+					indexDate1 = otherResults[0];
+					if (otherResults[2] == 1) {
+						toSkip = i+1;
+					}
+				} else if (otherResults[1] != -1) {
+					indexDate2 = otherResults[1];
+					if (otherResults[2] == 1) {
+						toSkip = i+1;
+					}
 				}
 			}
-			int[] otherResults = checkForOtherFormats(words, indexDate1,
-					indexDate2, i);
-			if (otherResults[0] != -1) {
-				indexDate1 = otherResults[0];
-			} else if (otherResults[1] != -1) {
-				indexDate2 = otherResults[1];
-			}
 		}
-		int[] result = { indexDate1, indexDate2, indexFormat };
+		int[] result = { indexDate1, indexDate2 };
 		return result;
 	}
 
 	private int[] checkForOtherFormats(String[] words, int indexDate1,
 			int indexDate2, int curIndex) {
-		int[] result = { -1, -1 };
+		int[] result = { -1, -1 , 0};
 		int indexKey = checkIfIsKeyWord(words[curIndex]);
 		if (indexKey != -1) {
-			if (indexKey == 3 || indexKey == 4) {
+			if (indexKey == 3) {
 				if (curIndex != words.length - 1) {
 					int dateKey = checkIfIsDateWord(words[curIndex + 1]);
 					if (dateKey != -1) {
 						if (indexDate1 == -1) {
 							result[0] = curIndex;
+							result[2] = 1;
 						} else {
 							result[1] = curIndex;
+							result[2] = 1;
 						}
 					}
 				}
@@ -334,102 +348,249 @@ public class MyTasksParser implements IParser {
 	 * @return DoubleDate object representing DateFrom and DateTo respectively
 	 */
 	private DoubleDate handleTimedTask(String[] words, int indexOfDate1,
-			int indexOfDate2, int indexOfFrom, int indexOfTo, int indexOfFormat) {
-		Date dateTimeObj1 = null;
-		Date dateTimeObj2 = null;
-		boolean noTime = false;
+			int indexOfDate2, int indexOfFrom, int indexOfTo) {
+		DoubleDate results = null;
 		if (indexOfDate2 == -1) {
 			try {
 				String date = words[indexOfDate1];
+				String toDateFormat = convertToDateFormat(words, indexOfDate1);
+				// TODO: Parse date word here and convert to string date
 				String time1 = words[indexOfFrom + 1];
 				String time2 = words[indexOfTo + 1];
-				DoubleDate results = getDoubleDates(date, null, time1, time2);
-				String dateTime1 = date + " " + time1;
-				String dateTime2 = date + " " + time2;
-				//TODO: try all time formats
-				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat + 1);
-				dateForm.setLenient(false);
-				dateTimeObj1 = dateForm.parse(dateTime1);
-				dateTimeObj2 = dateForm.parse(dateTime2);
-				usedWords.add((Integer) indexOfFrom);
-				usedWords.add((Integer) indexOfTo);
-				usedWords.add((Integer) indexOfDate1);
-				usedWords.add((Integer) indexOfFrom + 1);
-				usedWords.add((Integer) indexOfTo + 1);
+				results = getDoubleDateTime(toDateFormat, null, time1, time2);
+				if (results.getDate1() != null && results.getDate2() != null) {
+					usedWords.add((Integer) indexOfFrom);
+					usedWords.add((Integer) indexOfTo);
+					usedWords.add((Integer) indexOfDate1);
+					usedWords.add((Integer) indexOfFrom + 1);
+					usedWords.add((Integer) indexOfTo + 1);
+				}
 			} catch (IndexOutOfBoundsException e) {
 				Logger logger = Logger.getInstance();
-				logger.log("Parser: Unexpected error: No time found after 'to'");
-			} catch (ParseException e) {
-				Logger logger = Logger.getInstance();
-				logger.log("Parser: Unexpected error: Invalid indexes");
+				logger.log("Parser: No time found after word 'to' or 'next': Taken as task description");
 			}
+
 		} else {
+			boolean noTime = false;
 			try {
 				String time1 = words[indexOfDate1 + 1];
 				String time2 = words[indexOfDate2 + 1];
 				String date1 = words[indexOfDate1];
 				String date2 = words[indexOfDate2];
-				String dateTime1 = date1 + " " + time1;
-				String dateTime2 = date2 + " " + time2;
-				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat + 1);
-				dateForm.setLenient(false);
-				dateTimeObj1 = dateForm.parse(dateTime1);
-				dateTimeObj2 = dateForm.parse(dateTime2);
-				usedWords.add((Integer) indexOfFrom);
-				usedWords.add((Integer) indexOfTo);
-				usedWords.add((Integer) indexOfDate1);
-				usedWords.add((Integer) indexOfDate2);
-				usedWords.add((Integer) indexOfDate1 + 1);
-				usedWords.add((Integer) indexOfDate2 + 1);
-			} catch (IndexOutOfBoundsException e) {
-				noTime = true;
-			} catch (ParseException e) {
-				Logger logger = Logger.getInstance();
-				logger.log("Parser: Unexpected error: Invalid indexes");
-			}
-			if (noTime) {
-				try {
-					String date1 = words[indexOfDate1];
-					String date2 = words[indexOfDate2];
-					SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
-					dateForm.setLenient(false);
-					dateTimeObj1 = dateForm.parse(date1);
-					dateTimeObj2 = dateForm.parse(date2);
+				results = getDoubleDateTime(date1, date2, time1, time2);
+				if (results.getDate1() != null && results.getDate2() != null) {
 					usedWords.add((Integer) indexOfFrom);
 					usedWords.add((Integer) indexOfTo);
 					usedWords.add((Integer) indexOfDate1);
 					usedWords.add((Integer) indexOfDate2);
-				} catch (ParseException e1) {
-					Logger logger = Logger.getInstance();
-					logger.log("Parser: Unexpected error: Invalid indexes");
-				} catch (IndexOutOfBoundsException e1) {
-					Logger logger = Logger.getInstance();
-					logger.log("Parser: Unexpected error: No date/time found after 'to'");
+					usedWords.add((Integer) indexOfDate1 + 1);
+					usedWords.add((Integer) indexOfDate2 + 1);
 				}
+			} catch (IndexOutOfBoundsException e) {
+				noTime = true;
+			}
+			if (noTime) { // Suggesting that no time was present (ie. only from
+							// date to date)
+				String dateonly1 = words[indexOfDate1];
+				String dateonly2 = words[indexOfDate2];
+				System.out.println(dateonly1);
+				System.out.println(dateonly2);
+				results = getDoubleDate(dateonly1, dateonly2);
+				System.out.println(results.getDate1() + "GG");
+				System.out.println(results.getDate2() + "GG");
+				if (results.getDate1() != null && results.getDate2() != null) {
+					usedWords.add((Integer) indexOfFrom);
+					usedWords.add((Integer) indexOfTo);
+					usedWords.add((Integer) indexOfDate1);
+					usedWords.add((Integer) indexOfDate2);
+				}
+			}
+		}
+		return results;
+	}
+
+	/**
+	 * convertToDateFormat checks the word against an inbuilt set of keywords to
+	 * return strings of the dates that they are supposed to represent
+	 * 
+	 * @param words
+	 * @param index
+	 * @return strings that represent the dates
+	 */
+	private String convertToDateFormat(String[] words, int index) {
+		String curWord = words[index];
+		String result = "";
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+		String nextWord = "";
+		switch (curWord) {
+		case ("today"):
+			result = dateFormats.get(0).format(today);
+			break;
+		case ("tomorrow"):
+			cal.setTime(today);
+			cal.add(Calendar.DATE, 1);
+			Date tomorrow = cal.getTime();
+			result = dateFormats.get(0).format(tomorrow);
+			break;
+		case ("yesterday"):
+			cal.setTime(today);
+			cal.add(Calendar.DATE, -1);
+			Date ysd = cal.getTime();
+			result = dateFormats.get(0).format(ysd);
+			break;
+		case ("next"):
+			nextWord = words[index + 1];
+			if (nextWord.equals("month")) {
+				cal.setTime(today);
+				cal.add(Calendar.MONTH, 1);
+				Date nextMonth = cal.getTime();
+				result = dateFormats.get(0).format(nextMonth);
+			} else if (nextWord.equals("year")) {
+				cal.setTime(today);
+				cal.add(Calendar.YEAR, 1);
+				Date nextYear = cal.getTime();
+				result = dateFormats.get(0).format(nextYear);
+			} else {
+				result = findNextWeekday(nextWord, DAYSINWEEK);
+			}
+			break;
+		default:
+			// Deals with the days (ie. if type day of today, taken as today
+			result = findNextWeekday(curWord, 0);
+		}
+		return result;
+	}
+
+	private String findNextWeekday(String day, int offset) {
+		String result = "";
+		Calendar cal = Calendar.getInstance();
+		int today = cal.get(Calendar.DAY_OF_WEEK);
+		int toAdd = -1;
+		boolean isInvalidDay = false;
+		switch (day) {
+		case ("monday"):
+			if (today == Calendar.MONDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % DAYSINWEEK;
+			}
+			break;
+		case ("tuesday"):
+			if (today == Calendar.TUESDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 3) % DAYSINWEEK;
+			}
+			break;
+		case ("wednesday"):
+			if (today == Calendar.WEDNESDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 4) % DAYSINWEEK;
+			}
+			break;
+		case ("thursday"):
+			if (today == Calendar.THURSDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 5) % DAYSINWEEK;
+			}
+			break;
+		case ("friday"):
+			if (today == Calendar.FRIDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 6) % DAYSINWEEK;
+			}
+			break;
+		case ("saturday"):
+			if (today == Calendar.SATURDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 7) % DAYSINWEEK;
+			}
+			break;
+		case ("sunday"):
+			if (today == Calendar.SUNDAY) {
+				toAdd = DAYSINWEEK;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 8) % DAYSINWEEK;
+			}
+			break;
+		default:
+			Logger logger = Logger.getInstance();
+			isInvalidDay = true;
+			logger.log("Parser: Unexpected error: Invalid day of week");
+		}
+		if (!isInvalidDay) {
+			Date todayDate = new Date();
+			cal.setTime(todayDate);
+			toAdd += offset;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			result = dateFormats.get(0).format(nextXDay);
+		}
+		return result;
+	}
+
+	private DoubleDate getDoubleDateTime(String date1, String date2,
+			String time1, String time2) {
+		Date dateTimeObj1 = null;
+		Date dateTimeObj2 = null;
+		String dateTime1 = date1 + " " + time1;
+		String dateTime2 = "";
+		if (date2 == null) {
+			dateTime2 = date1 + " " + time2;
+		} else {
+			dateTime2 = date2 + " " + time2;
+		}
+		for (int i = 0; i < dateTimeFormats.size(); i++) {
+			SimpleDateFormat dateForm = dateTimeFormats.get(i);
+			dateForm.setLenient(false);
+			try {
+				dateTimeObj1 = dateForm.parse(dateTime1);
+				break;
+			} catch (ParseException e) {
+			}
+
+		}
+		for (int i = 0; i < dateTimeFormats.size(); i++) {
+			SimpleDateFormat dateForm = dateTimeFormats.get(i);
+			dateForm.setLenient(false);
+			try {
+				dateTimeObj2 = dateForm.parse(dateTime2);
+				break;
+			} catch (ParseException e) {
 			}
 		}
 		return new DoubleDate(dateTimeObj1, dateTimeObj2);
 	}
-	
-	private DoubleDate getDoubleDates(String date1, String date2, String time1, String time2) {
-		Date dateTimeObj1 = null;
-		Date dateTimeObj2 = null;
-		String dateTime1 = date1 + " " + time1;
-		String dateTime2 = date1 + " " + time2;
-		//TODO: try all time formats run 2 loops for each datetime pair
-		//TODO: add all used variables to usedwords
-		SimpleDateFormat dateForm = dateFormats.get(indexOfFormat + 1);
-		dateForm.setLenient(false);
-		dateTimeObj1 = dateForm.parse(dateTime1);
-		dateTimeObj2 = dateForm.parse(dateTime2);
-		usedWords.add((Integer) indexOfFrom);
-		usedWords.add((Integer) indexOfTo);
-		usedWords.add((Integer) indexOfDate1);
-		usedWords.add((Integer) indexOfFrom + 1);
-		usedWords.add((Integer) indexOfTo + 1);
-		return new DoubleDate(dateTimeObj1, dateTimeObj2);
+
+	private DoubleDate getDoubleDate(String date1, String date2) {
+		Date dateObj1 = null;
+		Date dateObj2 = null;
+		for (int i = 0; i < dateFormats.size(); i++) {
+			SimpleDateFormat dateForm = dateFormats.get(i);
+			dateForm.setLenient(false);
+			try {
+				dateObj1 = dateForm.parse(date1);
+				break;
+			} catch (ParseException e) {
+			}
+		}
+		for (int i = 0; i < dateFormats.size(); i++) {
+			SimpleDateFormat dateForm = dateFormats.get(i);
+			dateForm.setLenient(false);
+			try {
+				dateObj2 = dateForm.parse(date2);
+				break;
+			} catch (ParseException e) {
+			}
+		}
+		return new DoubleDate(dateObj1, dateObj2);
 	}
-	
+
 	/**
 	 * handleUntimedTask uses the variables provided to parse a word array into
 	 * the corresponding date object. usedWords is also updated here to that it
@@ -445,7 +606,7 @@ public class MyTasksParser implements IParser {
 	 * @return DoubleDate object representing DateFrom and DateTo respectively
 	 */
 	private DoubleDate handleUntimedTask(String[] words, int indexOfDate1,
-			int indexOfDate2, int indexOfFrom, int indexOfTo, int indexOfFormat) {
+			int indexOfDate2, int indexOfFrom, int indexOfTo) {
 		Date dateTimeObj1 = null;
 		boolean noTime = false;
 		if (indexOfDate1 != words.length - 1 && indexOfDate1 > -1) {
@@ -459,7 +620,8 @@ public class MyTasksParser implements IParser {
 			}
 		} else {
 			try {
-				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
+				// TODO: fix 4
+				SimpleDateFormat dateForm = dateFormats.get(4);
 				dateForm.setLenient(false);
 				dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
 				usedWords.add((Integer) indexOfDate1);
@@ -472,7 +634,8 @@ public class MyTasksParser implements IParser {
 		}
 		if (noTime) {
 			try {
-				SimpleDateFormat dateForm = dateFormats.get(indexOfFormat);
+				// TODO: fix 4
+				SimpleDateFormat dateForm = dateFormats.get(4);
 				dateTimeObj1 = dateForm.parse(words[indexOfDate1]);
 				usedWords.add((Integer) indexOfDate1);
 			} catch (ParseException e) {
@@ -525,6 +688,8 @@ public class MyTasksParser implements IParser {
 		DoubleDate dates = extractDate(withoutLabels);
 		Date dateFrom = dates.getDate1();
 		Date dateTo = dates.getDate2();
+		System.out.println(dateFrom);
+		System.out.println(dateTo);
 		String taskDesc = removeDate(withoutLabels);
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;

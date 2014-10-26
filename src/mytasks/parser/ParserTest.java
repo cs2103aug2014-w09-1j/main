@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import mytasks.file.Task;
@@ -33,6 +34,8 @@ public class ParserTest {
 	private Command test14 = null;
 	private Command test15 = null;
 	private Command test16 = null;
+	private Command test17 = null;
+	private Command test18 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
@@ -51,6 +54,18 @@ public class ParserTest {
 	public void deleteTest() {
 		initDeleteObjects();
 		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
+	}
+	
+	@Test
+	public void testTimedTask(){
+		initAddObjects();
+		initUpdateObjects();
+		//assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12pm to 2pm"));
+		//assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+		//assertObjFields(test13, tester.parseInput("update read book - write report from 09.10.2014 2pm to 10.Oct.2014 14:00  #gg"));
+		assertObjFields(test17, tester.parseInput("add do homework next tuesday from 2am to 3am"));
+		//assertObjFields(test18, tester.parseInput("add coding from today 2am to tomorrow 3am"));
+		
 	}
 	
 	@Test
@@ -139,7 +154,7 @@ public class ParserTest {
 			Date date2 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			test2 = new AddCommand("dinner", date2, null, null, null);
 			
-			Date date3 = MyTasksParser.dateFormats.get(1).parse("20.09.2014 12:00");
+			Date date3 = MyTasksParser.dateTimeFormats.get(0).parse("20.09.2014 12:00");
 			test3 = new AddCommand("submit assignment", date3, null, null, null);
 			
 			ArrayList<String> list4 = new ArrayList<String>();
@@ -159,9 +174,15 @@ public class ParserTest {
 			Date date6 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			test6 = new AddCommand("have fun!", date6, null, list6, null);
 			
-			Date date121 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 12:00");
-			Date date122 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 14:00");
+			Date date121 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 12:00");
+			Date date122 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 14:00");
 			test12 = new AddCommand("code for project", date121, date122, null, null);
+			
+			Date temp = new Date();
+			String dateOnly = MyTasksParser.dateFormats.get(0).format(temp);
+			Date date171 = MyTasksParser.dateTimeFormats.get(1).parse(dateOnly+ " 2am");
+			Date date172 = MyTasksParser.dateTimeFormats.get(1).parse(dateOnly+ " 3am");
+			test17 = new AddCommand("do homework", date171, date172, null, null);
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -190,8 +211,8 @@ public class ParserTest {
 			
 			ArrayList<String> list13 = new ArrayList<String>();
 			list13.add("gg");
-			Date date131 = MyTasksParser.dateFormats.get(1).parse("09.10.2014 14:00");
-			Date date132 = MyTasksParser.dateFormats.get(1).parse("10.10.2014 14:00");
+			Date date131 = MyTasksParser.dateTimeFormats.get(0).parse("09.10.2014 14:00");
+			Date date132 = MyTasksParser.dateTimeFormats.get(0).parse("10.10.2014 14:00");
 			test13 = new UpdateCommand("write report", date131, date132, list13, "read book");
 			
 			Date date141 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
