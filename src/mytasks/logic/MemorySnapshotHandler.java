@@ -25,6 +25,7 @@ class MemorySnapshotHandler {
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
 	private ArrayList<String> labelsInSortedOrder;
+	private ArrayList<ArrayList<String>> labels;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
@@ -53,6 +54,7 @@ class MemorySnapshotHandler {
 			snapshotList.add(LocalMem.getLocalMem().get(i));
 		}
 		labelsInSortedOrder = new ArrayList<String>();
+		labels = new ArrayList<ArrayList<String>>();
 	}
 
 	/**
@@ -76,6 +78,7 @@ class MemorySnapshotHandler {
 		}
 		
 		if (!labelsInSortedOrder.isEmpty()){
+			combinationOfLabels();
 			sortByLabels();
 			return convertSnapshotListToStringInLabelsFormat(snapshotList);
 			
@@ -149,24 +152,48 @@ class MemorySnapshotHandler {
 	
 	private String convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){			
 		String snapshot = "";
-		
-		for (int i=0; i < labelsInSortedOrder.size(); i++){
-			snapshot += "#" + labelsInSortedOrder.get(i) + "\n";
-			for (int j=0; j < snapshotList.size(); j++){
-				if (haveLabel(j, i)){
+
+		for (int i=0; i < snapshotList.size(); i++){
+			int order = labelOrder(i);
+			if (order == labels.size()){
+				snapshot += "N.A.\n";
+				for (int j=i; j < snapshotList.size(); j++){
 					snapshot += snapshotList.get(j).toString() + "\n";
 				}
+				break;
+			}
+			else{
+				for (int j=0; j < labels.get(order).size(); j++){
+					snapshot += "#" + labels.get(order).get(j);
+				}
+				snapshot += "\n";
+				int j=i;
+				while (j < snapshotList.size() && labelOrder(j) == labelOrder(i)){
+				snapshot += snapshotList.get(j).toString() + "\n";
+				j++;
+				}
+				i = j-1;
 			}
 		}
-		
+		/*
+		for (int i=0; i < labelsInSortedOrder.size(); i++){
+			for (int j=0; j < snapshotList.size(); j++){
+				if (haveLabel(j, i)){
+					snapshot += "#" + labelsInSortedOrder.get(i);
+				}
+				snapshot += "\n" + snapshotList.get(j).toString() + "\n";
+			}
+		}
+
 		snapshot += "N.A.\n";
 		for (int i=0; i < snapshotList.size(); i++){
 			if (!haveLabels(i)){
 				snapshot += snapshotList.get(i).toString() + "\n";
 			}
 		}
+		 */
 
-        return snapshot;
+		return snapshot;
 	}
 
 	private void timedTaskToNormalTask(){	
@@ -194,6 +221,52 @@ class MemorySnapshotHandler {
 		}
 	}
 
+	private void combinationOfLabels(){
+		ArrayList<String> chosen = new ArrayList<String>();
+		ArrayList<String> remaining = new ArrayList<String>();		
+		for (int j=0; j < labelsInSortedOrder.size(); j++){
+			remaining.add(labelsInSortedOrder.get(j));
+		}
+		combinationOfLabelsRec(remaining, chosen);
+
+		for (int i=0; i < labels.size()-1; i++){
+			for (int j=0; j < labels.size()-1-i; j++){
+				if (labels.get(j).size() < labels.get(j+1).size()){
+					ArrayList<String> temp = labels.get(j);
+					labels.set(j, labels.get(j+1));
+					labels.set(j+1, temp);
+				}
+			}
+		}
+
+		/*
+		for (int i=0; i < labels.size(); i++){
+			System.out.print(i + ": ");
+			for (int j=0; j < labels.get(i).size(); j++){
+				System.out.print(labels.get(i).get(j) + "-");
+			}
+			System.out.println();
+		}
+		*/
+		
+
+	}
+
+	private void combinationOfLabelsRec(ArrayList<String> remaining, ArrayList<String> chosen){
+		if (remaining.isEmpty()){
+			labels.add(chosen);
+		}
+		else{
+			ArrayList<String> r2 = (ArrayList<String>) remaining.clone();
+			String s = r2.remove(0);
+			ArrayList<String> c2 = (ArrayList<String>) chosen.clone();
+			c2.add(s);
+			combinationOfLabelsRec(r2, c2);
+			combinationOfLabelsRec(r2, chosen);
+			
+		}
+	}
+
 	private String taskToStringWithoutDate(Task task){
 		String labelsToString = "";
 		if (task.getLabels() != null) {
@@ -201,15 +274,16 @@ class MemorySnapshotHandler {
 				labelsToString += " " + "#" + s;
 			}
 		}
-		
+
 		String timeToString = getTime(task);
-		
+
 		if (timeToString.equals("")){
 			return String.format("%s%s", task.getDescription(), labelsToString);
 		}
 
 		return String.format("%s %s%s", task.getDescription(), timeToString, labelsToString);
 	}
+	
 
 	private String getTime(Task task){		
 		String timeToString = "";
@@ -273,20 +347,41 @@ class MemorySnapshotHandler {
 	}
 
 	private int labelOrder(int index){
-		int order = labelsInSortedOrder.size();
+		int order = labels.size();
 		if (snapshotList.get(index).getLabels() == null){
 			return order;
 		}
 		
+		int match=0;
 		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
 			for (int j=0; j < labelsInSortedOrder.size(); j++){
-				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j)) && j < order){
-					order = j;
+				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
+					match++;
+				}
+			}
+		}
+		if (match == 0){
+			return order;
+		}
+		
+		for (int i=0; i < labels.size(); i++){
+			if (labels.get(i).size() == match){
+				int mm=0;
+				for (int k=0; k < snapshotList.get(index).getLabels().size(); k++){
+					for (int j=0; j < labels.get(i).size(); j++){
+						if (snapshotList.get(index).getLabels().get(k).equals(labels.get(i).get(j))){
+							mm++;
+						}
+					}
+				}
+				if (mm == match){
+					order = i;
 				}
 			}
 		}
 		return order;
 	}
+	
 
 	private Date incrementDate(Date date){
 		Calendar c = Calendar.getInstance();
