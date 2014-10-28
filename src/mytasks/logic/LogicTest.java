@@ -21,6 +21,19 @@ public class LogicTest {
 	@Test
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add - #a");
+		taskLogic.executeCommand("add - #a #b");
+		taskLogic.executeCommand("add - #a #c");
+		taskLogic.executeCommand("add - #a #d");
+		taskLogic.executeCommand("add - #c #d");
+		taskLogic.executeCommand("add - #d #b");
+		taskLogic.executeCommand("add - #a #b #c");
+		taskLogic.executeCommand("add - #a #b #d");
+		taskLogic.executeCommand("add - #a #c #d");
+		taskLogic.executeCommand("add - #c #b #d");
+		taskLogic.executeCommand("add - #b #c #a #d");
+		taskLogic.executeCommand("add - #d #b #a #c");
+		taskLogic.executeCommand("add - #e #r #c #d #g");
 		// assertEquals("meeting 22.09.2014 #important added",
 		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("meeting added",
@@ -107,10 +120,10 @@ public class LogicTest {
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", taskLogic.obtainPrintableOutput());
 		// sort by labels - test 1 - sort 1 labels
 		taskLogic.executeCommand("sort important");
-		assertEquals("CS2103T meeting on 22.09.2014 #important\n" 
+		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014 #important\n" 
 				+ "CS2101 meeting on 29.09.2014 #important\n" 
 				+ "CS2100 Midterm on 25.09.2014 #important #urgent\n" 
-				+ "play badminton #anytime\n" 
+				+ "N.A.\n" + "play badminton #anytime\n" 
 				+ "medical check up on 01.10.2014 13:00 #$100\n" 
 				+ "pay acceptance fee from 28.09.2014 to 29.09.2014 #$200\n" 
 				+ "do PS4 from 28.09.2014 to 30.09.2014\n" 
