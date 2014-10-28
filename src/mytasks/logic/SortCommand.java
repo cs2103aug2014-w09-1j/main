@@ -10,23 +10,40 @@ import java.util.Date;
  *
  */
 public class SortCommand extends Command {
+	
 	private MemorySnapshotHandler mViewHandler;
+	private LocalMemory mLocalMem;
 
 	public SortCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mViewHandler = MemorySnapshotHandler.getInstance();
+		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
 	String execute() {
+		String[] prevSettings = mViewHandler.getView();
+		ArrayList<String> prevLabels = new ArrayList<String>();
+		for (int i = 0; i<prevSettings.length; i++){
+			prevLabels.add(prevSettings[i]);
+		}
+		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		mLocalMem.undoPush(commandToUndo);
 		mViewHandler.setView(super.getTask().getLabels());
 		return null;
 	}
 
 	@Override
 	String undo() {
-		// TODO Auto-generated method stub
+		String[] prevSettings = mViewHandler.getView();
+		ArrayList<String> prevLabels = new ArrayList<String>();
+		for (int i = 0; i<prevSettings.length; i++){
+			prevLabels.add(prevSettings[i]);
+		}
+		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		mLocalMem.redoPush(commandToUndo);
+		mViewHandler.setView(super.getTask().getLabels());
 		return null;
 	}
 }

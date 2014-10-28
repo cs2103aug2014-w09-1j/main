@@ -1,5 +1,7 @@
 package mytasks.logic;
 
+import java.util.ArrayList;
+
 import mytasks.file.Task;
 import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;

@@ -47,6 +47,10 @@ class MemorySnapshotHandler {
 		assert currentSettings != null : "invalid setting";
 	}
 	
+	protected String[] getView() {
+		return currentSettings;
+	}
+	
 	private void initSnapshotList(LocalMemory LocalMem){
 		snapshotList = new ArrayList<Task>();
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
