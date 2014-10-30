@@ -20,21 +20,7 @@ public class LogicTest {
 
 	@Test
 	public void testAddCommand() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("add - #a");
-		taskLogic.executeCommand("add - #a #b");
-		taskLogic.executeCommand("add - #a #c");
-		taskLogic.executeCommand("add - #a #d");
-		taskLogic.executeCommand("add - #c #d");
-		taskLogic.executeCommand("add - #d #b");
-		taskLogic.executeCommand("add - #a #b #c");
-		taskLogic.executeCommand("add - #a #b #d");
-		taskLogic.executeCommand("add - #a #c #d");
-		taskLogic.executeCommand("add - #c #b #d");
-		taskLogic.executeCommand("add - #b #c #a #d");
-		taskLogic.executeCommand("add - #d #b #a #c");
-		taskLogic.executeCommand("add - #e #r #c #d #g");
-		// assertEquals("meeting 22.09.2014 #important added",
+		taskLogic.getMemory().clearMemory();	
 		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("meeting added",
 		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));

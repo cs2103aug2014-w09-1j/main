@@ -65,7 +65,7 @@ class MemorySnapshotHandler {
 	 * getSnapshot takes looks at local memory and organizes it according to currentSettings. 
 	 * @return data structure that is read and printed by UI
 	 */
-	public String getSnapshot(LocalMemory LocalMem) {
+	public ArrayList<String> getSnapshot(LocalMemory LocalMem) {
 		assert currentSettings != null : "invalid setting";
 		initSnapshotList(LocalMem);
 		
@@ -124,16 +124,18 @@ class MemorySnapshotHandler {
 		}
 	}
 
-	private String convertSnapshotListToStringInDateFormat(ArrayList<Task> snapshotList){	
-		String snapshot = "";
+	private ArrayList<String> convertSnapshotListToStringInDateFormat(ArrayList<Task> snapshotList){	
+		ArrayList<String> output = new ArrayList<String>();
 
 		for (int i=0; i < snapshotList.size(); i++){
+			String snapshot = "";
 			Date date = snapshotList.get(i).getFromDateTime();
 			if (date == null){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
 					snapshot += snapshotList.get(j).toString() + "\n";
 				}
+				output.add(snapshot);
 				break;
 			}
 			else{
@@ -149,21 +151,24 @@ class MemorySnapshotHandler {
 				}
 				i = j-1;
 			}
+			output.add(snapshot);
 		}
 
-		return snapshot;
+		return output;
 	}
 	
-	private String convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){			
-		String snapshot = "";
+	private ArrayList<String> convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){		
+		ArrayList<String> output = new ArrayList<String>();
 
 		for (int i=0; i < snapshotList.size(); i++){
+			String snapshot = "";
 			int order = labelOrder(i);
 			if (order == labels.size()){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
 					snapshot += snapshotList.get(j).toString() + "\n";
 				}
+				output.add(snapshot);
 				break;
 			}
 			else{
@@ -178,6 +183,7 @@ class MemorySnapshotHandler {
 				}
 				i = j-1;
 			}
+			output.add(snapshot);
 		}
 		/*
 		for (int i=0; i < labelsInSortedOrder.size(); i++){
@@ -197,7 +203,7 @@ class MemorySnapshotHandler {
 		}
 		 */
 
-		return snapshot;
+		return output;
 	}
 
 	private void timedTaskToNormalTask(){	
@@ -252,8 +258,6 @@ class MemorySnapshotHandler {
 			System.out.println();
 		}
 		*/
-		
-
 	}
 
 	private void combinationOfLabelsRec(ArrayList<String> remaining, ArrayList<String> chosen){

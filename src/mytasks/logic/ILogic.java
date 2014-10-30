@@ -1,5 +1,7 @@
 package mytasks.logic;
 
+import java.util.ArrayList;
+
 /**
  * ILogic interface defines abstract methods to be used by logic component
  * @author Wilson
@@ -18,5 +20,5 @@ public interface ILogic {
 	 * obtainPrintableOutput reads and converts local memory into a form that is directly printable by UI.
 	 * @return printable format that is not neccessarily a string. Will use string temporarily
 	 */
-	public String obtainPrintableOutput();
+	public ArrayList<String> obtainPrintableOutput();
 }

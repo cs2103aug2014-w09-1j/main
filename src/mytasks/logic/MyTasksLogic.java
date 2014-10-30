@@ -159,7 +159,7 @@ public class MyTasksLogic implements ILogic {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String obtainPrintableOutput() {
+	public ArrayList<String> obtainPrintableOutput() {
 		return mViewHandler.getSnapshot(mLocalMem);
 	}
 
