@@ -119,8 +119,7 @@ class LocalMemory implements Serializable {
 
 	protected String search(Task userRequest) {
 		String searchedTasks = "";
-		assert userRequest != null;
-
+		/*
 		if (userRequest.getDescription() != null
 						&& userRequest.getLabels() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
@@ -129,19 +128,27 @@ class LocalMemory implements Serializable {
 			        searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
 			}
-		} else if (userRequest.getDescription() != null) {
+		}
+		*/
+		if (userRequest.getDescription() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameDesc(userRequest, i)) {
 					searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
+				else if (haveSameLabels(userRequest, i)) {
+					searchedTasks += mLocalMem.get(i).toString() + "\n";
+				}
 			}
-		} else if (userRequest.getLabels() != null) {
+		} 
+		/*
+		else if (userRequest.getLabels() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameLabels(userRequest, i)) {
 					searchedTasks += mLocalMem.get(i).toString() + "\n";
 				}
 			}
 		}
+		*/
 
 		return searchedTasks;
 	}
@@ -166,16 +173,18 @@ class LocalMemory implements Serializable {
 		String desc = userRequest.getDescription();
 
 		if (mLocalMem.get(index).getDescription() != null
-						&& mLocalMem.get(index).getDescription().contains(desc)) {
+						&& mLocalMem.get(index).getDescription().toLowerCase().contains(desc.toLowerCase())) {
 			return true;
 		}
 		return false;
 	}
 
 	private boolean haveSameLabels(Task userRequest, int index) {
-		String userRequestedTaskLabelsToString = "";
-		String mLocalMemTaskLabelsToString = "";
+		//String userRequestedTaskLabelsToString = "";
+		//String mLocalMemTaskLabelsToString = "";
+		String desc = userRequest.getDescription();
 
+		/*
 		if (userRequest.getLabels() != null) {
 			for (String s : userRequest.getLabels()) {
 				userRequestedTaskLabelsToString += s;
@@ -185,14 +194,23 @@ class LocalMemory implements Serializable {
 			for (String s : mLocalMem.get(index).getLabels()) {
 				mLocalMemTaskLabelsToString += s;
 			}
+
 		}
 
 		if (mLocalMemTaskLabelsToString.equals(userRequestedTaskLabelsToString)) {
 			return true;
 		}
 		return false;
+		 */
+
+		for (int i=0; i < mLocalMem.get(index).getLabels().size(); i++){
+			if (mLocalMem.get(index).getLabels().get(i).toLowerCase().contains(desc.toLowerCase())){
+				return true;
+			}
+		}
+		return false;
 	}
-	
+
 	//Backdoor function to use for testing
 	protected void clearMemory() {
 		mLocalMem.clear();
