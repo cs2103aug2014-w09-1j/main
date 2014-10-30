@@ -202,6 +202,9 @@ class LocalMemory implements Serializable {
 		}
 		return false;
 		 */
+		if (mLocalMem.get(index).getLabels() == null){
+			return false;
+		}
 
 		for (int i=0; i < mLocalMem.get(index).getLabels().size(); i++){
 			if (mLocalMem.get(index).getLabels().get(i).toLowerCase().contains(desc.toLowerCase())){
