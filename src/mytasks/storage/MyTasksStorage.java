@@ -11,6 +11,7 @@ import java.util.Date;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
+import mytasks.file.Logger;
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
@@ -78,12 +79,13 @@ public class MyTasksStorage implements IStorage, Serializable {
 		if (memString.length()==0) {
 			return result;
 		}
-		String delims = "[/]+";
+		String delims = "(//)";
 		String[] memBlock = memString.split(delims);
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks%sizeBlocks != 0){
-			System.out.println(MESSAGE_CORPTDATA);
+			Logger logger = Logger.getInstance();
+			logger.log(MESSAGE_CORPTDATA);
 			return result;
 		}
 		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
@@ -166,7 +168,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	}
 	
 	private String addBreak() {
-		return "/";
+		return "//";
 	}
 	
 	private void printOutput(String output, String fileName){
@@ -175,7 +177,8 @@ public class MyTasksStorage implements IStorage, Serializable {
 			writer.print(output);
 			writer.close();
 		} catch (IOException e) {
-			System.out.println(MESSAGE_FILEERROR);
+			Logger logger = Logger.getInstance();
+			logger.log(MESSAGE_FILEERROR);
 		}
 	}
 }
