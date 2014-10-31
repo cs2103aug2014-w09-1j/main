@@ -90,9 +90,13 @@ public class MyTasksUI extends JPanel implements ActionListener {
         c.weighty = 1.0;        
         add(textField, c);
         
+        String output = "";
+        
         for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-        	textArea.setText(mLogic.obtainPrintableOutput().get(i));
+        	output = output + mLogic.obtainPrintableOutput().get(i) + "\n";
         }
+    	textArea.setText(output);
+
 //      Container contentPane = getRootPane();
 //      contentPane.add(tasksBox, BorderLayout.CENTER);
       
@@ -124,9 +128,16 @@ public class MyTasksUI extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent evt) {    	
         String text = textField.getText();
         textAreaFeedback.setText(mLogic.executeCommand(text));
+        String output = "";
+        
         for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-        	textArea.setText(mLogic.obtainPrintableOutput().get(i));
+        	output = output + mLogic.obtainPrintableOutput().get(i) + "\n";
         }
+    	textArea.setText(output);
+    	
+//        for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+//        	textArea.append(mLogic.obtainPrintableOutput().get(i) + "\n");
+//        }
         textField.selectAll();
         
 //        textField.setText("");
