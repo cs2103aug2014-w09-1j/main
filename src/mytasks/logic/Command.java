@@ -26,11 +26,19 @@ public abstract class Command {
 	private Task mTask;
 	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
+	protected static boolean haveSearched;
 
 	// Constructor
 	public Command(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		//determineCommandType(comdType);
+		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
+		mTask = thisTask;
+		mToUpdateTaskDesc = updateDesc;
+	}
+	
+	public Command(String comdDes, Date fromDateTime,
+			Date toDateTime, ArrayList<String> comdLabels, String updateDesc, boolean canDo) {
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;

@@ -53,7 +53,7 @@ public class MyTasksLogic implements ILogic {
 	 * {@inheritDoc}
 	 */
 	public String executeCommand(String input) {
-
+		mLocalMem.print();
 		Command commandObject = parseInput(input);
 		// String output = removeFirstWord(input);
 
@@ -61,6 +61,7 @@ public class MyTasksLogic implements ILogic {
 			return "Invalid input";
 		}
 		String feedback = commandObject.execute();
+		mLocalMem.print();
 		return feedback;
 		
 		// Don't remove this chunk yet. Useful for adding into individual command sections
@@ -159,7 +160,7 @@ public class MyTasksLogic implements ILogic {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String obtainPrintableOutput() {
+	public ArrayList<String> obtainPrintableOutput() {
 		return mViewHandler.getSnapshot(mLocalMem);
 	}
 
