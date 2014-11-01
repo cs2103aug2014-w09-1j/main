@@ -133,6 +133,30 @@ public class LogicTest {
 				+ "eat sushi #KentRidge\n"
 				+ "work from 10.10.2014 10:00 to 12.10.2014 13:00\n"
 				+ "gaming from 03.10.2014 10:00 to 03.10.2014 15:00\n", output);
+		// sort by labels - test 2 - sort multiple labels
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add tutorial #CS2103");
+		taskLogic.executeCommand("add demo 5.11.2014 #CS2103 #important");
+		taskLogic.executeCommand("add tutorial #CS2100");
+		taskLogic.executeCommand("add lab #CS2100 #important");
+		taskLogic.executeCommand("add meeting 3.11.2014 #CS2101 #important");
+		taskLogic.executeCommand("add video making #CS2101");
+		taskLogic.executeCommand("sort CS2103 CS2100 important");
+		output = "";
+		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
+			output += taskLogic.obtainPrintableOutput().get(i);		
+		assertEquals("#CS2103#important\n" 
+				+ "demo on 05.11.2014 #CS2103 #important\n"
+				+ "#CS2100#important\n"
+				+ "lab #CS2100 #important\n"
+				+ "#CS2103\n"
+				+ "tutorial #CS2103\n"
+				+ "#CS2100\n"
+				+ "tutorial #CS2100\n"
+				+ "#important\n"
+				+ "meeting on 03.11.2014 #CS2101 #important\n"
+				+ "N.A.\n"
+				+ "video making #CS2101\n", output);
 	}
 	
 	@Test
