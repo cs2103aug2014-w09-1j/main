@@ -36,7 +36,7 @@ public class MyTasksUI extends JPanel implements ActionListener {
 	private Border paneEdge;
 	private JScrollPane scrollPane;
 	private Border titled;
-
+	
 	public MyTasksUI() {
 		super(new GridBagLayout());
 
@@ -50,7 +50,16 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
 		textAreaPanel.setLayout(new BoxLayout(textAreaPanel,BoxLayout.Y_AXIS));
-
+		
+		System.out.println("obtainprintableoutput: ");
+		for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+			System.out.println(mLogic.obtainPrintableOutput().get(i));
+		}
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();
+		textArea = new JTextArea();
+		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea(20, 50);
 			textArea.setEditable(false);			
@@ -58,6 +67,7 @@ public class MyTasksUI extends JPanel implements ActionListener {
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {	
+<<<<<<< HEAD
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();		
@@ -67,6 +77,15 @@ public class MyTasksUI extends JPanel implements ActionListener {
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				System.out.println("firstWord: " + firstWord);
 				textArea = new JTextArea();
+=======
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {				
+				System.out.println("before start up i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
+				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				System.out.println("firstWord: " + firstWord);
+				
+				textArea = new JTextArea(10, 50);
+>>>>>>> a008315a706e62563cdf7d034066f254cf116cb0
 				textArea.setEditable(false);
 
 				titled = BorderFactory.createTitledBorder(firstWord);
@@ -149,23 +168,31 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
 		
-		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-			System.out.println("i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
-			
-			String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-			System.out.println("firstWord: " + firstWord);
-			textArea = new JTextArea();
-			textArea.setEditable(false);
-
-			titled = BorderFactory.createTitledBorder(firstWord);
-
-			String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-			textArea.setText(content);
+		if(mLogic.obtainPrintableOutput().size() == 0) {
+			textArea = new JTextArea(20, 50);
+			textArea.setEditable(false);			
+			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
-			System.out.println("print output: ");
-			System.out.println(mLogic.obtainPrintableOutput().get(i));
-			
 			textAreaPanel.add(textArea);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				System.out.println("i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
+			
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				System.out.println("firstWord: " + firstWord);
+				textArea = new JTextArea();
+				textArea.setEditable(false);
+
+				titled = BorderFactory.createTitledBorder(firstWord);
+
+				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+				textArea.setText(content);
+				textArea.setBorder(titled);
+				System.out.println("print output: ");
+				System.out.println(mLogic.obtainPrintableOutput().get(i));
+			
+				textAreaPanel.add(textArea);
+			}
 		}
 
 		textArea.setCaretPosition(textArea.getDocument().getLength());
