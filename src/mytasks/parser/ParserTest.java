@@ -37,6 +37,7 @@ public class ParserTest {
 	private Command test17 = null;
 	private Command test18 = null;
 	private Command test19 = null;
+	private Command test20 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
@@ -67,6 +68,8 @@ public class ParserTest {
 		assertObjFields(test17, tester.parseInput("add do homework today from 2am to 3am"));
 		assertObjFields(test18, tester.parseInput("add coding from today 2am to tomorrow 3am"));
 		assertObjFields(test19, tester.parseInput("update play - tomorrow from 3pm to 4pm #yolo"));
+		assertObjFields(test20, tester.parseInput("add sleep next monday"));
+		//TODO: create and pass test20
 		
 	}
 	
