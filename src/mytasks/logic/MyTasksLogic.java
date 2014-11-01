@@ -61,7 +61,7 @@ public class MyTasksLogic implements ILogic {
 			return "Invalid input";
 		}
 		String feedback = commandObject.execute();
-		mLocalMem.print();
+		//mLocalMem.print();
 		return feedback;
 		
 		// Don't remove this chunk yet. Useful for adding into individual command sections

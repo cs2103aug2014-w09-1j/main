@@ -57,16 +57,16 @@ public class MyTasksUI extends JPanel implements ActionListener {
 			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
-		} else {			
+		} else {	
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();		
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				textAreaPanel.removeAll();
-				textAreaPanel.revalidate();
-				textAreaPanel.repaint();
 				System.out.println("i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
 				
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				System.out.println("firstWord: " + firstWord);
-				textArea = new JTextArea(10, 50);
+				textArea = new JTextArea();
 				textArea.setEditable(false);
 
 				titled = BorderFactory.createTitledBorder(firstWord);
@@ -77,7 +77,7 @@ public class MyTasksUI extends JPanel implements ActionListener {
 				System.out.println("print output: ");
 				System.out.println(mLogic.obtainPrintableOutput().get(i));
 			
-				textAreaPanel.add(textArea);
+				textAreaPanel.add(textArea);			
 			}
 		}
 		scrollPane = new JScrollPane(textAreaPanel);
