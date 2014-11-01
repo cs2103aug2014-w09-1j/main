@@ -4,16 +4,27 @@ import java.awt.*;
 //waits for user to do something
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogic;
@@ -25,7 +36,7 @@ import mytasks.logic.MyTasksLogic;
  * @author Huiwen
  *
  */
-public class MyTasksUI extends JPanel implements ActionListener {
+public class MyTasksUI extends JPanel implements ActionListener, DocumentListener {
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
 	protected JTextArea textArea;
@@ -37,13 +48,20 @@ public class MyTasksUI extends JPanel implements ActionListener {
 	private JScrollPane scrollPane;
 	private Border titled;
 	
+	private Mode mode = Mode.INSERT;
+	private final List<String> words;
+	private static enum Mode {
+	    INSERT,
+	    COMPLETION
+	  };
+	
+	  
 	public MyTasksUI() {
 		super(new GridBagLayout());
 
 		mLogic = new MyTasksLogic(false);
 		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
-
 
 		// A border that puts 10 extra pixels at the sides and bottom of each pane.
 		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
@@ -58,7 +76,6 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
-		textArea = new JTextArea();
 		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea(20, 50);
@@ -73,7 +90,8 @@ public class MyTasksUI extends JPanel implements ActionListener {
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				System.out.println("firstWord: " + firstWord);
 				
-				textArea = new JTextArea(10, 50);
+				textArea = new JTextArea(1, 50);
+				textArea = new JTextArea();
 				textArea.setEditable(false);
 
 				titled = BorderFactory.createTitledBorder(firstWord);
@@ -84,11 +102,22 @@ public class MyTasksUI extends JPanel implements ActionListener {
 				System.out.println("print output: ");
 				System.out.println(mLogic.obtainPrintableOutput().get(i));
 			
-				textAreaPanel.add(textArea);
+				textAreaPanel.add(textArea);			
+				
+				GridBagConstraints c = new GridBagConstraints();
+				c.gridwidth = GridBagConstraints.REMAINDER;
+				c.fill = GridBagConstraints.HORIZONTAL;
+				c.gridx = 0;
+				c.weightx = 1.0;
+				c.weighty = 1.0;
+				
+				textAreaPanel.add(textArea, c);
 			}
 		}
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPane.setBounds(100, 100, 20, 50);
+		scrollPane.setPreferredSize(new Dimension(300, 400));
 
 		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
 		textAreaFeedback = new JTextArea(5, 50);
@@ -99,7 +128,17 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
 		textField = new JTextField(20);
 		textField.addActionListener(this);
+		textField.getDocument().addDocumentListener(this);
 
+		words = new ArrayList<String>();
+		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
+			for(int k = 0; k < strArr.length; k++) {
+				System.out.println("k: " + k + " word: " + strArr[k]);
+				words.add(strArr[k]);
+			}
+		}
+		
 		// Add Components to this panel.
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
@@ -135,22 +174,22 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		c.weighty = 1.0;
 		add(textField, c);
 	}
-
-	/**
-	 * run starts the process of accepting and executing input
-	 */
-	public void run() {
-		// Schedule a job for the event dispatch thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				createAndShowGUI();
-			}
-		});
-	}
+	 
+	 /**
+		 * run starts the process of accepting and executing input
+		 */
+		public void run() {
+			// Schedule a job for the event dispatch thread:
+			// creating and showing this application's GUI.
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					createAndShowGUI();
+				}
+			});
+		}
 
 	public void actionPerformed(ActionEvent evt) {
-		String text = textField.getText();
+        String text = textField.getText();
 		textAreaFeedback.setText(mLogic.executeCommand(text));
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
@@ -203,5 +242,92 @@ public class MyTasksUI extends JPanel implements ActionListener {
 		// Display the window.
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	 @Override
+	  public void insertUpdate(DocumentEvent ev) {
+	    if (ev.getLength() != 1)
+	      return;
+
+	    int pos = ev.getOffset();
+	    String content = null;
+	    try {
+	      content = textField.getText(0, pos + 1);
+	    } catch (BadLocationException e) {
+	      e.printStackTrace();
+	    }
+
+	    // Find where the word starts
+	    int w;
+	    for (w = pos; w >= 0; w--) {
+	      if (!Character.isLetter(content.charAt(w))) {
+	        break;
+	      }
+	    }
+
+	    // Too few chars
+	    if (pos - w < 2)
+	      return;
+
+	    String prefix = content.substring(w + 1).toLowerCase();
+	    int n = Collections.binarySearch(words, prefix);
+	    if (n < 0 && -n <= words.size()) {
+	      String match = words.get(-n - 1);
+	      if (match.startsWith(prefix)) {
+	        // A completion is found
+	        String completion = match.substring(pos - w);
+	        // We cannot modify Document from within notification,
+	        // so we submit a task that does the change later
+	        SwingUtilities.invokeLater(new CompletionTask(completion, pos + 1));
+	      }
+	    } else {
+	      // Nothing found
+	      mode = Mode.INSERT;
+	    }
+	  }
+
+	  public class CommitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent ev) {
+	      if (mode == Mode.COMPLETION) {
+	        int pos = textField.getSelectionEnd();
+	        StringBuffer sb = new StringBuffer(textField.getText());
+	        sb.insert(pos, " ");
+	        textField.setText(sb.toString());
+	        textField.setCaretPosition(pos + 1);
+	        mode = Mode.INSERT;
+	      } else {
+	        textField.replaceSelection("\t");
+	      }
+	    }
+	  }
+
+	  private class CompletionTask implements Runnable {
+	    private String completion;
+	    private int position;
+
+	    CompletionTask(String completion, int position) {
+	      this.completion = completion;
+	      this.position = position;
+	    }
+
+	    public void run() {	    	
+	      StringBuffer sb = new StringBuffer(textField.getText());
+	      sb.insert(position, completion);
+	      textField.setText(sb.toString());
+	      textField.setCaretPosition(position + completion.length());
+	      textField.moveCaretPosition(position);
+	      mode = Mode.COMPLETION;
+	    }
+	  }
+
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
 	}
 }

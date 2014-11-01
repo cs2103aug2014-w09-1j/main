@@ -29,7 +29,7 @@ public class RedoCommand extends Command {
 			Command commandToRevert = mLocalMem.getRedoStack().pop();
 			feedback = commandToRevert.execute();
 		}
-		super.haveSearched = false;
+		haveSearched = false;
 		return feedback;
 	}
 

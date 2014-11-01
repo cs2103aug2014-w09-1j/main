@@ -87,12 +87,15 @@ class MemorySnapshotHandler {
 			return convertSnapshotListToStringInLabelsFormat(snapshotList);
 			
 			/*
-			String snapshot = "";
+			ArrayList<String> snapshot = new ArrayList<String>();
+			//String snapshot = "";
 			for (int i=0; i < snapshotList.size(); i++){
-				snapshot += snapshotList.get(i).toString() + "\n";
+				//snapshot += snapshotList.get(i).toString() + "\n";
+				snapshot.add(snapshotList.get(i).toString() + "\n");
 			}
 			return snapshot;
 			*/
+			
 		}
 
 		return convertSnapshotListToStringInDateFormat(snapshotList);

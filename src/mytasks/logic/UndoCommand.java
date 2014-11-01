@@ -30,7 +30,7 @@ public class UndoCommand extends Command {
 			Command commandToRevert = mLocalMem.getUndoStack().pop();
 			feedback = commandToRevert.undo();
 		}
-		super.haveSearched = false;
+		haveSearched = false;
 		return feedback;
 	}
 
