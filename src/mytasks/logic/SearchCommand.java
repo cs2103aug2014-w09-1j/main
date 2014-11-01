@@ -27,10 +27,10 @@ public class SearchCommand extends Command {
 		String searchedTasks = mLocalMem.search(super.getTask());
 		if (!searchedTasks.isEmpty()) {
 			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
-			super.haveSearched = true;
+			haveSearched = true;
 		} else {
 			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
-			super.haveSearched = false;
+			haveSearched = false;
 		}
 		return searchedTasks;
 	}

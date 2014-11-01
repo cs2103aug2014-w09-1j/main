@@ -67,25 +67,13 @@ public class MyTasksUI extends JPanel implements ActionListener {
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {	
-<<<<<<< HEAD
-		textAreaPanel.removeAll();
-		textAreaPanel.revalidate();
-		textAreaPanel.repaint();		
-			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				System.out.println("i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
-				
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-				System.out.println("firstWord: " + firstWord);
-				textArea = new JTextArea();
-=======
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {				
 				System.out.println("before start up i: " + i + " size: " + mLogic.obtainPrintableOutput().size());
 				
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				System.out.println("firstWord: " + firstWord);
 				
-				textArea = new JTextArea(10, 50);
->>>>>>> a008315a706e62563cdf7d034066f254cf116cb0
+				textArea = new JTextArea(1, 50);
 				textArea.setEditable(false);
 
 				titled = BorderFactory.createTitledBorder(firstWord);

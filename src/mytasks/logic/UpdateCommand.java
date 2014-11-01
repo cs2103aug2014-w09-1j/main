@@ -24,6 +24,12 @@ public class UpdateCommand extends Command {
 
 	@Override
 	String execute() {
+		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) && Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
+			String feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), super.getTask().getToDateTime(), 
+					super.getTask().getLabels(), mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
+			haveSearched = false;
+			return feedback;
+		}
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
@@ -74,7 +80,7 @@ public class UpdateCommand extends Command {
 			}
 		}
 		mLocalMem.saveLocalMemory();
-		super.haveSearched = false;
+		haveSearched = false;
 		return super.getToUpdateTaskDesc() + " updated";
 	}
 
@@ -96,6 +102,19 @@ public class UpdateCommand extends Command {
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
 		return this.getToUpdateTaskDesc() + " reverted";
+	}
+	
+	public static boolean isNumeric(String str)  
+	{  
+	  try  
+	  {  
+	     int i = Integer.parseInt(str);  
+	  }  
+	  catch(NumberFormatException nfe)  
+	  {  
+	    return false;  
+	  }  
+	  return true;  
 	}
 
 }
