@@ -90,11 +90,8 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				System.out.println("firstWord: " + firstWord);
 				
-<<<<<<< HEAD
 				textArea = new JTextArea(1, 50);
-=======
 				textArea = new JTextArea();
->>>>>>> 18e5d15d49e130f5be2006b55377df07e88b5faa
 				textArea.setEditable(false);
 
 				titled = BorderFactory.createTitledBorder(firstWord);
@@ -104,10 +101,8 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				textArea.setBorder(titled);
 				System.out.println("print output: ");
 				System.out.println(mLogic.obtainPrintableOutput().get(i));
-<<<<<<< HEAD
 			
 				textAreaPanel.add(textArea);			
-=======
 				
 				GridBagConstraints c = new GridBagConstraints();
 				c.gridwidth = GridBagConstraints.REMAINDER;
@@ -117,7 +112,6 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				c.weighty = 1.0;
 				
 				textAreaPanel.add(textArea, c);
->>>>>>> 18e5d15d49e130f5be2006b55377df07e88b5faa
 			}
 		}
 		scrollPane = new JScrollPane(textAreaPanel);
