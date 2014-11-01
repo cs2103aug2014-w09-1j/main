@@ -53,7 +53,7 @@ public class MyTasksLogic implements ILogic {
 	 * {@inheritDoc}
 	 */
 	public String executeCommand(String input) {
-
+		mLocalMem.print();
 		Command commandObject = parseInput(input);
 		// String output = removeFirstWord(input);
 
