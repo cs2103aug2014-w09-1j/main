@@ -29,6 +29,7 @@ public class AddCommand extends Command {
 				.getTask().getDescription());
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.saveLocalMemory();
+		super.haveSearched = false;
 		return super.getTaskDetails() + " added";
 	}
 

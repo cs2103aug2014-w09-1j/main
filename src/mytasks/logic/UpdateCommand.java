@@ -74,6 +74,7 @@ public class UpdateCommand extends Command {
 			}
 		}
 		mLocalMem.saveLocalMemory();
+		super.haveSearched = false;
 		return super.getToUpdateTaskDesc() + " updated";
 	}
 

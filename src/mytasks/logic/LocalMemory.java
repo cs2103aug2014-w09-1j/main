@@ -27,6 +27,7 @@ class LocalMemory implements Serializable {
 	private Stack<Command> undoStack = new Stack<Command>();
 	private Stack<Command> redoStack = new Stack<Command>();
 	private IStorage mStore;
+	private static ArrayList<Task> searchList;
 
 	// Constructor
 	private LocalMemory() {
@@ -54,6 +55,10 @@ class LocalMemory implements Serializable {
 
 	protected ArrayList<Task> getLocalMem() {
 		return mLocalMem;
+	}
+	
+	protected ArrayList<Task> getSearchList(){
+		return searchList;
 	}
 
 	protected void add(Task userRequest) {
@@ -119,6 +124,7 @@ class LocalMemory implements Serializable {
 
 	protected String search(Task userRequest) {
 		String searchedTasks = "";
+		searchList = new ArrayList<Task>();
 		/*
 		if (userRequest.getDescription() != null
 						&& userRequest.getLabels() != null) {
@@ -133,10 +139,10 @@ class LocalMemory implements Serializable {
 		if (userRequest.getDescription() != null) {
 			for (int i = 0; i < mLocalMem.size(); i++) {
 				if (haveSameDesc(userRequest, i)) {
-					searchedTasks += mLocalMem.get(i).toString() + "\n";
+					searchedTasks += searchList.size() + ". " + mLocalMem.get(i).toString() + "\n";
 				}
 				else if (haveSameLabels(userRequest, i)) {
-					searchedTasks += mLocalMem.get(i).toString() + "\n";
+					searchedTasks += searchList.size() + ". " + mLocalMem.get(i).toString() + "\n";
 				}
 			}
 		} 
@@ -149,6 +155,9 @@ class LocalMemory implements Serializable {
 			}
 		}
 		*/
+		for (int i=0; i < searchList.size(); i++){
+			System.out.println(searchList.get(i).toString());
+		}
 
 		return searchedTasks;
 	}
@@ -174,6 +183,7 @@ class LocalMemory implements Serializable {
 
 		if (mLocalMem.get(index).getDescription() != null
 						&& mLocalMem.get(index).getDescription().toLowerCase().contains(desc.toLowerCase())) {
+			searchList.add(mLocalMem.get(index));
 			return true;
 		}
 		return false;
@@ -208,6 +218,7 @@ class LocalMemory implements Serializable {
 
 		for (int i=0; i < mLocalMem.get(index).getLabels().size(); i++){
 			if (mLocalMem.get(index).getLabels().get(i).toLowerCase().contains(desc.toLowerCase())){
+				searchList.add(mLocalMem.get(index));
 				return true;
 			}
 		}

@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 
 /**
@@ -26,8 +27,10 @@ public class SearchCommand extends Command {
 		String searchedTasks = mLocalMem.search(super.getTask());
 		if (!searchedTasks.isEmpty()) {
 			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
+			super.haveSearched = true;
 		} else {
 			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
+			super.haveSearched = false;
 		}
 		return searchedTasks;
 	}

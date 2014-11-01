@@ -25,21 +25,30 @@ public class DeleteCommand extends Command {
 
 	@Override
 	String execute() {
-		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription()
-					.equals(super.getTask().getDescription())) {
-				Task currentTask = mLocalMem.getLocalMem().get(i);
-				Command commandToUndo = new DeleteCommand(
-						currentTask.getDescription(),
-						currentTask.getFromDateTime(),
-						currentTask.getToDateTime(), currentTask.getLabels(),
-						null);
-				mLocalMem.undoPush(commandToUndo);
-				mLocalMem.remove(super.getTask());
-				break;
+		if (super.haveSearched == true && isNumeric(super.getTaskDetails()) && Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
+			String feedback = new DeleteCommand(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
+			super.haveSearched = false;
+			return feedback;
+		}
+		else{
+			for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+				if (mLocalMem.getLocalMem().get(i).getDescription()
+						.equals(super.getTask().getDescription())) {
+					Task currentTask = mLocalMem.getLocalMem().get(i);
+					Command commandToUndo = new DeleteCommand(
+							currentTask.getDescription(),
+							currentTask.getFromDateTime(),
+							currentTask.getToDateTime(), currentTask.getLabels(),
+							null);
+					mLocalMem.undoPush(commandToUndo);
+					mLocalMem.remove(super.getTask());
+					break;
+				}
 			}
 		}
+		super.haveSearched = false;
 		mLocalMem.saveLocalMemory();
+		System.out.println(super.getTaskDetails());
 		return super.getTaskDetails() + " deleted";
 	}
 
@@ -52,5 +61,18 @@ public class DeleteCommand extends Command {
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
 		return this.getTask().getDescription() + " added";
+	}
+	
+	public static boolean isNumeric(String str)  
+	{  
+	  try  
+	  {  
+	     int i = Integer.parseInt(str);  
+	  }  
+	  catch(NumberFormatException nfe)  
+	  {  
+	    return false;  
+	  }  
+	  return true;  
 	}
 }
