@@ -75,7 +75,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		}		
 		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
-			textArea = new JTextArea(20, 50);
+			textArea = new JTextArea();
 			textArea.setEditable(false);			
 			Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
 			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
