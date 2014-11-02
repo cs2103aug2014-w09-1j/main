@@ -15,6 +15,9 @@ public class UpdateCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
+	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update";
+	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
+
 
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -31,13 +34,19 @@ public class UpdateCommand extends Command {
 			return feedback;
 		}
 		Task prevState = null;
+		boolean hasTask = false;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getToUpdateTaskDesc())) {
+				hasTask = true;
 				prevState = mLocalMem.getLocalMem().get(i).getClone();
 				break;
 			}
 		}
+		if (!hasTask){
+			return String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc());
+		}
+		
 		UpdateCommand commandToUndo = null;
 		if (this.getTaskDetails() == null) {
 			commandToUndo = new UpdateCommand(prevState.getDescription(),
@@ -81,7 +90,7 @@ public class UpdateCommand extends Command {
 		}
 		mLocalMem.saveLocalMemory();
 		haveSearched = false;
-		return super.getToUpdateTaskDesc() + " updated";
+		return String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
 	}
 
 	@Override

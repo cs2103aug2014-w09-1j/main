@@ -164,7 +164,7 @@ public class LogicTest {
 	public void testUpdateCommand() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("add meeting");
-		assertEquals("meeting updated",
+		assertEquals("'meeting' updated",
 				taskLogic.executeCommand("update meeting - CS2103T #important"));
 	}
 
@@ -174,7 +174,7 @@ public class LogicTest {
 		taskLogic.executeCommand("add play");
 		taskLogic.executeCommand("update play - do homework");
 		assertEquals("do homework reverted", taskLogic.executeCommand("undo"));
-		assertEquals("play updated", taskLogic.executeCommand("redo"));
+		assertEquals("'play' updated", taskLogic.executeCommand("redo"));
 		assertEquals("do homework reverted", taskLogic.executeCommand("undo"));
 	}
 	
@@ -182,7 +182,7 @@ public class LogicTest {
 	public void testDeleteCommand() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("add play");
-		assertEquals("play deleted", taskLogic.executeCommand("delete play"));
+		assertEquals("'play' deleted", taskLogic.executeCommand("delete play"));
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 	
@@ -193,7 +193,7 @@ public class LogicTest {
 		taskLogic.executeCommand("delete play");
 		assertEquals("play added", taskLogic.executeCommand("undo"));
 		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
-		assertEquals("play deleted", taskLogic.executeCommand("redo"));
+		assertEquals("'play' deleted", taskLogic.executeCommand("redo"));
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 

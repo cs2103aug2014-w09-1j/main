@@ -9,17 +9,14 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
@@ -64,23 +61,24 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		textAreaLabel.setOpaque(true);
 
 		// A border that puts 10 extra pixels at the sides and bottom of each pane.
-		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);		
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
 		textAreaPanel.setLayout(new BoxLayout(textAreaPanel,BoxLayout.Y_AXIS));
-		
-		System.out.println("obtainprintableoutput: ");
-		for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-			System.out.println(mLogic.obtainPrintableOutput().get(i));
-		}
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
 		
+		System.out.println("obtainprintableoutput: ");
+		for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+			System.out.println(mLogic.obtainPrintableOutput().get(i));
+		}		
+		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea(20, 50);
 			textArea.setEditable(false);			
-			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
+			Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {	
@@ -92,9 +90,10 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				
 				textArea = new JTextArea(1, 50);
 				textArea = new JTextArea();
-				textArea.setEditable(false);
-
-				titled = BorderFactory.createTitledBorder(firstWord);
+				textArea.setEditable(false);				
+		
+				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 
 				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 				textArea.setText(content);
@@ -138,6 +137,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				words.add(strArr[k]);
 			}
 		}
+		Collections.sort(words);
 		
 		// Add Components to this panel.
 		GridBagConstraints c = new GridBagConstraints();
@@ -195,6 +195,14 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
 		
+		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
+			for(int k = 0; k < strArr.length; k++) {
+				words.add(strArr[k]);
+			}
+		}
+		Collections.sort(words);
+		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea(20, 50);
 			textArea.setEditable(false);			
@@ -210,7 +218,8 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				textArea = new JTextArea();
 				textArea.setEditable(false);
 
-				titled = BorderFactory.createTitledBorder(firstWord);
+				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 
 				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 				textArea.setText(content);
