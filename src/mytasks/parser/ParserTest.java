@@ -18,7 +18,6 @@ import mytasks.logic.UpdateCommand;
 import org.junit.Test;
 
 public class ParserTest {
-	private Command test14 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
@@ -310,7 +309,7 @@ public class ParserTest {
 		try {
 			Date date141 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
 			Date date142 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
-			test14 = new UpdateCommand("wake up", date141, date142, null,
+			Command test14 = new UpdateCommand("wake up", date141, date142, null,
 					"sleep");
 			assertObjFields(
 					test14,
