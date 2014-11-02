@@ -16,6 +16,8 @@ public class DeleteCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
+	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete";
+	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -30,9 +32,11 @@ public class DeleteCommand extends Command {
 			haveSearched = false;
 			return feedback;
 		}
+		boolean hasTask = false;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getTask().getDescription())) {
+				hasTask = true;
 				Task currentTask = mLocalMem.getLocalMem().get(i);
 				Command commandToUndo = new DeleteCommand(
 						currentTask.getDescription(),
@@ -47,8 +51,12 @@ public class DeleteCommand extends Command {
 
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
-		System.out.println(super.getTaskDetails());
-		return super.getTaskDetails() + " deleted";
+		if (hasTask){
+			return String.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
+		}
+		else{
+			return String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
+		}
 	}
 
 	@Override
