@@ -21,7 +21,11 @@ public class LogicTest {
 	@Test
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();	
-		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
+		taskLogic.executeCommand("add meeting 22.09.2014 #important");
+		taskLogic.executeCommand("add Beyond Earth #CivV");
+		taskLogic.executeCommand("add OP2 3.11.2014");
+		taskLogic.executeCommand("add demo 5.11.2014 #CS2103 #V0.4");
+		taskLogic.executeCommand("add lab quiz 11.11.2014 #MA1101R");
 		//assertEquals("meeting added",
 		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
@@ -42,25 +46,21 @@ public class LogicTest {
 	@Test
 	public void testSearchCommand() {
 		taskLogic.getMemory().clearMemory();
-		// test 1
+		// test 1 - search for 1 keyword
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("search meeting"));
 		taskLogic.executeCommand("add CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("add CS2101 meeting 29.09.2014");
 		taskLogic.executeCommand("add important");
-		assertEquals("CS2103T meeting on 22.09.2014 #important\n"
-				+ "CS2101 meeting on 29.09.2014\n" 
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
-		// test 2
-		assertEquals("CS2103T meeting on 22.09.2014 #important\n" + "CS2101 meeting on 29.09.2014\n"
-				+ "task(s) with keyword 'meeting #important' searched", taskLogic.executeCommand("search meeting #important"));
-		// test 3
-		taskLogic.executeCommand("add important date 1.10.2014 #meeting");
-		assertEquals("CS2103T meeting on 22.09.2014 #important\n" 
-				+ "CS2101 meeting on 29.09.2014\n" 
-				+ "important date on 01.10.2014 #meeting\n"
-				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("search meeting"));
+		// test 2 - search for multiple keywords
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "3. important\n"
+				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("search meeting important"));
 	}
-	
+
 
 	@Test
 	public void testGetSnapshot(){
