@@ -78,6 +78,40 @@ public class ParserTest {
 			e.printStackTrace();
 		}
 	}
+	
+	//TODO: pass this testcase
+	@Test
+	public void addDateTest4() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.TUESDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 3) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String dayFormat = MyTasksParser.dateFormats.get(0)
+					.format(nextXDay);
+			Date includeTime = MyTasksParser.dateTimeFormats.get(0).parse(
+					dayFormat + " 17:00");
+			Command test20 = new AddCommand("sleep", includeTime, null, null,
+					null);
+			assertObjFields(test20,
+					tester.parseInput("add sleep next tuesday 5pm"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void addDateLabelsTest1() {
@@ -170,12 +204,11 @@ public class ParserTest {
 			e.printStackTrace();
 		}
 	}
-
+	
+	//TODO pass this testcase. dates with next still fails
 	@Test
 	public void addTimedTest4() {
 		try {
-			// TODO: Pass test21
-			// TODO: date wth "next" shud fail
 			Date temp = new Date();
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(temp);
@@ -196,12 +229,49 @@ public class ParserTest {
 
 			cal.add(Calendar.DATE, -7);
 			Date date212 = cal.getTime();
-			Command test21 = new AddCommand("sleep more", nextXDay, date212,
+			Command test21 = new AddCommand("sleep more", date212, nextXDay,
 					null, null);
 			assertObjFields(
 					test21,
 					tester.parseInput("add sleep more from monday to next monday"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//TODO pass this
+	@Test
+	public void addTimedTest5() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String nextXDayOnly = MyTasksParser.dateFormats.get(0).format(nextXDay);
+			nextXDay = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 10:00");
 
+			cal.add(Calendar.DATE, -7);
+			Date date212 = cal.getTime();
+			String date212Only = MyTasksParser.dateFormats.get(0).format(date212);
+			date212 = MyTasksParser.dateTimeFormats.get(0).parse(date212Only + " 17:00");
+			Command test21 = new AddCommand("sleep more", date212, nextXDay,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("add sleep more from monday 5pm to next monday 10am"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -373,7 +443,7 @@ public class ParserTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void extractDateTest5() {
 		try {
