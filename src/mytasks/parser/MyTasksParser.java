@@ -35,6 +35,7 @@ public class MyTasksParser implements IParser {
 		}
 	};
 
+	@SuppressWarnings("serial")
 	public static List<SimpleDateFormat> dateTimeFormats = new ArrayList<SimpleDateFormat>() {
 		{
 			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -389,6 +390,12 @@ public class MyTasksParser implements IParser {
 				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
 				results = getDoubleDate(toDateFormat1, toDateFormat2);
 				if (results.getDate1() != null && results.getDate2() != null) {
+//					if (words[indexOfDate1].equals("next")){
+//						usedWords.add((Integer) indexOfDate1+1);
+//					}
+//					if (words[indexOfDate2].equals("next")){
+//						usedWords.add((Integer) indexOfDate2+1);
+//					}
 					usedWords.add((Integer) indexOfFrom);
 					usedWords.add((Integer) indexOfTo);
 					usedWords.add((Integer) indexOfDate1);
@@ -621,6 +628,9 @@ public class MyTasksParser implements IParser {
 			String toDateFormat = convertToDateFormat(words, indexOfDate1);
 			result = getDoubleDate(toDateFormat, null);
 			if (result.getDate1()!= null) {
+				if (words[indexOfDate1].equals("next")){
+					usedWords.add((Integer) indexOfDate1+1);
+				}
 				usedWords.add((Integer) indexOfDate1);
 			} else {
 				Logger logger = Logger.getInstance();

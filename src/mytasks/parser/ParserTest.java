@@ -38,6 +38,7 @@ public class ParserTest {
 	private Command test18 = null;
 	private Command test19 = null;
 	private Command test20 = null;
+	private Command test21 = null;
 	MyTasksParser tester = new MyTasksParser();
 
 	@Test
@@ -62,14 +63,16 @@ public class ParserTest {
 	public void testTimedTask(){
 		initAddObjects();
 		initUpdateObjects();
-		assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12pm to 2pm"));
-		assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
-		assertObjFields(test13, tester.parseInput("update read book - write report from 09.10.2014 2pm to 10.Oct.2014 14:00  #gg"));
-		assertObjFields(test17, tester.parseInput("add do homework today from 2am to 3am"));
-		assertObjFields(test18, tester.parseInput("add coding from today 2am to tomorrow 3am"));
-		assertObjFields(test19, tester.parseInput("update play - tomorrow from 3pm to 4pm #yolo"));
+//		assertObjFields(test12, tester.parseInput("add code for project 06.10.2014 from 12pm to 2pm"));
+//		assertObjFields(test14, tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+//		assertObjFields(test13, tester.parseInput("update read book - write report from 09.10.2014 2pm to 10.Oct.2014 14:00  #gg"));
+//		assertObjFields(test17, tester.parseInput("add do homework today from 2am to 3am"));
+//		assertObjFields(test18, tester.parseInput("add coding from today 2am to tomorrow 3am"));
+//		assertObjFields(test19, tester.parseInput("update play - tomorrow from 3pm to 4pm #yolo"));
 		assertObjFields(test20, tester.parseInput("add sleep next monday"));
-		//TODO: create and pass test20
+		//TODO: date wth next monday shud fail
+		assertObjFields(test21, tester.parseInput("add sleep more from monday to next monday"));
+		//TODO: create and pass test21
 		
 	}
 	
@@ -197,6 +200,26 @@ public class ParserTest {
 			Date date182 = MyTasksParser.dateTimeFormats.get(1).parse(date2Only + " 3am");
 			test18 = new AddCommand("coding", date181, date182, null, null);
 			
+			
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd+=7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			test20 = new AddCommand("sleep", nextXDay, null, null, null);
+			
+			cal.add(Calendar.DATE, -7);
+			Date date212 = cal.getTime();
+			test21 = new AddCommand("sleep more", nextXDay, date212, null, null);
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
