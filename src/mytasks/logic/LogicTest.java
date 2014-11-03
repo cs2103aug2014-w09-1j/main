@@ -22,14 +22,10 @@ public class LogicTest {
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();	
 		taskLogic.executeCommand("add meeting 22.09.2014 #important");
-<<<<<<< HEAD
-		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-=======
 		taskLogic.executeCommand("add Beyond Earth #CivV");
 		taskLogic.executeCommand("add OP2 3.11.2014");
 		taskLogic.executeCommand("add demo 5.11.2014 #CS2103 #V0.4");
 		taskLogic.executeCommand("add lab quiz 11.11.2014 #MA1101R");
->>>>>>> 920c6556909bc62a0e0ef9fc835716dd0475f6db
 		//assertEquals("meeting added",
 		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
@@ -177,7 +173,10 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("add meeting");
 		taskLogic.executeCommand("done meeting");
-		assertEquals("N.A.\n" + "meeting #done\n", taskLogic.obtainPrintableOutput());
+		String output = "";
+		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
+			output += taskLogic.obtainPrintableOutput().get(i);		
+		assertEquals("N.A.\n" + "meeting #done\n", output);
 	}
 
 	@Test

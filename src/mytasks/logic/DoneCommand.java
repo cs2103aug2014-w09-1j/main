@@ -30,16 +30,20 @@ public class DoneCommand extends Command {
 			haveSearched = false;
 			return feedback;
 		}
-	    boolean hasTask = false;
+		boolean hasTask = false;
 		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
 				hasTask = true;
 				Task currentTask = mLocalMem.getLocalMem().get(i);
-			    Command commandToUndo = new DoneCommand(currentTask.getDescription(),
+				Command commandToUndo = new DoneCommand(currentTask.getDescription(),
 						currentTask.getFromDateTime(), currentTask.getToDateTime(), 
 						currentTask.getLabels(), null);
 				mLocalMem.undoPush(commandToUndo);
-				ArrayList<String> labels = currentTask.getLabels();
+				
+				ArrayList<String> labels = new ArrayList<String>();
+				if (currentTask.getLabels() != null){
+					labels = currentTask.getLabels();
+				}
 				labels.add("done");
 				currentTask.setLabels(labels);
 				break;
