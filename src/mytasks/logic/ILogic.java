@@ -21,4 +21,10 @@ public interface ILogic {
 	 * @return printable format that is not neccessarily a string. Will use string temporarily
 	 */
 	public ArrayList<String> obtainPrintableOutput();
+	
+	/**
+	 * obtainAllTaskDescription 
+	 * @return 
+	 */
+	public ArrayList<String> obtainAllTaskDesciption();
 }

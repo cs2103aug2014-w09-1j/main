@@ -172,4 +172,14 @@ public class MyTasksLogic implements ILogic {
 		return mViewHandler;
 	}
 
+	@Override
+	public ArrayList<String> obtainAllTaskDesciption() {
+		ArrayList<String> result = new ArrayList<String>();
+		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
+			String curDesc = mLocalMem.getLocalMem().get(i).getDescription();
+			result.add(curDesc);
+		}
+		return result;
+	}
+
 }
