@@ -89,8 +89,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				
 				textArea = new JTextArea();
-				textArea = new JTextArea();
-				textArea.setEditable(false);				
+				textArea.setEditable(false);			
 		
 				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
 				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
@@ -196,7 +195,15 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 
 	public void actionPerformed(ActionEvent evt) {
         String text = textField.getText();
-		textAreaFeedback.setText(mLogic.executeCommand(text));
+        String feedbackText = mLogic.executeCommand(text);
+
+        if(feedbackText.equals("Invalid input")) {
+        	textAreaFeedback.setForeground(new Color(255, 0, 0));
+        	textAreaFeedback.setText(feedbackText);
+        } else {
+        	textAreaFeedback.setForeground(new Color(0, 0, 0));
+    		textAreaFeedback.setText(feedbackText);
+        }
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
@@ -226,7 +233,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				textArea = new JTextArea();
 				textArea.setEditable(false);
 
-				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
 				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 
 				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
