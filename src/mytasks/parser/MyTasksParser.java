@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import mytasks.file.Logger;
+import mytasks.file.Task;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
@@ -35,6 +36,7 @@ public class MyTasksParser implements IParser {
 		}
 	};
 
+	@SuppressWarnings("serial")
 	public static List<SimpleDateFormat> dateTimeFormats = new ArrayList<SimpleDateFormat>() {
 		{
 			add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
@@ -249,7 +251,7 @@ public class MyTasksParser implements IParser {
 		int indexDate2 = -1;
 		int toSkip = -1;
 		for (int i = 0; i < words.length; i++) {
-			if (i!=toSkip){
+			if (i != toSkip) {
 				for (int j = 0; j < dateFormats.size(); j++) {
 					SimpleDateFormat dateForm = dateFormats.get(j);
 					try {
@@ -268,12 +270,12 @@ public class MyTasksParser implements IParser {
 				if (otherResults[0] != -1) {
 					indexDate1 = otherResults[0];
 					if (otherResults[2] == 1) {
-						toSkip = i+1;
+						toSkip = i + 1;
 					}
 				} else if (otherResults[1] != -1) {
 					indexDate2 = otherResults[1];
 					if (otherResults[2] == 1) {
-						toSkip = i+1;
+						toSkip = i + 1;
 					}
 				}
 			}
@@ -284,7 +286,7 @@ public class MyTasksParser implements IParser {
 
 	private int[] checkForOtherFormats(String[] words, int indexDate1,
 			int indexDate2, int curIndex) {
-		int[] result = { -1, -1 , 0};
+		int[] result = { -1, -1, 0 };
 		int indexKey = checkIfIsKeyWord(words[curIndex]);
 		if (indexKey != -1) {
 			if (indexKey == 3) {
@@ -371,7 +373,8 @@ public class MyTasksParser implements IParser {
 				String time2 = words[indexOfDate2 + 1];
 				String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
 				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
-				results = getDoubleDateTime(toDateFormat1, toDateFormat2, time1, time2);
+				results = getDoubleDateTime(toDateFormat1, toDateFormat2,
+						time1, time2);
 				if (results.getDate1() != null && results.getDate2() != null) {
 					usedWords.add((Integer) indexOfFrom);
 					usedWords.add((Integer) indexOfTo);
@@ -389,6 +392,12 @@ public class MyTasksParser implements IParser {
 				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
 				results = getDoubleDate(toDateFormat1, toDateFormat2);
 				if (results.getDate1() != null && results.getDate2() != null) {
+					// if (words[indexOfDate1].equals("next")){
+					// usedWords.add((Integer) indexOfDate1+1);
+					// }
+					// if (words[indexOfDate2].equals("next")){
+					// usedWords.add((Integer) indexOfDate2+1);
+					// }
 					usedWords.add((Integer) indexOfFrom);
 					usedWords.add((Integer) indexOfTo);
 					usedWords.add((Integer) indexOfDate1);
@@ -509,7 +518,7 @@ public class MyTasksParser implements IParser {
 			}
 			break;
 		default:
-			//Implying that it is not one of the "new" NLP formats
+			// Implying that it is not one of the "new" NLP formats
 			isInvalidDay = true;
 		}
 		if (!isInvalidDay) {
@@ -559,7 +568,7 @@ public class MyTasksParser implements IParser {
 	private DoubleDate getDoubleDate(String date1, String date2) {
 		Date dateObj1 = null;
 		Date dateObj2 = null;
-		if (date1!=null) {
+		if (date1 != null) {
 			for (int i = 0; i < dateFormats.size(); i++) {
 				SimpleDateFormat dateForm = dateFormats.get(i);
 				dateForm.setLenient(false);
@@ -570,7 +579,7 @@ public class MyTasksParser implements IParser {
 				}
 			}
 		}
-		if (date2!=null) {
+		if (date2 != null) {
 			for (int i = 0; i < dateFormats.size(); i++) {
 				SimpleDateFormat dateForm = dateFormats.get(i);
 				dateForm.setLenient(false);
@@ -606,7 +615,7 @@ public class MyTasksParser implements IParser {
 			String toDateFormat = convertToDateFormat(words, indexOfDate1);
 			String time1 = words[indexOfDate1 + 1];
 			result = getDoubleDateTime(toDateFormat, null, time1, null);
-			if (result.getDate1()!= null) {
+			if (result.getDate1() != null) {
 				usedWords.add((Integer) indexOfDate1);
 				usedWords.add((Integer) indexOfDate1 + 1);
 			} else {
@@ -620,7 +629,10 @@ public class MyTasksParser implements IParser {
 		if (noTime) {
 			String toDateFormat = convertToDateFormat(words, indexOfDate1);
 			result = getDoubleDate(toDateFormat, null);
-			if (result.getDate1()!= null) {
+			if (result.getDate1() != null) {
+				if (words[indexOfDate1].equals("next")) {
+					usedWords.add((Integer) indexOfDate1 + 1);
+				}
 				usedWords.add((Integer) indexOfDate1);
 			} else {
 				Logger logger = Logger.getInstance();
@@ -696,24 +708,5 @@ public class MyTasksParser implements IParser {
 			}
 		}
 		return new SortCommand(null, null, null, labels, null);
-	}
-
-	protected class DoubleDate {
-
-		private Date mDate1;
-		private Date mDate2;
-
-		private DoubleDate(Date date1, Date date2) {
-			mDate1 = date1;
-			mDate2 = date2;
-		}
-
-		public Date getDate1() {
-			return mDate1;
-		}
-
-		public Date getDate2() {
-			return mDate2;
-		}
 	}
 }

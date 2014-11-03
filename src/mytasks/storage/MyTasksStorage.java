@@ -100,13 +100,13 @@ public class MyTasksStorage implements IStorage, Serializable {
 					taskDesc = curBlock;
 				} else if (j == 1) {
 					try {
-						dateFrom = MyTasksParser.dateFormats.get(1).parse(curBlock);
+						dateFrom = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
 					} catch (ParseException e) {
 						//Implying empty space which is null date
 					}
 				} else if (j == 2) {
 					try {
-						dateTo = MyTasksParser.dateFormats.get(1).parse(curBlock);
+						dateTo = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
 					} catch (ParseException e) {
 						//Implying empty space which is null date
 					}
@@ -144,13 +144,13 @@ public class MyTasksStorage implements IStorage, Serializable {
 			if (currentTask.getFromDateTime() == null){
 				result += " ";
 			} else {
-				result += MyTasksParser.dateFormats.get(1).format(currentTask.getFromDateTime());
+				result += MyTasksParser.dateTimeFormats.get(0).format(currentTask.getFromDateTime());
 			}
 			result += addBreak();
 			if (currentTask.getToDateTime() == null){
 				result += " ";
 			} else {
-				result += MyTasksParser.dateFormats.get(1).format(currentTask.getToDateTime());
+				result += MyTasksParser.dateTimeFormats.get(0).format(currentTask.getToDateTime());
 			}
 			result += addBreak();
 			ArrayList<String> labels = currentTask.getLabels();
