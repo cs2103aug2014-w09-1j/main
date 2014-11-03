@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -26,6 +27,7 @@ class MemorySnapshotHandler {
 	private ArrayList<Task> snapshotList;
 	private ArrayList<String> labelsInSortedOrder;
 	private ArrayList<ArrayList<String>> labelCombinations;
+	private HashMap<Task, Integer> tasksToLabelOrders;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
@@ -54,11 +56,12 @@ class MemorySnapshotHandler {
 	
 	private void initSnapshotHandler(LocalMemory LocalMem){
 		snapshotList = new ArrayList<Task>();
+		labelsInSortedOrder = new ArrayList<String>();
+		labelCombinations = new ArrayList<ArrayList<String>>();
+		tasksToLabelOrders = new HashMap<Task, Integer>();
 		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
 			snapshotList.add(LocalMem.getLocalMem().get(i));
 		}
-		labelsInSortedOrder = new ArrayList<String>();
-		labelCombinations = new ArrayList<ArrayList<String>>();
 	}
 
 	/**
@@ -83,6 +86,7 @@ class MemorySnapshotHandler {
 		
 		if (!labelsInSortedOrder.isEmpty()){
 			combinationOfLabels();
+			computeLabelOrder();
 			sortByLabels();
 			return convertSnapshotListToStringInLabelsFormat(snapshotList);
 		}
@@ -107,7 +111,7 @@ class MemorySnapshotHandler {
 	private void sortByLabels(){
 		for (int i=0; i < snapshotList.size()-1; i++){
 			for (int j=0; j < snapshotList.size()-1-i; j++){
-				if (labelOrder(j) > labelOrder(j+1)){
+				if (tasksToLabelOrders.get(snapshotList.get(j)) > tasksToLabelOrders.get(snapshotList.get(j+1))){
 					Task temp = snapshotList.get(j);
 					snapshotList.set(j, snapshotList.get(j+1));
 					snapshotList.set(j+1, temp);
@@ -169,7 +173,7 @@ class MemorySnapshotHandler {
 			}
 
 			String snapshot = "";
-			int order = labelOrder(i);
+			int order = tasksToLabelOrders.get(snapshotList.get(i));
 			if (order == labelCombinations.size()){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
@@ -187,7 +191,7 @@ class MemorySnapshotHandler {
 				}
 				snapshot += "\n";
 				int j=i;
-				while (j < snapshotList.size() && labelOrder(j) == labelOrder(i)){
+				while (j < snapshotList.size() && tasksToLabelOrders.get(snapshotList.get(j)) == tasksToLabelOrders.get(snapshotList.get(i))){
 					if (wantDoneTasks() == false && isDone(snapshotList.get(j))){
 						continue;
 					}
@@ -245,16 +249,6 @@ class MemorySnapshotHandler {
 				}
 			}
 		}
-
-		/*
-		for (int i=0; i < labels.size(); i++){
-			System.out.print(i + ": ");
-			for (int j=0; j < labels.get(i).size(); j++){
-				System.out.print(labels.get(i).get(j) + "-");
-			}
-			System.out.println();
-		}
-		*/
 	}
 
 	private void combinationOfLabelsRec(ArrayList<String> remaining, ArrayList<String> chosen){
@@ -289,7 +283,6 @@ class MemorySnapshotHandler {
 		return String.format("%s %s%s", task.getDescription(), timeToString, labelsToString);
 	}
 	
-
 	private String getTime(Task task){		
 		String timeToString = "";
 		assert task.getFromDateTime() != null;
@@ -350,36 +343,43 @@ class MemorySnapshotHandler {
 		
 		return false;	
 	}
+	
+	private void computeLabelOrder(){
+		for (int i=0; i < snapshotList.size(); i++){
+			Task currentTask = snapshotList.get(i);
+			tasksToLabelOrders.put(currentTask, labelOrder(currentTask));		
+		}
+	}
 
-	private int labelOrder(int index){
+	private int labelOrder(Task task){
 		int order = labelCombinations.size();
-		if (snapshotList.get(index).getLabels() == null){
+		if (task.getLabels() == null){
 			return order;
 		}
 		
-		int match=0;
-		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
+		int matchingLabels=0;
+		for (int i=0; i < task.getLabels().size(); i++){
 			for (int j=0; j < labelsInSortedOrder.size(); j++){
-				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
-					match++;
+				if (task.getLabels().get(i).equals(labelsInSortedOrder.get(j))){
+					matchingLabels++;
 				}
 			}
 		}
-		if (match == 0){
+		if (matchingLabels == 0){
 			return order;
 		}
 		
 		for (int i=0; i < labelCombinations.size(); i++){
-			if (labelCombinations.get(i).size() == match){
-				int mm=0;
-				for (int k=0; k < snapshotList.get(index).getLabels().size(); k++){
-					for (int j=0; j < labelCombinations.get(i).size(); j++){
-						if (snapshotList.get(index).getLabels().get(k).equals(labelCombinations.get(i).get(j))){
-							mm++;
+			if (labelCombinations.get(i).size() == matchingLabels){
+				int matchingSet=0;
+				for (int j=0; j < task.getLabels().size(); j++){
+					for (int k=0; k < labelCombinations.get(i).size(); k++){
+						if (task.getLabels().get(j).equals(labelCombinations.get(i).get(k))){
+							matchingSet++;
 						}
 					}
 				}
-				if (mm == match){
+				if (matchingSet == matchingLabels){
 					order = i;
 				}
 			}
@@ -409,11 +409,10 @@ class MemorySnapshotHandler {
 		return false;
 	}
 
-
 	private Date incrementDate(Date date){
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.DATE, 1);
-		return c.getTime();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DATE, 1);
+		return calendar.getTime();
 	}
 }
