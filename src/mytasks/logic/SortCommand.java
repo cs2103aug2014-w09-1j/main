@@ -31,8 +31,13 @@ public class SortCommand extends Command {
 		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
 		mLocalMem.undoPush(commandToUndo);
 		mViewHandler.setView(super.getTask().getLabels());
-		super.haveSearched = false;
-		return null;
+		haveSearched = false;
+		
+		String output = "";
+		for (int i=0; i < super.getTask().getLabels().size(); i++){
+			output +=  super.getTask().getLabels().get(i) + " ";
+		}
+		return output + "sorted";
 	}
 
 	@Override

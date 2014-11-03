@@ -21,6 +21,7 @@ public class LogicTest {
 	@Test
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();	
+		taskLogic.executeCommand("add meeting 22.09.2014 #important");
 		// taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("meeting added",
 		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
@@ -166,6 +167,14 @@ public class LogicTest {
 		taskLogic.executeCommand("add meeting");
 		assertEquals("'meeting' updated",
 				taskLogic.executeCommand("update meeting - CS2103T #important"));
+	}
+	
+	@Test
+	public void testDoneCommand(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("add meeting");
+		taskLogic.executeCommand("done meeting");
+		assertEquals("N.A.\n" + "meeting #done\n", taskLogic.obtainPrintableOutput());
 	}
 
 	@Test

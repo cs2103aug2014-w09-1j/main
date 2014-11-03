@@ -37,13 +37,6 @@ public abstract class Command {
 		mToUpdateTaskDesc = updateDesc;
 	}
 	
-	public Command(String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc, boolean canDo) {
-		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
-		mTask = thisTask;
-		mToUpdateTaskDesc = updateDesc;
-	}
-	
 	protected String getTaskDetails(){
 		return mTask.getDescription();
 	}
