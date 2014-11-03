@@ -173,7 +173,7 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	@Override
-	public ArrayList<String> obtainAllTaskDesciption() {
+	public ArrayList<String> obtainAllTaskDescription() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
 			String curDesc = mLocalMem.getLocalMem().get(i).getDescription();

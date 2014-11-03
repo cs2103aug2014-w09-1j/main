@@ -26,5 +26,5 @@ public interface ILogic {
 	 * obtainAllTaskDescription 
 	 * @return 
 	 */
-	public ArrayList<String> obtainAllTaskDesciption();
+	public ArrayList<String> obtainAllTaskDescription();
 }

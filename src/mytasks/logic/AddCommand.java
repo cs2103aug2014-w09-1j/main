@@ -8,7 +8,7 @@ import mytasks.file.Task;
 /**
  * AddCommand extends Command object to follow OOP standards
  * 
- * @author Wilson
+ * @author Huiwen, Shuan Siang 
  *
  */
 public class AddCommand extends Command {

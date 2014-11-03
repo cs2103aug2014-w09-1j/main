@@ -8,7 +8,7 @@ import mytasks.file.Task;
 /**
  * DeleteCommand extends Command to follow OOP standards
  * 
- * @author Huiwen
+ * @author Huiwen, Shuan Siang 
  *
  */
 

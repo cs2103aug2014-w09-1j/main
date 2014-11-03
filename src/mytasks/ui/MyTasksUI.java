@@ -88,7 +88,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {								
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				
-				textArea = new JTextArea(1, 50);
+				textArea = new JTextArea();
 				textArea = new JTextArea();
 				textArea.setEditable(false);				
 		
@@ -132,13 +132,18 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	    am.put("commit", new CommitAction());
 
 		words = new ArrayList<String>();
-		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
-			for(int k = 0; k < strArr.length; k++) {
-				words.add(strArr[k]);
-			}
+		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
+			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
 		Collections.sort(words);
+		
+//		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+//			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
+//			for(int k = 0; k < strArr.length; k++) {
+//				words.add(strArr[k]);
+//			}
+//		}
+//		Collections.sort(words);
 		
 		// Add Components to this panel.
 		GridBagConstraints c = new GridBagConstraints();
@@ -196,16 +201,21 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
 		
-		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
-			for(int k = 0; k < strArr.length; k++) {
-				words.add(strArr[k]);
-			}
+		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
+			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
 		Collections.sort(words);
 		
+//		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+//			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
+//			for(int k = 0; k < strArr.length; k++) {
+//				words.add(strArr[k]);
+//			}
+//		}
+//		Collections.sort(words);
+		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
-			textArea = new JTextArea(20, 50);
+			textArea = new JTextArea();
 			textArea.setEditable(false);			
 			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
