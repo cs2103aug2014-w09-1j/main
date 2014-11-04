@@ -8,10 +8,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.*;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
-import mytasks.file.Logger;
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
@@ -30,6 +30,9 @@ public class MyTasksStorage implements IStorage, Serializable {
 	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
+	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+			.getName());
+	private Handler fh = null;
 
 	// Constructor
 	private MyTasksStorage() {
@@ -44,6 +47,25 @@ public class MyTasksStorage implements IStorage, Serializable {
 	
 	protected Object readResolve() {
 		return INSTANCE;
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasks.default_log, 0, 1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
 	}
 
 	/**
@@ -84,8 +106,9 @@ public class MyTasksStorage implements IStorage, Serializable {
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks%sizeBlocks != 0){
-			Logger logger = Logger.getInstance();
-			logger.log(MESSAGE_CORPTDATA);
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA);
+			closeHandler();
 			return result;
 		}
 		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
@@ -177,8 +200,9 @@ public class MyTasksStorage implements IStorage, Serializable {
 			writer.print(output);
 			writer.close();
 		} catch (IOException e) {
-			Logger logger = Logger.getInstance();
-			logger.log(MESSAGE_FILEERROR);
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_FILEERROR, e);
+			closeHandler();
 		}
 	}
 }

@@ -14,7 +14,7 @@ import mytasks.storage.MyTasksStorage;
  * only required to read and write
  * to external memory minimally.
  * 
- * @author Wilson
+ * @author Huiwen, Michael, Shuan Siang 
  *
  */
 

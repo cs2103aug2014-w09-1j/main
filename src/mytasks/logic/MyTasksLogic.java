@@ -2,10 +2,8 @@ package mytasks.logic;
 
 import java.util.ArrayList;
 
-import mytasks.file.Task;
 import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
-import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
 
 /**
@@ -20,7 +18,6 @@ public class MyTasksLogic implements ILogic {
 
 	// Private variables
 	private IParser mParser;
-	private IStorage mStorage;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
@@ -41,7 +38,7 @@ public class MyTasksLogic implements ILogic {
 	private void initLogic(boolean isDev) {
 		isDeveloper = isDev;
 		mParser = new MyTasksParser();
-		mStorage = MyTasksStorage.getInstance();
+		MyTasksStorage.getInstance();
 		mLocalMem = LocalMemory.getInstance();
 		if (!isDeveloper) {
 			mLocalMem.loadLocalMemory();
@@ -173,7 +170,7 @@ public class MyTasksLogic implements ILogic {
 	}
 
 	@Override
-	public ArrayList<String> obtainAllTaskDesciption() {
+	public ArrayList<String> obtainAllTaskDescription() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
 			String curDesc = mLocalMem.getLocalMem().get(i).getDescription();

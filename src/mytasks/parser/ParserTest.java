@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import mytasks.file.Logger;
 import mytasks.file.Task;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
