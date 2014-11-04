@@ -42,7 +42,7 @@ public class LogicTest {
 		assertEquals("meeting added", taskLogic.executeCommand("re"));
 	}
 
-	
+	//@author A0112139R
 	@Test
 	public void testSearchCommand() {
 		taskLogic.getMemory().clearMemory();
@@ -60,7 +60,6 @@ public class LogicTest {
 				+ "3. important\n"
 				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important"));
 	}
-
 
 	@Test
 	public void testGetSnapshot(){
@@ -162,14 +161,6 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void testUpdateCommand() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad meeting");
-		assertEquals("'meeting' updated",
-				taskLogic.executeCommand("up meeting - CS2103T #important"));
-	}
-	
-	@Test
 	public void testDoneCommand(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
@@ -179,6 +170,14 @@ public class LogicTest {
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
 		assertEquals("#done\n" + "meeting #done\n", output);
+	}
+	
+	@Test
+	public void testUpdateCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		assertEquals("'meeting' updated",
+				taskLogic.executeCommand("up meeting - CS2103T #important"));
 	}
 
 	@Test

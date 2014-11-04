@@ -10,6 +10,8 @@ import java.util.Date;
  * @author Wilson
  *
  */
+
+//@author A0112139R
 public class SearchCommand extends Command {
 	
 	private LocalMemory mLocalMem;
