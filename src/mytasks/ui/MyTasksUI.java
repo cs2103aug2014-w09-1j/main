@@ -47,9 +47,11 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	private Border paneEdge;
 	private JScrollPane scrollPane;
 	private Border titled;
+	private boolean lookingFor = false; 
+	private int w = 0;
 	
 	private Mode mode = Mode.INSERT;
-	private final List<String> words;
+	private List<String> words;
 	private static enum Mode {
 	    INSERT,
 	    COMPLETION
@@ -70,17 +72,12 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		textAreaPanel.setLayout(new BoxLayout(textAreaPanel,BoxLayout.Y_AXIS));
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
-		textAreaPanel.repaint();
-		
-//		System.out.println("obtainprintableoutput: ");
-//		for(int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-//			System.out.println(mLogic.obtainPrintableOutput().get(i));
-//		}		
+		textAreaPanel.repaint();		
 		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);			
-			Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+			Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
 			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
@@ -91,7 +88,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 				textArea = new JTextArea();
 				textArea.setEditable(false);			
 		
-				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
+				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
 				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 
 				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
@@ -111,11 +108,10 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		}
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
-		scrollPane.setBounds(100, 100, 20, 50);
-		scrollPane.setPreferredSize(new Dimension(300, 400));
+		scrollPane.setPreferredSize(new Dimension(500, 400));
 
 		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
-		textAreaFeedback = new JTextArea(5, 50);
+		textAreaFeedback = new JTextArea(10, 50);
 		textAreaFeedback.setEditable(false);
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
 		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -135,14 +131,6 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
 		Collections.sort(words);
-		
-//		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-//			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
-//			for(int k = 0; k < strArr.length; k++) {
-//				words.add(strArr[k]);
-//			}
-//		}
-//		Collections.sort(words);
 		
 		// Add Components to this panel.
 		GridBagConstraints c = new GridBagConstraints();
@@ -194,7 +182,10 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		}
 
 	public void actionPerformed(ActionEvent evt) {
-        String text = textField.getText();
+		lookingFor = false;
+		w = 0;
+		words = new ArrayList<String>();
+        String text = textField.getText();        
         String feedbackText = mLogic.executeCommand(text);
 
         if(feedbackText.equals("Invalid input")) {
@@ -212,14 +203,6 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
 		Collections.sort(words);
-		
-//		for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-//			String[] strArr = mLogic.obtainPrintableOutput().get(i).split("\\s+");
-//			for(int k = 0; k < strArr.length; k++) {
-//				words.add(strArr[k]);
-//			}
-//		}
-//		Collections.sort(words);
 		
 		if(mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
@@ -243,7 +226,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 			}
 		}
 
-		textArea.setCaretPosition(textArea.getDocument().getLength());
+		textArea.setCaretPosition(0);
 		textField.selectAll();
 	}
 
@@ -270,22 +253,26 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	    if (ev.getLength() != 1)
 	      return;
 
-	    int pos = ev.getOffset();
+	    int pos = ev.getOffset();	//last letter of input 
 	    String content = null;
 	    try {
 	      content = textField.getText(0, pos + 1);
 	    } catch (BadLocationException e) {
 	      e.printStackTrace();
 	    }
-
+	    
+	   
+	    
 	    // Find where the word starts
-	    int w;
-	    for (w = pos; w >= 0; w--) {
-	      if (!Character.isLetter(content.charAt(w))) {
-	        break;
-	      }
+	    if(lookingFor == false) { 
+	    	for (w = pos; w >= 0; w--) {	    	
+		 		if (!Character.isLetter(content.charAt(w))) {
+		 			lookingFor = true;
+		 	    	break;
+		 	 	}
+		 	}	   
 	    }
-
+	    
 	    // Too few chars
 	    if (pos - w < 2)
 	      return;
@@ -319,7 +306,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	        textField.setCaretPosition(pos + 1);
 	        mode = Mode.INSERT;
 	      } else {
-	        textField.replaceSelection("\t");
+	        textField.replaceSelection(textField.getText());
 	      }
 	    }
 	  }
