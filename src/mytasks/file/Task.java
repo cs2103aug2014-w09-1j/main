@@ -1,5 +1,6 @@
 package mytasks.file;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Task {
 	
 	private static final Logger LOGGER = Logger.getLogger(Task.class
 			.getName());
+	private Handler fh = null;
 	private final String MESSAGE_UNEXPERROR = "Unexpected error in dates";
 
 	// Constructor
@@ -41,6 +43,25 @@ public class Task {
 		mFromDateTime = newTask.getFromDateTime();
 		mToDateTime = newTask.getToDateTime();
 		mLabels = newTask.getLabels();
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasks.default_log, 0, 1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
 	}
 
 	public String getDescription() {
@@ -95,7 +116,9 @@ public class Task {
 				newDate2 = form.parse(form.format(mToDateTime));
 			}
 		} catch (ParseException e) {
+			runLogger();
 			LOGGER.log(Level.SEVERE, MESSAGE_UNEXPERROR, e);
+			closeHandler();
 		}
 		ArrayList<String> newLabels = null;
 		if (mLabels!=null){
