@@ -2,7 +2,6 @@ package mytasks.logic;
 
 import java.util.ArrayList;
 import java.util.Date;
-
 import mytasks.file.Task;
 
 /**
@@ -16,6 +15,7 @@ public class DoneCommand extends Command {
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_DONE_SUCCESS = "'%1$s' mark as done";
 	private static String MESSAGE_DONE_FAIL = "Task '%1$s' does not exist. Unable to mark as done.";
+	private static String MESSAGE_DONE_ALREADY = "Task '%1$s' had already been marked as done.";
 
 	public DoneCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
@@ -39,20 +39,25 @@ public class DoneCommand extends Command {
 						currentTask.getFromDateTime(), currentTask.getToDateTime(), 
 						currentTask.getLabels(), null);
 				mLocalMem.undoPush(commandToUndo);
-				
+
 				ArrayList<String> labels = new ArrayList<String>();
 				if (currentTask.getLabels() != null){
 					labels = currentTask.getLabels();
 				}
-				labels.add("done");
+				if (!isDone(currentTask)){
+					labels.add("done");
+				}
 				currentTask.setLabels(labels);
 				break;
 			}
 		}
-		
+
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
-		if (hasTask){
+		if (hasTask && isDone(super.getTask())){
+			return String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
+		}
+		else if (hasTask){
 			return String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
 		}
 		else{
@@ -63,6 +68,19 @@ public class DoneCommand extends Command {
 	@Override
 	String undo() {
 		return null;
+	}
+	
+	private boolean isDone(Task task){
+		if (task.getLabels() == null){
+			return false;
+		}
+		
+		for (int i=0; i < task.getLabels().size(); i++){
+			if (task.getLabels().get(i).toLowerCase().equals("done")){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static boolean isNumeric(String str)  
