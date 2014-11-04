@@ -1,18 +1,13 @@
 package mytasks.file;
 
+//@author A0114302A
 import java.util.Date;
 
-import mytasks.logic.ILogic;
-import mytasks.logic.MyTasksLogicController;
 import mytasks.ui.MyTasksUI;
 
 /**
- * MyTasks is a tasks management program designed for users who like to use command line interface 
- * to manage daily schedule. API for myTasks is provided in the user guide.
- * MyTasks hides the creation of UI and simply runs it upon program call
- * 
- * @author Wilson, Micheal, Huiwen, Shuansiang
- * @version 0.1
+ * MyTasksController acts as the controller of MyTasks. However, this is shared with the UI
+ * MyTasksController hides the creation of UI and simply runs it upon program call
  */
 public class MyTasksController {
 	

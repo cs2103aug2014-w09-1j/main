@@ -1,5 +1,6 @@
 package mytasks.logic;
 
+//@author A0114302A
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -8,9 +9,6 @@ import mytasks.file.Task;
 /**
  * CommandType instance used to access different fields of a command that has
  * been parsed.
- * 
- * @author Wilson
- *
  */
 public abstract class Command {
 
@@ -23,7 +21,6 @@ public abstract class Command {
 	// Constructor
 	public Command(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
-		// determineCommandType(comdType);
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;

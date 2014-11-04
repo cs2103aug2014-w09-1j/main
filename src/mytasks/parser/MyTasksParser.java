@@ -1,5 +1,6 @@
 package mytasks.parser;
 
+//@author A0114302A
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,9 +23,7 @@ import mytasks.logic.UpdateCommand;
 
 /**
  * MyTasksParser interprets userinput to useable data structures to work with in
- * the Logic component. Naive version for now
- * 
- * @author A0114302A
+ * the Logic component.
  */
 public class MyTasksParser implements IParser {
 
@@ -72,7 +71,8 @@ public class MyTasksParser implements IParser {
 
 	private void runLogger() {
 		try {
-			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
 			LOGGER.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
@@ -98,8 +98,7 @@ public class MyTasksParser implements IParser {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
 			if (withoutComdType.trim().length() == 0
-					&& !comdType.trim().equals("un")
-					&& !comdType.equals("re")) {
+					&& !comdType.trim().equals("un") && !comdType.equals("re")) {
 				return null;
 			}
 			switch (comdType) {
@@ -168,8 +167,8 @@ public class MyTasksParser implements IParser {
 		}
 		switch (comdType) {
 		case "ad":
-			if (dateFrom!= null && dateTo!= null){
-				if (dateFrom.compareTo(dateTo)>=0){
+			if (dateFrom != null && dateTo != null) {
+				if (dateFrom.compareTo(dateTo) >= 0) {
 					runLogger();
 					LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
 					closeHandler();
@@ -246,7 +245,7 @@ public class MyTasksParser implements IParser {
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
 			int indexOfDate1 = 0;
 			int indexOfDate2 = 0;
-			if (indexOfFrom>indexOfTo){
+			if (indexOfFrom > indexOfTo) {
 				indexOfDate1 = indexDatesFormat[1];
 				indexOfDate2 = indexDatesFormat[0];
 			} else {
@@ -820,8 +819,8 @@ public class MyTasksParser implements IParser {
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
 		}
-		if (dateFrom!= null && dateTo!= null){
-			if (dateFrom.compareTo(dateTo)>=0){
+		if (dateFrom != null && dateTo != null) {
+			if (dateFrom.compareTo(dateTo) >= 0) {
 				runLogger();
 				LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
 				closeHandler();

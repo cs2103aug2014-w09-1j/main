@@ -8,7 +8,7 @@ import mytasks.file.Task;
 /**
  * DeleteCommand extends Command to follow OOP standards
  * 
- * @author Huiwen, Shuan Siang 
+ * @author Huiwen, Shuan Siang
  *
  */
 
@@ -27,8 +27,13 @@ public class DeleteCommand extends Command {
 
 	@Override
 	String execute() {
-		if (haveSearched == true && isNumeric(super.getTaskDetails()) && Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
-			String feedback = new DeleteCommand(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
+		if (haveSearched == true
+				&& isNumeric(super.getTaskDetails())
+				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem
+						.getSearchList().size())) {
+			String feedback = new DeleteCommand(mLocalMem.getSearchList()
+					.get(Integer.parseInt(super.getTaskDetails()) - 1)
+					.getDescription(), null, null, null, null).execute();
 			haveSearched = false;
 			return feedback;
 		}
@@ -51,10 +56,10 @@ public class DeleteCommand extends Command {
 
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
-		if (hasTask){
-			return String.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
-		}
-		else{
+		if (hasTask) {
+			return String
+					.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
+		} else {
 			return String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
 		}
 	}
@@ -69,17 +74,13 @@ public class DeleteCommand extends Command {
 		mLocalMem.saveLocalMemory();
 		return this.getTask().getDescription() + " added";
 	}
-	
-	public static boolean isNumeric(String str)  
-	{  
-	  try  
-	  {  
-	     int i = Integer.parseInt(str);  
-	  }  
-	  catch(NumberFormatException nfe)  
-	  {  
-	    return false;  
-	  }  
-	  return true;  
+
+	public static boolean isNumeric(String str) {
+		try {
+			int i = Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
 	}
 }

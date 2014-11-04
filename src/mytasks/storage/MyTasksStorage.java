@@ -1,5 +1,6 @@
 package mytasks.storage;
 
+//@author A0114302A
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,9 +21,6 @@ import mytasks.parser.MyTasksParser;
  * MyTasksStorage handles the storage of tasks into external memory as well as
  * converting it to readable
  * local memory for logical processes
- * 
- * @author Tay Shuan Siang, Wilson
- *
  */
 @SuppressWarnings("serial")
 public class MyTasksStorage implements IStorage, Serializable {

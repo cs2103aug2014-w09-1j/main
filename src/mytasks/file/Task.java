@@ -1,5 +1,6 @@
 package mytasks.file;
 
+//@author A0114302A
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,9 +13,6 @@ import mytasks.parser.MyTasksParser;
 /**
  * Task object represents a single task with all the relevant fields that is
  * essential to a task
- * 
- * @author Wilson
- *
  */
 public class Task {
 

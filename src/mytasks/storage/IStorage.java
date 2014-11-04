@@ -1,12 +1,11 @@
 package mytasks.storage;
 
+//@author A0114302A
 import java.util.ArrayList;
 import mytasks.file.Task;
 
 /**
  * Istorage interface defines abstract methods to be used by storage component
- * @author Wilson
- *
  */
 public interface IStorage {
 	
