@@ -490,6 +490,28 @@ public class ParserTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void flexibilityTest1() {
+		try {
+			Date date1 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
+			Date date2 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			Command test1 = new UpdateCommand(null, date1, date2, null, "play");
+			assertObjFields(test1, tester.parseInput("update play - to 06.10.2014 from 05.10.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void flexibilityTest2() {
+		assertEquals(null, tester.parseInput("add play 04.11.2014 from 5pm to 3pm"));
+	}
+	
+	@Test
+	public void flexibilityTest3() {
+		assertEquals(null, tester.parseInput("add play from tuesday to monday"));
+	}
 
 	private void assertObjFields(Command testCase, Command result) {
 		Task testCaseTask = testCase.getTask();

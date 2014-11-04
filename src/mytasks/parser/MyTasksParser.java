@@ -161,6 +161,11 @@ public class MyTasksParser implements IParser {
 		}
 		switch (comdType) {
 		case "add":
+			if (dateFrom!= null && dateTo!= null){
+				if (dateFrom.compareTo(dateTo)>=0){
+					return null;
+				}
+			}
 			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
 		case "search":
 			return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
@@ -225,13 +230,22 @@ public class MyTasksParser implements IParser {
 		int indexOfTo = indexFromTo[1];
 
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
-		int indexOfDate1 = indexDatesFormat[0];
-		int indexOfDate2 = indexDatesFormat[1];
 		DoubleDate result = null;
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
+			int indexOfDate1 = 0;
+			int indexOfDate2 = 0;
+			if (indexOfFrom>indexOfTo){
+				indexOfDate1 = indexDatesFormat[1];
+				indexOfDate2 = indexDatesFormat[0];
+			} else {
+				indexOfDate1 = indexDatesFormat[0];
+				indexOfDate2 = indexDatesFormat[1];
+			}
 			result = handleTimedTask(words, indexOfDate1, indexOfDate2,
 					indexOfFrom, indexOfTo);
 		} else {
+			int indexOfDate1 = indexDatesFormat[0];
+			int indexOfDate2 = indexDatesFormat[1];
 			result = handleUntimedTask(words, indexOfDate1, indexOfDate2,
 					indexOfFrom, indexOfTo);
 		}
@@ -240,16 +254,14 @@ public class MyTasksParser implements IParser {
 
 	/**
 	 * checkFromAndTo looks at an array of words and checks if words "from" and
-	 * "to" exist. If both words exist, and are not seperated by more than
-	 * MAX_SPACING, their respective indexes are returned in an array. Else if
-	 * one or more don't exists, they are represented by a -1
+	 * "to" exist. If both words exist,their respective indexes are returned in
+	 * an array. Else if one or more don't exists, they are represented by a -1
 	 * 
 	 * @param words
 	 * @return int[] where first int represents index of "from" and second int
 	 *         represents index of "to"
 	 */
 	private int[] checkFromAndTo(String[] words) {
-		final int MAX_SPACING = 3;
 		int indexFrom = -1;
 		int indexTo = -1;
 		for (int i = 0; i < words.length; i++) {
@@ -257,11 +269,13 @@ public class MyTasksParser implements IParser {
 			if (curWord.equals("from")) {
 				indexFrom = i;
 			}
-			if (curWord.equals("to") && indexFrom >= i - MAX_SPACING
-					&& indexFrom != -1) {
+			if (curWord.equals("to")) {
 				indexTo = i;
-				break;
 			}
+		}
+		if (indexTo == -1 || indexFrom == -1) {
+			int[] result = { -1, -1 };
+			return result;
 		}
 		int[] result = { indexFrom, indexTo };
 		return result;
@@ -378,10 +392,6 @@ public class MyTasksParser implements IParser {
 	private DoubleDate handleTimedTask(String[] words, int indexOfDate1,
 			int indexOfDate2, int indexOfFrom, int indexOfTo) {
 		DoubleDate results = null;
-		System.out.println(indexOfDate1);
-		System.out.println(indexOfDate2);
-		System.out.println(indexOfFrom);
-		System.out.println(indexOfTo);
 		if (indexOfDate2 == -1) {
 			try {
 				String toDateFormat = convertToDateFormat(words, indexOfDate1);
@@ -402,26 +412,50 @@ public class MyTasksParser implements IParser {
 				}
 			} catch (IndexOutOfBoundsException e) {
 				runLogger();
-				LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM);
+				LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM, e);
 				closeHandler();
 			}
 
 		} else {
 			boolean noTime = false;
 			try {
+				boolean isNext1 = isNextDate(words[indexOfDate1]);
+				boolean isNext2 = isNextDate(words[indexOfDate2]);
 				String time1 = words[indexOfDate1 + 1];
+				if (isNext1 && indexOfDate1 < words.length - 2) {
+					time1 = words[indexOfDate1 + 2];
+				}
 				String time2 = words[indexOfDate2 + 1];
+				if (isNext2 && indexOfDate2 < words.length - 2) {
+					time2 = words[indexOfDate2 + 2];
+				}
 				String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
 				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
 				results = getDoubleDateTime(toDateFormat1, toDateFormat2,
 						time1, time2);
 				if (results.getDate1() != null && results.getDate2() != null) {
-					usedWords.add((Integer) indexOfFrom);
-					usedWords.add((Integer) indexOfTo);
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfDate2);
-					usedWords.add((Integer) indexOfDate1 + 1);
-					usedWords.add((Integer) indexOfDate2 + 1);
+					if (isNext1 && isNext2) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate1 + 2, indexOfDate2 + 1,
+								indexOfDate2 + 2 };
+						addToUsedWords(toAdd);
+					} else if (isNext1) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate1 + 2, indexOfDate2 + 1 };
+						addToUsedWords(toAdd);
+					} else if (isNext2) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate2 + 1, indexOfDate2 + 2 };
+						addToUsedWords(toAdd);
+					} else {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate2 + 1 };
+						addToUsedWords(toAdd);
+					}
 				} else {
 					noTime = true;
 				}
@@ -432,7 +466,6 @@ public class MyTasksParser implements IParser {
 				results = handleTimedDateOnly(words, indexOfDate1,
 						indexOfDate2, indexOfFrom, indexOfTo);
 			}
-			System.out.println(noTime);
 		}
 		return results;
 	}
@@ -774,6 +807,11 @@ public class MyTasksParser implements IParser {
 		String taskDesc = removeDate(withoutLabels);
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
+		}
+		if (dateFrom!= null && dateTo!= null){
+			if (dateFrom.compareTo(dateTo)>=0){
+				return null;
+			}
 		}
 		return new UpdateCommand(taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
