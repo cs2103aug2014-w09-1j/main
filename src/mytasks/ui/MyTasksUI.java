@@ -27,16 +27,17 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import mytasks.logic.ILogic;
-import mytasks.logic.MyTasksLogic;
+import mytasks.logic.MyTasksLogicController;
 
 /**
- * MyTasksUI is the GUI for MyTasks. 
+ * MyTasksUI is the GUI for MyTasks.
  *
  * 
  * @author A0115034X Huiwen
  *
  */
-public class MyTasksUI extends JPanel implements ActionListener, DocumentListener {
+public class MyTasksUI extends JPanel implements ActionListener,
+		DocumentListener {
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
 	protected JTextArea textArea;
@@ -47,62 +48,84 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	private Border paneEdge;
 	private JScrollPane scrollPane;
 	private Border titled;
-	private boolean lookingFor = false; 
+	private boolean lookingFor = false;
 	private int w = 0;
-	
+	private static MyTasksUI INSTANCE = null;
+
 	private Mode mode = Mode.INSERT;
 	private List<String> words;
+
 	private static enum Mode {
-	    INSERT,
-	    COMPLETION
-	  };
+		INSERT, COMPLETION
+	};
 	
-	  
-	public MyTasksUI() {
+	public static MyTasksUI getInstance(){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksUI();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	private MyTasksUI() {
 		super(new GridBagLayout());
 
-		mLogic = new MyTasksLogic(false);
-		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
+		mLogic = MyTasksLogicController.getInstance(false);
+		textAreaLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
 
-		// A border that puts 10 extra pixels at the sides and bottom of each pane.
-		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);		
+		// A border that puts 10 extra pixels at the sides and bottom of each
+		// pane.
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
-		textAreaPanel.setLayout(new BoxLayout(textAreaPanel,BoxLayout.Y_AXIS));
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
-		textAreaPanel.repaint();		
-		
-		if(mLogic.obtainPrintableOutput().size() == 0) {
+		textAreaPanel.repaint();
+
+		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
-			textArea.setEditable(false);			
-			Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
-			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
+			textArea.setEditable(false);
+			Border colourLine = BorderFactory.createLineBorder(new Color(
+					(int) (Math.random() * 200), (int) (Math.random() * 255),
+					(int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine,
+					"Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
-		} else {	
-			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {								
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-				
-				textArea = new JTextArea();
-				textArea.setEditable(false);			
-		
-				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
-				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
 
-				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+				textArea = new JTextArea();
+				textArea.setEditable(false);
+
+				Border colourLine = BorderFactory.createLineBorder(new Color(
+						(int) (Math.random() * 200),
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255)), 3);
+				titled = BorderFactory
+						.createTitledBorder(colourLine, firstWord);
+
+				String content = mLogic.obtainPrintableOutput().get(i)
+						.replace(firstWord, "").trim();
 				textArea.setText(content);
-				textArea.setBorder(titled);			
-				textAreaPanel.add(textArea);			
-				
+				textArea.setBorder(titled);
+				textAreaPanel.add(textArea);
+
 				GridBagConstraints c = new GridBagConstraints();
 				c.gridwidth = GridBagConstraints.REMAINDER;
 				c.fill = GridBagConstraints.HORIZONTAL;
 				c.gridx = 0;
 				c.weightx = 1.0;
 				c.weighty = 1.0;
-				
+
 				textAreaPanel.add(textArea, c);
 			}
 		}
@@ -110,31 +133,34 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(500, 400));
 
-		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
+		feedbackLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Feedback Box</font>");
 		textAreaFeedback = new JTextArea(10, 50);
 		textAreaFeedback.setEditable(false);
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
-		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPaneFeedback.setBorder(BorderFactory
+				.createLineBorder(Color.black));
 
-		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
+		textfieldLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Input Tasks</font>");
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
-		
+
 		InputMap im = textField.getInputMap();
-	    ActionMap am = textField.getActionMap();
-	    im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
-	    am.put("commit", new CommitAction());
+		ActionMap am = textField.getActionMap();
+		im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
+		am.put("commit", new CommitAction());
 
 		words = new ArrayList<String>();
-		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
+		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
 		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);
-		
+
 		// Add Components to this panel.
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
@@ -170,33 +196,33 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		c.weighty = 1.0;
 		add(textField, c);
 	}
-	 
-	 /**
-		 * run starts the process of accepting and executing input
-		 */
-		public void run() {
-			// Schedule a job for the event dispatch thread:
-			// creating and showing this application's GUI.
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					createAndShowGUI();
-				}
-			});
-		}
+
+	/**
+	 * run starts the process of accepting and executing input
+	 */
+	public void run() {
+		// Schedule a job for the event dispatch thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
 
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
-        String text = textField.getText();        
-        String feedbackText = mLogic.executeCommand(text);
+		String text = textField.getText();
+		String feedbackText = mLogic.executeCommand(text);
 
-        if(feedbackText.equals("Invalid input")) {
-        	textAreaFeedback.setForeground(new Color(255, 0, 0));
-        	textAreaFeedback.setText(feedbackText);
-        } else {
-        	textAreaFeedback.setForeground(new Color(0, 0, 0));
-    		textAreaFeedback.setText(feedbackText);
-        }
+		if (feedbackText.equals("Invalid input")) {
+			textAreaFeedback.setForeground(new Color(255, 0, 0));
+			textAreaFeedback.setText(feedbackText);
+		} else {
+			textAreaFeedback.setForeground(new Color(0, 0, 0));
+			textAreaFeedback.setText(feedbackText);
+		}
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
@@ -209,23 +235,30 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);
-		
-		if(mLogic.obtainPrintableOutput().size() == 0) {
+
+		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
-			textArea.setEditable(false);			
-			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
+			textArea.setEditable(false);
+			titled = BorderFactory
+					.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
 				textArea = new JTextArea();
 				textArea.setEditable(false);
 
-				Border colourLine = BorderFactory.createLineBorder(new Color((int)(Math.random()*200), (int)(Math.random()*255), (int)(Math.random()*255)), 3);
-				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+				Border colourLine = BorderFactory.createLineBorder(new Color(
+						(int) (Math.random() * 200),
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255)), 3);
+				titled = BorderFactory
+						.createTitledBorder(colourLine, firstWord);
 
-				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+				String content = mLogic.obtainPrintableOutput().get(i)
+						.replace(firstWord, "").trim();
 				textArea.setText(content);
 				textArea.setBorder(titled);
 				textAreaPanel.add(textArea);
@@ -235,7 +268,6 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		textArea.setCaretPosition(0);
 		textField.selectAll();
 	}
-
 
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be
@@ -254,88 +286,86 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 		frame.setVisible(true);
 	}
 
-	 @Override
-	  public void insertUpdate(DocumentEvent ev) {
-	    if (ev.getLength() != 1)
-	      return;
+	@Override
+	public void insertUpdate(DocumentEvent ev) {
+		if (ev.getLength() != 1)
+			return;
 
-	    int pos = ev.getOffset();	//last letter of input 
-	    String content = null;
-	    try {
-	      content = textField.getText(0, pos + 1);
-	    } catch (BadLocationException e) {
-	      e.printStackTrace();
-	    }
-	    
-	   
-	    
-	    // Find where the word starts
-	    if(lookingFor == false) { 
-	    	for (w = pos; w >= 0; w--) {	    	
-		 		if (!Character.isLetter(content.charAt(w))) {
-		 			lookingFor = true;
-		 	    	break;
-		 	 	}
-		 	}	   
-	    }
-	    
-	    // Too few chars
-	    if (pos - w < 2)
-	      return;
+		int pos = ev.getOffset(); // last letter of input
+		String content = null;
+		try {
+			content = textField.getText(0, pos + 1);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 
-	    String prefix = content.substring(w + 1).toLowerCase();
-	    int n = Collections.binarySearch(words, prefix);
-	    if (n < 0 && -n <= words.size()) {
-	      String match = words.get(-n - 1);
-	      if (match.startsWith(prefix)) {
-	        // A completion is found
-	        String completion = match.substring(pos - w);
-	        // We cannot modify Document from within notification,
-	        // so we submit a task that does the change later
-	        SwingUtilities.invokeLater(new CompletionTask(completion, pos + 1));
-	      }
-	    } else {
-	      // Nothing found
-	      mode = Mode.INSERT;
-	    }
-	  }
+		// Find where the word starts
+		if (lookingFor == false) {
+			for (w = pos; w >= 0; w--) {
+				if (!Character.isLetter(content.charAt(w))) {
+					lookingFor = true;
+					break;
+				}
+			}
+		}
 
-	  public class CommitAction extends AbstractAction {
+		// Too few chars
+		if (pos - w < 2)
+			return;
+
+		String prefix = content.substring(w + 1).toLowerCase();
+		int n = Collections.binarySearch(words, prefix);
+		if (n < 0 && -n <= words.size()) {
+			String match = words.get(-n - 1);
+			if (match.startsWith(prefix)) {
+				// A completion is found
+				String completion = match.substring(pos - w);
+				// We cannot modify Document from within notification,
+				// so we submit a task that does the change later
+				SwingUtilities.invokeLater(new CompletionTask(completion,
+						pos + 1));
+			}
+		} else {
+			// Nothing found
+			mode = Mode.INSERT;
+		}
+	}
+
+	public class CommitAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
 		public void actionPerformed(ActionEvent ev) {
-	      if (mode == Mode.COMPLETION) {
-	        int pos = textField.getSelectionEnd();
-	        StringBuffer sb = new StringBuffer(textField.getText());
-	        sb.insert(pos, " ");
-	        textField.setText(sb.toString());
-	        textField.setCaretPosition(pos + 1);
-	        mode = Mode.INSERT;
-	      } else {
-	        textField.replaceSelection(textField.getText());
-	      }
-	    }
-	  }
+			if (mode == Mode.COMPLETION) {
+				int pos = textField.getSelectionEnd();
+				StringBuffer sb = new StringBuffer(textField.getText());
+				sb.insert(pos, " ");
+				textField.setText(sb.toString());
+				textField.setCaretPosition(pos + 1);
+				mode = Mode.INSERT;
+			} else {
+				textField.replaceSelection(textField.getText());
+			}
+		}
+	}
 
-	  private class CompletionTask implements Runnable {
-	    private String completion;
-	    private int position;
+	private class CompletionTask implements Runnable {
+		private String completion;
+		private int position;
 
-	    CompletionTask(String completion, int position) {
-	      this.completion = completion;
-	      this.position = position;
-	    }
+		CompletionTask(String completion, int position) {
+			this.completion = completion;
+			this.position = position;
+		}
 
-	    public void run() {	    	
-	      StringBuffer sb = new StringBuffer(textField.getText());
-	      sb.insert(position, completion);
-	      textField.setText(sb.toString());
-	      textField.setCaretPosition(position + completion.length());
-	      textField.moveCaretPosition(position);
-	      mode = Mode.COMPLETION;
-	    }
-	  }
-
+		public void run() {
+			StringBuffer sb = new StringBuffer(textField.getText());
+			sb.insert(position, completion);
+			textField.setText(sb.toString());
+			textField.setCaretPosition(position + completion.length());
+			textField.moveCaretPosition(position);
+			mode = Mode.COMPLETION;
+		}
+	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {

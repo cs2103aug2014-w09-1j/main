@@ -1,11 +1,10 @@
 package mytasks.logic;
 
-import java.util.ArrayList;
+//@author A0114302A
+import java.util.List;
 
 /**
  * ILogic interface defines abstract methods to be used by logic component
- * @author Wilson
- *
  */
 public interface ILogic {
 	
@@ -20,17 +19,17 @@ public interface ILogic {
 	 * obtainPrintableOutput reads and converts local memory into a form that is directly printable by UI.
 	 * @return printable format that is not neccessarily a string. Will use string temporarily
 	 */
-	public ArrayList<String> obtainPrintableOutput();
+	public List<String> obtainPrintableOutput();
 	
 	/**
-	 * obtainAllTaskDescription 
-	 * @return 
+	 * obtainAllTaskDescription generates a list of all the task descriptions
+	 * @return a list containing all the task descriptions of the current memory
 	 */
-	public ArrayList<String> obtainAllTaskDescription();
+	public List<String> obtainAllTaskDescription();
 	
 	/**
-	 * obtains all labels 
-	 * @return 
+	 * obtainsAllLabels generates a list of all the labels currently used by memory 
+	 * @return a list of strings
 	 */
-	public ArrayList<String> obtainAllLabels();
+	public List<String> obtainAllLabels();
 }

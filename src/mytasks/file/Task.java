@@ -1,5 +1,6 @@
 package mytasks.file;
 
+//@author A0114302A
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,9 +13,6 @@ import mytasks.parser.MyTasksParser;
 /**
  * Task object represents a single task with all the relevant fields that is
  * essential to a task
- * 
- * @author Wilson
- *
  */
 public class Task {
 
@@ -47,7 +45,7 @@ public class Task {
 	
 	private void runLogger() {
 		try {
-			fh = new FileHandler(mytasks.file.MyTasks.default_log, 0, 1, true);
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
 			LOGGER.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);

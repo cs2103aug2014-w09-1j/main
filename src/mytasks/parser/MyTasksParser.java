@@ -12,7 +12,6 @@ import java.util.logging.*;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
-import mytasks.logic.HelpCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
 import mytasks.logic.SortCommand;
@@ -97,8 +96,7 @@ public class MyTasksParser implements IParser {
 			String withoutComdType = removeCommand(input, comdType);
 			if (withoutComdType.trim().length() == 0
 					&& !comdType.trim().equals("undo")
-					&& !comdType.equals("redo")
-					&& !comdType.equals("help")) {
+					&& !comdType.equals("redo")) {
 				return null;
 			}
 			switch (comdType) {
@@ -123,8 +121,6 @@ public class MyTasksParser implements IParser {
 			case "sort":
 				Command temp3 = convertSort(withoutComdType, comdType);
 				return temp3;
-			case "help":
-				return new HelpCommand(null, null, null, null, null);
 			case "done":
 				break;
 			default:

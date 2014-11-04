@@ -1,13 +1,12 @@
 package mytasks.logic;
 
+//@author A0114302A
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * RedoCommand extends Command to follow OOP standard
- * 
- * @author Wilson
- *
+ * RedoCommand extends Command to follow OOP standard. Redo command does not exist within the stack
+ * for undo/redo but is used to manipulate these stacks 
  */
 public class RedoCommand extends Command {
 	

@@ -1,9 +1,14 @@
 package mytasks.parser;
 
+//@author A0114302A
 import java.util.Date;
 
+/**
+ * DoubleDate is a data structure to hold 2 dates for the parser to use. This is
+ * a protected class that cannot be accessed from outside package
+ */
 class DoubleDate {
-	
+
 	private Date mDate1 = null;
 	private Date mDate2 = null;
 

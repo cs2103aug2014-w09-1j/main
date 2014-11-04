@@ -1,5 +1,6 @@
 package mytasks.logic;
 
+//@author A0114302A
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -8,62 +9,26 @@ import mytasks.file.Task;
 /**
  * CommandType instance used to access different fields of a command that has
  * been parsed.
- * 
- * TODO research NLP and its relevant libraries. This object may no longer be
- * needed but will be left here for the time being
- * 
- * @author Wilson
- *
  */
 public abstract class Command {
 
 	// Private variables
-	// public enum CommandType {
-	// ADD, DELETE, SORT, SEARCH, UPDATE, UNDO, REDO, INVALID
-	// };
-	//
-	// private CommandType mType;
 	private Task mTask;
 	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
 	protected static boolean haveSearched;
 
 	// Constructor
-	public Command(String comdDes, Date fromDateTime,
-			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
-		//determineCommandType(comdType);
+	public Command(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;
 	}
-	
-	protected String getTaskDetails(){
+
+	protected String getTaskDetails() {
 		return mTask.getDescription();
 	}
-
-	// private void determineCommandType(String comdType) {
-	// if (comdType.equals("add")) {
-	// mType = CommandType.ADD;
-	// } else if (comdType.equals("delete")) {
-	// mType = CommandType.DELETE;
-	// } else if (comdType.equals("sort")) {
-	// mType = CommandType.SORT;
-	// } else if (comdType.equals("search")) {
-	// mType = CommandType.SEARCH;
-	// } else if (comdType.equals("update")) {
-	// mType = CommandType.UPDATE;
-	// } else if (comdType.equals("undo")) {
-	// mType = CommandType.UNDO;
-	// } else if (comdType.equals("redo")) {
-	// mType = CommandType.REDO;
-	// } else {
-	// mType = CommandType.INVALID;
-	// }
-	// }
-
-	// public CommandType getType() {
-	// return mType;
-	// }
 
 	public Task getTask() {
 		return mTask;
