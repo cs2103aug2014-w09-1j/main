@@ -215,13 +215,14 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		w = 0;
 		String text = textField.getText();
 		String feedbackText = mLogic.executeCommand(text);
-
-		if (feedbackText.equals("Invalid input")) {
-			textAreaFeedback.setForeground(new Color(255, 0, 0));
-			textAreaFeedback.setText(feedbackText);
-		} else {
-			textAreaFeedback.setForeground(new Color(0, 0, 0));
-			textAreaFeedback.setText(feedbackText);
+		if (feedbackText != null){
+			if (feedbackText.equals("Invalid input")) {
+				textAreaFeedback.setForeground(new Color(255, 0, 0));
+				textAreaFeedback.setText(feedbackText);
+			} else {
+				textAreaFeedback.setForeground(new Color(0, 0, 0));
+				textAreaFeedback.setText(feedbackText);
+			}
 		}
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
