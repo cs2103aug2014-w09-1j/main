@@ -13,6 +13,7 @@ import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
 import mytasks.logic.DoneCommand;
+import mytasks.logic.HelpCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
 import mytasks.logic.SortCommand;
@@ -127,8 +128,8 @@ public class MyTasksParser implements IParser {
 			case "?":
 			case "he":
 			case "help":
-				//TODO: add code for help command here
-				break;
+				Command temp4 = new HelpCommand(null, null, null, null, null);
+				return temp4;
 			default:
 				return null;
 			}
