@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.*;
 
-import mytasks.file.Logger;
 import mytasks.file.Task;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
@@ -47,7 +47,12 @@ public class MyTasksParser implements IParser {
 			add(new SimpleDateFormat("dd.MMM.yyyy hh:mma"));
 		}
 	};
+
 	private static final int DAYSINWEEK = 7;
+	private static final Logger LOGGER = Logger.getLogger(MyTasksParser.class
+			.getName());
+	private final String MESSAGE_INVALIDTOFROM = "No time found after word 'to' or 'next': Taken as task description";
+	private final String MESSAGE_INVALIDINDEX = "Unexpected error: Invalid indexes";
 
 	private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
 			"monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
@@ -97,6 +102,8 @@ public class MyTasksParser implements IParser {
 			case "sort":
 				Command temp3 = convertSort(withoutComdType, comdType);
 				return temp3;
+			case "done":
+				break;
 			default:
 				return null;
 			}
@@ -362,8 +369,7 @@ public class MyTasksParser implements IParser {
 					usedWords.add((Integer) indexOfTo + 1);
 				}
 			} catch (IndexOutOfBoundsException e) {
-				Logger logger = Logger.getInstance();
-				logger.log("Parser: No time found after word 'to' or 'next': Taken as task description");
+				LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM);
 			}
 
 		} else {
@@ -611,13 +617,27 @@ public class MyTasksParser implements IParser {
 			int indexOfDate2, int indexOfFrom, int indexOfTo) {
 		DoubleDate result = null;
 		boolean noTime = false;
+		boolean isNext = false;
 		if (indexOfDate1 != words.length - 1 && indexOfDate1 > -1) {
 			String toDateFormat = convertToDateFormat(words, indexOfDate1);
-			String time1 = words[indexOfDate1 + 1];
+			String time1 = "";
+			isNext = isNextDate(words[indexOfDate1]);
+			if (isNext && indexOfDate1 != words.length - 2) {
+
+				time1 = words[indexOfDate1 + 2];
+			} else {
+				time1 = words[indexOfDate1 + 1];
+			}
 			result = getDoubleDateTime(toDateFormat, null, time1, null);
 			if (result.getDate1() != null) {
-				usedWords.add((Integer) indexOfDate1);
-				usedWords.add((Integer) indexOfDate1 + 1);
+				if (isNext) {
+					usedWords.add((Integer) indexOfDate1);
+					usedWords.add((Integer) indexOfDate1 + 1);
+					usedWords.add((Integer) indexOfDate1 + 2);
+				} else {
+					usedWords.add((Integer) indexOfDate1);
+					usedWords.add((Integer) indexOfDate1 + 1);
+				}
 			} else {
 				noTime = true;
 			}
@@ -630,13 +650,12 @@ public class MyTasksParser implements IParser {
 			String toDateFormat = convertToDateFormat(words, indexOfDate1);
 			result = getDoubleDate(toDateFormat, null);
 			if (result.getDate1() != null) {
-				if (words[indexOfDate1].equals("next")) {
+				if (isNext) {
 					usedWords.add((Integer) indexOfDate1 + 1);
 				}
 				usedWords.add((Integer) indexOfDate1);
 			} else {
-				Logger logger = Logger.getInstance();
-				logger.log("Parser: Unexpected error: Invalid indexes");
+				LOGGER.log(Level.SEVERE,MESSAGE_INVALIDINDEX);
 			}
 		}
 		return result;
@@ -657,6 +676,10 @@ public class MyTasksParser implements IParser {
 			}
 		}
 		return result.trim();
+	}
+
+	private boolean isNextDate(String word) {
+		return word.equals("next");
 	}
 
 	/**
