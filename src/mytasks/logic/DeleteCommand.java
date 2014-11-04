@@ -12,6 +12,7 @@ import mytasks.file.Task;
  *
  */
 
+//@author A0108543J
 public class DeleteCommand extends Command {
 
 	// private variables
