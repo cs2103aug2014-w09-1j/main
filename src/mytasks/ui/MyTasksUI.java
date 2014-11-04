@@ -61,7 +61,7 @@ public class MyTasksUI extends JPanel implements ActionListener, DocumentListene
 	public MyTasksUI() {
 		super(new GridBagLayout());
 
-		mLogic = new MyTasksLogic(false);
+		mLogic = MyTasksLogic.getInstance(false);
 		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
 

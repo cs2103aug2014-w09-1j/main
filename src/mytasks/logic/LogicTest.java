@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 
 public class LogicTest {
 
-	private MyTasksLogic taskLogic = new MyTasksLogic(true);
+	private MyTasksLogic taskLogic = MyTasksLogic.getInstance(true);
 
 
 	@Test

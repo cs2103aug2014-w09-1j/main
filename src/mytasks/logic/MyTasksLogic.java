@@ -21,14 +21,22 @@ public class MyTasksLogic implements ILogic {
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
+	private static MyTasksLogic INSTANCE = null;
 
-	// TODO: introduce get Instance to all classes. This included. Read
-	// notes/google this
-	// Difference between creating a public getInstance for checking yourself,
-	// and getinstance for your member variables
 	// Constructor
-	public MyTasksLogic(boolean isDeveloper) {
+	private MyTasksLogic(boolean isDeveloper) {
 		initLogic(isDeveloper);
+	}
+	
+	public static MyTasksLogic getInstance(boolean isDeveloper){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksLogic(isDeveloper);
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
 	}
 
 	/**
