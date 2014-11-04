@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import mytasks.file.MyTasks;
+import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
@@ -46,7 +46,7 @@ class LocalMemory implements Serializable {
 	}
 
 	protected void loadLocalMemory() {
-		mLocalMem = mStore.readExtMem(MyTasks.DEFAULT_FILENAME);
+		mLocalMem = mStore.readExtMem(MyTasksController.DEFAULT_FILENAME);
 	}
 
 	protected void saveLocalMemory() {

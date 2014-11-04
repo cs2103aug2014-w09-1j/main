@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
-import mytasks.file.MyTasks;
+import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
@@ -34,7 +34,7 @@ class MemorySnapshotHandler {
 	
 	//Constructor
 	private MemorySnapshotHandler() {
-		currentSettings = MyTasks.DEFAULT_VIEW;
+		currentSettings = MyTasksController.DEFAULT_VIEW;
 		assert currentSettings[0] == "date" : "wrong default setting";
 	}
 	

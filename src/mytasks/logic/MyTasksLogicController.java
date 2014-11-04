@@ -14,23 +14,23 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class MyTasksLogic implements ILogic {
+public class MyTasksLogicController implements ILogic {
 
 	// Private variables
 	private IParser mParser;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
-	private static MyTasksLogic INSTANCE = null;
+	private static MyTasksLogicController INSTANCE = null;
 
 	// Constructor
-	private MyTasksLogic(boolean isDeveloper) {
+	private MyTasksLogicController(boolean isDeveloper) {
 		initLogic(isDeveloper);
 	}
 	
-	public static MyTasksLogic getInstance(boolean isDeveloper){
+	public static MyTasksLogicController getInstance(boolean isDeveloper){
 		if (INSTANCE == null){
-			INSTANCE= new MyTasksLogic(isDeveloper);
+			INSTANCE= new MyTasksLogicController(isDeveloper);
 		}
 		return INSTANCE;
 	}
