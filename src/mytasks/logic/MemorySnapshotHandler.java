@@ -4,15 +4,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
 
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
 
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
@@ -31,11 +27,10 @@ class MemorySnapshotHandler {
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
-	
 	//Constructor
 	private MemorySnapshotHandler() {
 		currentSettings = MyTasks.DEFAULT_VIEW;
-		assert currentSettings[0] == "date" : "wrong default setting";
+		assert currentSettings[0].equals("date") : "wrong default setting";
 	}
 	
 	protected static MemorySnapshotHandler getInstance(){
@@ -124,7 +119,7 @@ class MemorySnapshotHandler {
 		ArrayList<String> output = new ArrayList<String>();
 
 		for (int i=0; i < snapshotList.size(); i++){
-			if (wantDoneTasks() == false && isDone(snapshotList.get(i))){
+			if (!wantDoneTasks() && isDone(snapshotList.get(i))){
 				continue;
 			}
 			
@@ -133,7 +128,7 @@ class MemorySnapshotHandler {
 			if (date == null){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
-					if (wantDoneTasks() == false && isDone(snapshotList.get(j))){
+					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 					snapshot += snapshotList.get(j).toString() + "\n";
@@ -146,7 +141,7 @@ class MemorySnapshotHandler {
 				int j=i;
 				Date currentDate = snapshotList.get(j).getFromDateTime();
 				while (currentDate != null && dateFormat.format(currentDate).equals(dateFormat.format(date))){
-					if (wantDoneTasks() == false && isDone(snapshotList.get(j))){
+					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 
@@ -168,7 +163,7 @@ class MemorySnapshotHandler {
 		ArrayList<String> output = new ArrayList<String>();
 
 		for (int i=0; i < snapshotList.size(); i++){
-			if (wantDoneTasks() == false && isDone(snapshotList.get(i))){
+			if (!wantDoneTasks() && isDone(snapshotList.get(i))){
 				continue;
 			}
 
@@ -177,7 +172,7 @@ class MemorySnapshotHandler {
 			if (order == labelCombinations.size()){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
-					if (wantDoneTasks() == false && isDone(snapshotList.get(j))){
+					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 					snapshot += snapshotList.get(j).toString() + "\n";
@@ -192,7 +187,7 @@ class MemorySnapshotHandler {
 				snapshot += "\n";
 				int j=i;
 				while (j < snapshotList.size() && tasksToLabelOrders.get(snapshotList.get(j)) == tasksToLabelOrders.get(snapshotList.get(i))){
-					if (wantDoneTasks() == false && isDone(snapshotList.get(j))){
+					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 
