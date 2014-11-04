@@ -28,7 +28,7 @@ public class HelpCommand extends Command {
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc,
 					boolean canDo) {
-		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc, canDo);
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		// TODO Auto-generated constructor stub
 	}
 
