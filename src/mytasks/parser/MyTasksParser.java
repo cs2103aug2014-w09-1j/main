@@ -12,6 +12,7 @@ import java.util.logging.*;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
+import mytasks.logic.DoneCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
 import mytasks.logic.SortCommand;
@@ -53,6 +54,7 @@ public class MyTasksParser implements IParser {
 	private Handler fh = null;
 	private final String MESSAGE_INVALIDTOFROM = "No time found after word 'to' or 'next': Taken as task description";
 	private final String MESSAGE_INVALIDINDEX = "Unexpected error: Invalid indexes";
+	private final String MESSAGE_INVALIDDATES = "Input dates do not follow order";
 
 	private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
 			"monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
@@ -95,33 +97,37 @@ public class MyTasksParser implements IParser {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
 			if (withoutComdType.trim().length() == 0
-					&& !comdType.trim().equals("undo")
-					&& !comdType.equals("redo")) {
+					&& !comdType.trim().equals("un")
+					&& !comdType.equals("re")) {
 				return null;
 			}
 			switch (comdType) {
-			case "add":
-			case "search":
-			case "delete":
+			case "ad":
+			case "se":
+			case "de":
+			case "do":
 				Command temp = convertStandard(withoutComdType, comdType);
 				return temp;
-			case "undo":
+			case "un":
 				if (words.length != 1) {
 					return null;
 				}
 				return new UndoCommand(null, null, null, null, null);
-			case "redo":
+			case "re":
 				if (words.length != 1) {
 					return null;
 				}
 				return new RedoCommand(null, null, null, null, null);
-			case "update":
+			case "up":
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
-			case "sort":
+			case "so":
 				Command temp3 = convertSort(withoutComdType, comdType);
 				return temp3;
-			case "done":
+			case "?":
+			case "he":
+			case "help":
+				//TODO: add code for help command here
 				break;
 			default:
 				return null;
@@ -160,17 +166,22 @@ public class MyTasksParser implements IParser {
 			return null;
 		}
 		switch (comdType) {
-		case "add":
+		case "ad":
 			if (dateFrom!= null && dateTo!= null){
 				if (dateFrom.compareTo(dateTo)>=0){
+					runLogger();
+					LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+					closeHandler();
 					return null;
 				}
 			}
 			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
-		case "search":
+		case "se":
 			return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
-		case "delete":
+		case "de":
 			return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
+		case "do":
+			return new DoneCommand(taskDesc, dateFrom, dateTo, labels, null);
 		}
 		return null;
 	}
@@ -810,6 +821,9 @@ public class MyTasksParser implements IParser {
 		}
 		if (dateFrom!= null && dateTo!= null){
 			if (dateFrom.compareTo(dateTo)>=0){
+				runLogger();
+				LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+				closeHandler();
 				return null;
 			}
 		}
