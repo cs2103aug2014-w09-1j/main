@@ -2,6 +2,8 @@ package mytasks.file;
 
 import java.util.Date;
 
+import mytasks.logic.ILogic;
+import mytasks.logic.MyTasksLogicController;
 import mytasks.ui.MyTasksUI;
 
 /**
@@ -12,22 +14,24 @@ import mytasks.ui.MyTasksUI;
  * @author Wilson, Micheal, Huiwen, Shuansiang
  * @version 0.1
  */
-public class MyTasks {
+public class MyTasksController {
 	
 	public final static String DEFAULT_FILENAME = "externalmemoryfile";
 	public final static String[] DEFAULT_VIEW = {"date"};
 	public final static String SYSTEM_SHUTDOWN = "system off";
 	public static String default_log = "log";
 	
+	private MyTasksUI UIComponent = null;
+	
 	//Constructor
-	public MyTasks(){
+	public MyTasksController(){
 		Date today = new Date();
 		default_log +=today.hashCode();
+		UIComponent = MyTasksUI.getInstance();
 	}
 	
 	public static void main(String[] args){
-		MyTasks runningProgram = new MyTasks();	
-		MyTasksUI uiCompo = new MyTasksUI();
-		uiCompo.run();
+		MyTasksController runningProgram = new MyTasksController();
+		runningProgram.UIComponent.run();
 	}
 }

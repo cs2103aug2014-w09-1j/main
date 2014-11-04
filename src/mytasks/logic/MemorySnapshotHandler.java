@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import mytasks.file.MyTasks;
+import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 
 /**
@@ -29,8 +29,13 @@ class MemorySnapshotHandler {
 
 	//Constructor
 	private MemorySnapshotHandler() {
+<<<<<<< HEAD
 		currentSettings = MyTasks.DEFAULT_VIEW;
 		assert currentSettings[0].equals("date") : "wrong default setting";
+=======
+		currentSettings = MyTasksController.DEFAULT_VIEW;
+		assert currentSettings[0] == "date" : "wrong default setting";
+>>>>>>> 73771312e1b59244a4a39117037483b6a222fffd
 	}
 	
 	protected static MemorySnapshotHandler getInstance(){

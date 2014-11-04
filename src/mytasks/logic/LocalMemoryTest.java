@@ -13,7 +13,7 @@ import mytasks.parser.MyTasksParser;
 
 public class LocalMemoryTest {
 	
-	private MyTasksLogic taskLogic = new MyTasksLogic(true);
+	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
 	private ArrayList<String> labels = new ArrayList<String>();
 	private Task newTask;
 	

@@ -12,7 +12,7 @@ import java.util.logging.*;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
-import mytasks.file.MyTasks;
+import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
@@ -51,7 +51,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	
 	private void runLogger() {
 		try {
-			fh = new FileHandler(mytasks.file.MyTasks.default_log, 0, 1, true);
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
 			LOGGER.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
@@ -155,7 +155,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	 */
 	public void writeExtMem(ArrayList<Task> localMemory) {
 		String output = determineOutput(localMemory);
-		printOutput(output, MyTasks.DEFAULT_FILENAME);
+		printOutput(output, MyTasksController.DEFAULT_FILENAME);
 	}
 	
 	protected String determineOutput(ArrayList<Task> localMem){

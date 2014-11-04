@@ -22,7 +22,7 @@ public class ParserTest {
 	@Test
 	public void addTest1() {
 		Command test1 = new AddCommand("dinner", null, null, null, null);
-		assertObjFields(test1, tester.parseInput("add dinner"));
+		assertObjFields(test1, tester.parseInput("ad dinner"));
 	}
 
 	@Test
@@ -30,7 +30,7 @@ public class ParserTest {
 		try {
 			Date date2 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
 			Command test2 = new AddCommand("dinner", date2, null, null, null);
-			assertObjFields(test2, tester.parseInput("add dinner 18.09.2014"));
+			assertObjFields(test2, tester.parseInput("ad dinner 18.09.2014"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -44,7 +44,7 @@ public class ParserTest {
 			Command test3 = new AddCommand("submit assignment", date3, null,
 					null, null);
 			assertObjFields(test3,
-					tester.parseInput("add submit assignment 20.09.2014 12:00"));
+					tester.parseInput("ad submit assignment 20.09.2014 12:00"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -71,7 +71,7 @@ public class ParserTest {
 			cal.add(Calendar.DATE, toAdd);
 			Date nextXDay = cal.getTime();
 			Command test20 = new AddCommand("sleep", nextXDay, null, null, null);
-			assertObjFields(test20, tester.parseInput("add sleep next monday"));
+			assertObjFields(test20, tester.parseInput("ad sleep next monday"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -105,7 +105,7 @@ public class ParserTest {
 			Command test20 = new AddCommand("sleep", includeTime, null, null,
 					null);
 			assertObjFields(test20,
-					tester.parseInput("add sleep next tuesday 5pm"));
+					tester.parseInput("ad sleep next tuesday 5pm"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -123,7 +123,7 @@ public class ParserTest {
 					null);
 			assertObjFields(
 					test5,
-					tester.parseInput("add do homework 19.09.2014 #cs2103 #urgent #gg"));
+					tester.parseInput("ad do homework 19.09.2014 #cs2103 #urgent #gg"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -138,7 +138,7 @@ public class ParserTest {
 			Command test6 = new AddCommand("have fun!", date6, null, list6,
 					null);
 			assertObjFields(test6,
-					tester.parseInput("add have fun! #notpossible 18.09.2014"));
+					tester.parseInput("ad have fun! #notpossible 18.09.2014"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -155,7 +155,7 @@ public class ParserTest {
 					date122, null, null);
 			assertObjFields(
 					test12,
-					tester.parseInput("add code for project 06.10.2014 from 12:00 to 14:00"));
+					tester.parseInput("ad code for project 06.10.2014 from 12:00 to 14:00"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -173,7 +173,7 @@ public class ParserTest {
 			Command test17 = new AddCommand("do homework", date171, date172,
 					null, null);
 			assertObjFields(test17,
-					tester.parseInput("add do homework today from 2am to 3am"));
+					tester.parseInput("ad do homework today from 2am to 3am"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -197,7 +197,7 @@ public class ParserTest {
 					null);
 			assertObjFields(
 					test18,
-					tester.parseInput("add coding from today 2am to tomorrow 3am"));
+					tester.parseInput("ad coding from today 2am to tomorrow 3am"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -231,7 +231,7 @@ public class ParserTest {
 					null, null);
 			assertObjFields(
 					test21,
-					tester.parseInput("add sleep more from monday to next monday"));
+					tester.parseInput("ad sleep more from monday to next monday"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -269,7 +269,40 @@ public class ParserTest {
 					null, null);
 			assertObjFields(
 					test21,
-					tester.parseInput("add sleep more from monday 5pm to next monday 10am"));
+					tester.parseInput("ad sleep more from monday 5pm to next monday 10am"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void addTimedTest6() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String nextXDayOnly = MyTasksParser.dateFormats.get(0).format(nextXDay);
+			Date nextXDay1 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 16:00");
+			Date nextXDay2 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 17:00");
+			Command test21 = new AddCommand("play more", nextXDay1, nextXDay2,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("ad play more next monday from 4pm to 5pm"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -279,7 +312,7 @@ public class ParserTest {
 	public void deleteTest1() {
 		Command test7 = new DeleteCommand("CS2103 meeting", null, null, null,
 				null);
-		assertObjFields(test7, tester.parseInput("delete CS2103 meeting"));
+		assertObjFields(test7, tester.parseInput("de CS2103 meeting"));
 	}
 
 	@Test
@@ -287,7 +320,7 @@ public class ParserTest {
 		Command test8 = new UpdateCommand("CS2103 meeting", null, null, null,
 				"meeting");
 		assertObjFields(test8,
-				tester.parseInput("update meeting - CS2103 meeting"));
+				tester.parseInput("up meeting - CS2103 meeting"));
 	}
 
 	@Test
@@ -297,7 +330,7 @@ public class ParserTest {
 			Command test9 = new UpdateCommand(null, date9, null, null,
 					"meeting cs2103");
 			assertObjFields(test9,
-					tester.parseInput("update meeting cs2103 - 20.09.2014"));
+					tester.parseInput("up meeting cs2103 - 20.09.2014"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -312,7 +345,7 @@ public class ParserTest {
 					"sleep");
 			assertObjFields(
 					test14,
-					tester.parseInput("update sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+					tester.parseInput("up sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -337,7 +370,7 @@ public class ParserTest {
 					labels19, "play");
 			assertObjFields(
 					test19,
-					tester.parseInput("update play - tomorrow from 3pm to 4pm #yolo"));
+					tester.parseInput("up play - tomorrow from 3pm to 4pm #yolo"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -348,7 +381,7 @@ public class ParserTest {
 		ArrayList<String> list10 = new ArrayList<String>();
 		list10.add("CS2103");
 		Command test10 = new UpdateCommand(null, null, null, list10, "meeting");
-		assertObjFields(test10, tester.parseInput("update meeting - #CS2103"));
+		assertObjFields(test10, tester.parseInput("up meeting - #CS2103"));
 	}
 
 	@Test
@@ -364,7 +397,7 @@ public class ParserTest {
 					date132, list13, "read book");
 			assertObjFields(
 					test13,
-					tester.parseInput("update read book - write report from 09.Oct.2014 14:00 to 10.Oct.2014 14:00  #gg"));
+					tester.parseInput("up read book - write report from 09.Oct.2014 14:00 to 10.Oct.2014 14:00  #gg"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -377,7 +410,7 @@ public class ParserTest {
 		list16.add("CS2106");
 		list16.add("CS2101");
 		Command test16 = new SortCommand(null, null, null, list16, null);
-		assertObjFields(test16, tester.parseInput("sort CS2103 CS2106 CS2101"));
+		assertObjFields(test16, tester.parseInput("so CS2103 CS2106 CS2101"));
 	}
 
 	@Test
@@ -456,6 +489,28 @@ public class ParserTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void flexibilityTest1() {
+		try {
+			Date date1 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
+			Date date2 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			Command test1 = new UpdateCommand(null, date1, date2, null, "play");
+			assertObjFields(test1, tester.parseInput("up play - to 06.10.2014 from 05.10.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void flexibilityTest2() {
+		assertEquals(null, tester.parseInput("ad play 04.11.2014 from 5pm to 3pm"));
+	}
+	
+	@Test
+	public void flexibilityTest3() {
+		assertEquals(null, tester.parseInput("ad play from tuesday to monday"));
 	}
 
 	private void assertObjFields(Command testCase, Command result) {

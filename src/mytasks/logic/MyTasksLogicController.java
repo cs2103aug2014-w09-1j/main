@@ -14,21 +14,29 @@ import mytasks.storage.MyTasksStorage;
  *
  */
 
-public class MyTasksLogic implements ILogic {
+public class MyTasksLogicController implements ILogic {
 
 	// Private variables
 	private IParser mParser;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
+	private static MyTasksLogicController INSTANCE = null;
 
-	// TODO: introduce get Instance to all classes. This included. Read
-	// notes/google this
-	// Difference between creating a public getInstance for checking yourself,
-	// and getinstance for your member variables
 	// Constructor
-	public MyTasksLogic(boolean isDeveloper) {
+	private MyTasksLogicController(boolean isDeveloper) {
 		initLogic(isDeveloper);
+	}
+	
+	public static MyTasksLogicController getInstance(boolean isDeveloper){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksLogicController(isDeveloper);
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
 	}
 
 	/**
@@ -178,5 +186,20 @@ public class MyTasksLogic implements ILogic {
 		}
 		return result;
 	}
-
+	
+	@Override
+	public ArrayList<String> obtainAllLabels() {
+		ArrayList<String> labelsResult = new ArrayList<String>();
+		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
+			if(mLocalMem.getLocalMem().get(i).getLabels() != null) {
+				if(!mLocalMem.getLocalMem().get(i).getLabels().isEmpty()) {
+					for(int k = 0; k < mLocalMem.getLocalMem().get(i).getLabels().size(); k++) {
+						String curLabels = mLocalMem.getLocalMem().get(i).getLabels().get(k);
+						labelsResult.add(curLabels);
+					}
+				}
+			}			
+		}
+		return labelsResult;
+	}
 }

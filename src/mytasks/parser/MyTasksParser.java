@@ -12,6 +12,8 @@ import java.util.logging.*;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
+import mytasks.logic.DoneCommand;
+import mytasks.logic.HelpCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
 import mytasks.logic.SortCommand;
@@ -22,7 +24,7 @@ import mytasks.logic.UpdateCommand;
  * MyTasksParser interprets userinput to useable data structures to work with in
  * the Logic component. Naive version for now
  * 
- *@author A0114302A
+ * @author A0114302A
  */
 public class MyTasksParser implements IParser {
 
@@ -53,6 +55,7 @@ public class MyTasksParser implements IParser {
 	private Handler fh = null;
 	private final String MESSAGE_INVALIDTOFROM = "No time found after word 'to' or 'next': Taken as task description";
 	private final String MESSAGE_INVALIDINDEX = "Unexpected error: Invalid indexes";
+	private final String MESSAGE_INVALIDDATES = "Input dates do not follow order";
 
 	private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
 			"monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
@@ -66,10 +69,10 @@ public class MyTasksParser implements IParser {
 	public MyTasksParser() {
 		usedWords = new ArrayList<Integer>();
 	}
-	
+
 	private void runLogger() {
 		try {
-			fh = new FileHandler(mytasks.file.MyTasks.default_log, 0, 1, true);
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
 			LOGGER.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
@@ -80,7 +83,7 @@ public class MyTasksParser implements IParser {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void closeHandler() {
 		fh.flush();
 		fh.close();
@@ -95,34 +98,38 @@ public class MyTasksParser implements IParser {
 			String comdType = words[0];
 			String withoutComdType = removeCommand(input, comdType);
 			if (withoutComdType.trim().length() == 0
-					&& !comdType.trim().equals("undo")
-					&& !comdType.equals("redo")) {
+					&& !comdType.trim().equals("un")
+					&& !comdType.equals("re")) {
 				return null;
 			}
 			switch (comdType) {
-			case "add":
-			case "search":
-			case "delete":
+			case "ad":
+			case "se":
+			case "de":
+			case "do":
 				Command temp = convertStandard(withoutComdType, comdType);
 				return temp;
-			case "undo":
-				if (words.length != 1) { // Checks if there are any extra input
+			case "un":
+				if (words.length != 1) {
 					return null;
 				}
 				return new UndoCommand(null, null, null, null, null);
-			case "redo":
-				if (words.length != 1) { // Checks if there are any extra input
+			case "re":
+				if (words.length != 1) {
 					return null;
 				}
 				return new RedoCommand(null, null, null, null, null);
-			case "update":
+			case "up":
 				Command temp2 = convertUpdate(withoutComdType, comdType);
 				return temp2;
-			case "sort":
+			case "so":
 				Command temp3 = convertSort(withoutComdType, comdType);
 				return temp3;
-			case "done":
-				break;
+			case "?":
+			case "he":
+			case "help":
+				Command temp4 = new HelpCommand(null, null, null, null, null);
+				return temp4;
 			default:
 				return null;
 			}
@@ -151,7 +158,7 @@ public class MyTasksParser implements IParser {
 		DoubleDate dates = extractDate(withoutLabels);
 		Date dateFrom = null;
 		Date dateTo = null;
-		if (dates!=null) {
+		if (dates != null) {
 			dateFrom = dates.getDate1();
 			dateTo = dates.getDate2();
 		}
@@ -160,12 +167,22 @@ public class MyTasksParser implements IParser {
 			return null;
 		}
 		switch (comdType) {
-		case "add":
+		case "ad":
+			if (dateFrom!= null && dateTo!= null){
+				if (dateFrom.compareTo(dateTo)>=0){
+					runLogger();
+					LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+					closeHandler();
+					return null;
+				}
+			}
 			return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
-		case "search":
+		case "se":
 			return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
-		case "delete":
+		case "de":
 			return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
+		case "do":
+			return new DoneCommand(taskDesc, dateFrom, dateTo, labels, null);
 		}
 		return null;
 	}
@@ -225,13 +242,22 @@ public class MyTasksParser implements IParser {
 		int indexOfTo = indexFromTo[1];
 
 		int[] indexDatesFormat = updateDateIndexAndFormat(words);
-		int indexOfDate1 = indexDatesFormat[0];
-		int indexOfDate2 = indexDatesFormat[1];
 		DoubleDate result = null;
 		if (isTimedTask(indexOfFrom, indexOfTo)) {
+			int indexOfDate1 = 0;
+			int indexOfDate2 = 0;
+			if (indexOfFrom>indexOfTo){
+				indexOfDate1 = indexDatesFormat[1];
+				indexOfDate2 = indexDatesFormat[0];
+			} else {
+				indexOfDate1 = indexDatesFormat[0];
+				indexOfDate2 = indexDatesFormat[1];
+			}
 			result = handleTimedTask(words, indexOfDate1, indexOfDate2,
 					indexOfFrom, indexOfTo);
 		} else {
+			int indexOfDate1 = indexDatesFormat[0];
+			int indexOfDate2 = indexDatesFormat[1];
 			result = handleUntimedTask(words, indexOfDate1, indexOfDate2,
 					indexOfFrom, indexOfTo);
 		}
@@ -240,16 +266,14 @@ public class MyTasksParser implements IParser {
 
 	/**
 	 * checkFromAndTo looks at an array of words and checks if words "from" and
-	 * "to" exist. If both words exist, and are not seperated by more than
-	 * MAX_SPACING, their respective indexes are returned in an array. Else if
-	 * one or more don't exists, they are represented by a -1
+	 * "to" exist. If both words exist,their respective indexes are returned in
+	 * an array. Else if one or more don't exists, they are represented by a -1
 	 * 
 	 * @param words
 	 * @return int[] where first int represents index of "from" and second int
 	 *         represents index of "to"
 	 */
 	private int[] checkFromAndTo(String[] words) {
-		final int MAX_SPACING = 3;
 		int indexFrom = -1;
 		int indexTo = -1;
 		for (int i = 0; i < words.length; i++) {
@@ -257,11 +281,13 @@ public class MyTasksParser implements IParser {
 			if (curWord.equals("from")) {
 				indexFrom = i;
 			}
-			if (curWord.equals("to") && indexFrom >= i - MAX_SPACING
-					&& indexFrom != -1) {
+			if (curWord.equals("to")) {
 				indexTo = i;
-				break;
 			}
+		}
+		if (indexTo == -1 || indexFrom == -1) {
+			int[] result = { -1, -1 };
+			return result;
 		}
 		int[] result = { indexFrom, indexTo };
 		return result;
@@ -385,55 +411,101 @@ public class MyTasksParser implements IParser {
 				String time2 = words[indexOfTo + 1];
 				results = getDoubleDateTime(toDateFormat, null, time1, time2);
 				if (results.getDate1() != null && results.getDate2() != null) {
-					usedWords.add((Integer) indexOfFrom);
-					usedWords.add((Integer) indexOfTo);
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfFrom + 1);
-					usedWords.add((Integer) indexOfTo + 1);
+					if (isNextDate(words[indexOfDate1])) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate1 + 1, indexOfFrom + 1,
+								indexOfTo + 1 };
+						addToUsedWords(toAdd);
+					} else {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfFrom + 1, indexOfTo + 1 };
+						addToUsedWords(toAdd);
+					}
 				}
 			} catch (IndexOutOfBoundsException e) {
 				runLogger();
-				LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM);
+				LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM, e);
 				closeHandler();
 			}
 
 		} else {
 			boolean noTime = false;
 			try {
+				boolean isNext1 = isNextDate(words[indexOfDate1]);
+				boolean isNext2 = isNextDate(words[indexOfDate2]);
 				String time1 = words[indexOfDate1 + 1];
+				if (isNext1 && indexOfDate1 < words.length - 2) {
+					time1 = words[indexOfDate1 + 2];
+				}
 				String time2 = words[indexOfDate2 + 1];
+				if (isNext2 && indexOfDate2 < words.length - 2) {
+					time2 = words[indexOfDate2 + 2];
+				}
 				String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
 				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
 				results = getDoubleDateTime(toDateFormat1, toDateFormat2,
 						time1, time2);
 				if (results.getDate1() != null && results.getDate2() != null) {
-					usedWords.add((Integer) indexOfFrom);
-					usedWords.add((Integer) indexOfTo);
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfDate2);
-					usedWords.add((Integer) indexOfDate1 + 1);
-					usedWords.add((Integer) indexOfDate2 + 1);
+					if (isNext1 && isNext2) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate1 + 2, indexOfDate2 + 1,
+								indexOfDate2 + 2 };
+						addToUsedWords(toAdd);
+					} else if (isNext1) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate1 + 2, indexOfDate2 + 1 };
+						addToUsedWords(toAdd);
+					} else if (isNext2) {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate2 + 1, indexOfDate2 + 2 };
+						addToUsedWords(toAdd);
+					} else {
+						int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+								indexOfDate2, indexOfDate1 + 1,
+								indexOfDate2 + 1 };
+						addToUsedWords(toAdd);
+					}
+				} else {
+					noTime = true;
 				}
 			} catch (IndexOutOfBoundsException e) {
 				noTime = true;
 			}
-			if (noTime) { // Suggesting that no time was present (ie. only from
-							// date to date)
-				String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
-				String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
-				results = getDoubleDate(toDateFormat1, toDateFormat2);
-				if (results.getDate1() != null && results.getDate2() != null) {
-					// if (words[indexOfDate1].equals("next")){
-					// usedWords.add((Integer) indexOfDate1+1);
-					// }
-					// if (words[indexOfDate2].equals("next")){
-					// usedWords.add((Integer) indexOfDate2+1);
-					// }
-					usedWords.add((Integer) indexOfFrom);
-					usedWords.add((Integer) indexOfTo);
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfDate2);
-				}
+			if (noTime) {
+				results = handleTimedDateOnly(words, indexOfDate1,
+						indexOfDate2, indexOfFrom, indexOfTo);
+			}
+		}
+		return results;
+	}
+
+	public DoubleDate handleTimedDateOnly(String[] words, int indexOfDate1,
+			int indexOfDate2, int indexOfFrom, int indexOfTo) {
+		DoubleDate results;
+		String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
+		String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
+		results = getDoubleDate(toDateFormat1, toDateFormat2);
+		if (results.getDate1() != null && results.getDate2() != null) {
+			if (isNextDate(words[indexOfDate1])
+					&& isNextDate(words[indexOfDate2])) {
+				int[] toAdd = { indexOfDate1 + 1, indexOfFrom, indexOfTo,
+						indexOfDate1, indexOfDate2, indexOfDate2 + 1 };
+				addToUsedWords(toAdd);
+			} else if (isNextDate(words[indexOfDate1])) {
+				int[] toAdd = { indexOfDate1 + 1, indexOfFrom, indexOfTo,
+						indexOfDate1, indexOfDate2 };
+				addToUsedWords(toAdd);
+			} else if (isNextDate(words[indexOfDate2])) {
+				int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+						indexOfDate2, indexOfDate2 + 1 };
+				addToUsedWords(toAdd);
+			} else {
+				int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+						indexOfDate2 };
+				addToUsedWords(toAdd);
 			}
 		}
 		return results;
@@ -648,7 +720,6 @@ public class MyTasksParser implements IParser {
 			String time1 = "";
 			isNext = isNextDate(words[indexOfDate1]);
 			if (isNext && indexOfDate1 != words.length - 2) {
-
 				time1 = words[indexOfDate1 + 2];
 			} else {
 				time1 = words[indexOfDate1 + 1];
@@ -656,12 +727,12 @@ public class MyTasksParser implements IParser {
 			result = getDoubleDateTime(toDateFormat, null, time1, null);
 			if (result.getDate1() != null) {
 				if (isNext) {
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfDate1 + 1);
-					usedWords.add((Integer) indexOfDate1 + 2);
+					int[] toAdd = { indexOfDate1, indexOfDate1 + 1,
+							indexOfDate1 + 2 };
+					addToUsedWords(toAdd);
 				} else {
-					usedWords.add((Integer) indexOfDate1);
-					usedWords.add((Integer) indexOfDate1 + 1);
+					int[] toAdd = { indexOfDate1, indexOfDate1 + 1 };
+					addToUsedWords(toAdd);
 				}
 			} else {
 				noTime = true;
@@ -672,18 +743,31 @@ public class MyTasksParser implements IParser {
 			noTime = true;
 		}
 		if (noTime) {
-			String toDateFormat = convertToDateFormat(words, indexOfDate1);
-			result = getDoubleDate(toDateFormat, null);
-			if (result.getDate1() != null) {
-				if (isNext) {
-					usedWords.add((Integer) indexOfDate1 + 1);
-				}
-				usedWords.add((Integer) indexOfDate1);
-			} else {
-				runLogger();
-				LOGGER.log(Level.SEVERE, MESSAGE_INVALIDINDEX);
-				closeHandler();
+			result = handleUntimedDateOnly(words, indexOfDate1, isNext);
+		}
+		return result;
+	}
+
+	private void addToUsedWords(int[] toAdd) {
+		for (int i = 0; i < toAdd.length; i++) {
+			usedWords.add(toAdd[i]);
+		}
+	}
+
+	public DoubleDate handleUntimedDateOnly(String[] words, int indexOfDate1,
+			boolean isNext) {
+		DoubleDate result;
+		String toDateFormat = convertToDateFormat(words, indexOfDate1);
+		result = getDoubleDate(toDateFormat, null);
+		if (result.getDate1() != null) {
+			if (isNext) {
+				usedWords.add((Integer) indexOfDate1 + 1);
 			}
+			usedWords.add((Integer) indexOfDate1);
+		} else {
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_INVALIDINDEX);
+			closeHandler();
 		}
 		return result;
 	}
@@ -735,6 +819,14 @@ public class MyTasksParser implements IParser {
 		String taskDesc = removeDate(withoutLabels);
 		if (taskDesc.equals("") || taskDesc.length() == 0) {
 			taskDesc = null;
+		}
+		if (dateFrom!= null && dateTo!= null){
+			if (dateFrom.compareTo(dateTo)>=0){
+				runLogger();
+				LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+				closeHandler();
+				return null;
+			}
 		}
 		return new UpdateCommand(taskDesc, dateFrom, dateTo, labels,
 				toUpdateFrom);
