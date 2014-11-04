@@ -1,6 +1,8 @@
 package mytasks.logic;
 
+//@author A0114302A
 import java.util.ArrayList;
+import java.util.List;
 
 import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
@@ -9,9 +11,6 @@ import mytasks.storage.MyTasksStorage;
 /**
  * MyTasksLogic handles all logic related operations such as program flow and
  * execution of commands
- * 
- * @author Wilson, Huiwen, Michael
- *
  */
 
 public class MyTasksLogicController implements ILogic {
@@ -68,89 +67,8 @@ public class MyTasksLogicController implements ILogic {
 		String feedback = commandObject.execute();
 		//mLocalMem.print();
 		return feedback;
-		
-		// Don't remove this chunk yet. Useful for adding into individual command sections
-		// switch (commandObject.getType()) {
-		// case ADD:
-		// // a boolean to make sure that commandobject will only be
-		// // put into stack only if it is not an undo operation
-		// // addCommand(commandObject);
-		// commandObject.execute();
-		// // putToUndoStack(commandObject);
-		// if (!isDeveloper) {
-		// mLocalMem.saveLocalMemory();
-		// }
-		// return output + " added";
-		// case DELETE:
-		// // putToUndoStack(commandObject);
-		// deleteCommand(commandObject);
-		// if (!isDeveloper) {
-		// mLocalMem.saveLocalMemory();
-		// }
-		// return output + " deleted";
-		// case UPDATE:
-		// // putToUndoStack(commandObject);
-		// updateCommand(commandObject);
-		// if (!isDeveloper) {
-		// mLocalMem.saveLocalMemory();
-		// }
-		// output = input.replace(input.trim().split("[-]+")[0], "").trim();
-		// output = output.replace(output.trim().split("\\s+")[0], "").trim();
-		// // mLocalMem.print();
-		// return output + " updated";
-		// case SORT:
-		// sortCommand(commandObject);
-		// return output + " sorted";
-		// case SEARCH:
-		// boolean isFound = searchCommand(commandObject);
-		// if (isFound) {
-		// return String.format(MESSAGE_SEARCH_SUCCESS, output);
-		// } else {
-		// return String.format(MESSAGE_SEARCH_FAIL, output);
-		// }
-		// case UNDO:
-		// commandObject.execute();
-		// if (!isDeveloper) {
-		// mLocalMem.saveLocalMemory();
-		// }
-		// return "";
-		// case REDO:
-		// commandObject.execute();
-		// if (!isDeveloper) {
-		// mLocalMem.saveLocalMemory();
-		// }
-		// return "";
-		// default:
-		// return "invalid command";
-		// }
 	}
-
-	// private String removeFirstWord(String input) {
-	// int i = input.indexOf(' ');
-	// return input.substring(i).trim();
-	// }
-
-	// private void addCommand(Command commandObject) {
-	// mLocalMem.add(commandObject.getTask());
-	// }
-	//
-	// private void deleteCommand(Command commandObject) {
-	// mLocalMem.remove(commandObject.getTask());
-	// }
-	//
-	// private void updateCommand(Command commandObject) {
-	// mLocalMem.update(commandObject.getToUpdateTaskDesc(),
-	// commandObject.getTask());
-	// }
-	//
-	// private void sortCommand(Command commandObject) {
-	// mViewHandler.setView(commandObject.getTask().getLabels());
-	// }
-	//
-	// private boolean searchCommand(Command commandObject) {
-	// return mLocalMem.search(commandObject.getTask());
-	// }
-
+	
 	/**
 	 * parseInput calls the parser to read and understand user input
 	 * 
@@ -165,7 +83,7 @@ public class MyTasksLogicController implements ILogic {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<String> obtainPrintableOutput() {
+	public List<String> obtainPrintableOutput() {
 		return mViewHandler.getSnapshot(mLocalMem);
 	}
 
@@ -177,8 +95,11 @@ public class MyTasksLogicController implements ILogic {
 		return mViewHandler;
 	}
 
-	@Override
-	public ArrayList<String> obtainAllTaskDescription() {
+	//@author A0114302A
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> obtainAllTaskDescription() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
 			String curDesc = mLocalMem.getLocalMem().get(i).getDescription();
@@ -187,8 +108,10 @@ public class MyTasksLogicController implements ILogic {
 		return result;
 	}
 	
-	@Override
-	public ArrayList<String> obtainAllLabels() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> obtainAllLabels() {
 		ArrayList<String> labelsResult = new ArrayList<String>();
 		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
 			if(mLocalMem.getLocalMem().get(i).getLabels() != null) {

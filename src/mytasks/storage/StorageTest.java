@@ -1,5 +1,6 @@
 package mytasks.storage;
 
+//@author A0114302A
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
@@ -33,9 +34,9 @@ public class StorageTest {
 		try {
 			mem1 = new ArrayList<Task>();
 			Date d1 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
-			Date d2 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 14:00");
-			Date d3 = MyTasksParser.dateFormats.get(1).parse("06.10.2014 15:00");
-			Date d4 = MyTasksParser.dateFormats.get(1).parse("07.10.2014 15:00");
+			Date d2 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 14:00");
+			Date d3 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 15:00");
+			Date d4 = MyTasksParser.dateTimeFormats.get(0).parse("07.10.2014 15:00");
 			ArrayList<String> l1 = new ArrayList<String>();
 			l1.add("yolo");
 			l1.add("gg");
@@ -45,9 +46,9 @@ public class StorageTest {
 			mem1.add(t1);
 			mem1.add(t2);
 			mem1.add(t3);
-			test1 = "do homework/06.10.2014 00:00/ / /read book/06.10.2014 14:00/"
-					+ "06.10.2014 15:00/ /relax/06.10.2014 15:00/07.10.2014 15:00/"
-					+ "yolo,gg,/";
+			test1 = "do homework//06.10.2014 00:00// // //read book//06.10.2014 14:00//"
+					+ "06.10.2014 15:00// //relax//06.10.2014 15:00//07.10.2014 15:00//"
+					+ "yolo,gg,//";
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

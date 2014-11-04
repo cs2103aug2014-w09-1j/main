@@ -1,5 +1,6 @@
 package mytasks.parser;
 
+//@author A0114302A
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
@@ -16,6 +17,9 @@ import mytasks.logic.UpdateCommand;
 
 import org.junit.Test;
 
+/**
+ * ParserTest holds all unit test cases for the parser component. (Component testing only)
+ */
 public class ParserTest {
 	MyTasksParser tester = new MyTasksParser();
 
@@ -77,7 +81,6 @@ public class ParserTest {
 		}
 	}
 	
-	//TODO: pass this testcase
 	@Test
 	public void addDateTest4() {
 		try {
@@ -203,7 +206,6 @@ public class ParserTest {
 		}
 	}
 	
-	//TODO pass this testcase. dates with next still fails
 	@Test
 	public void addTimedTest4() {
 		try {
@@ -237,7 +239,6 @@ public class ParserTest {
 		}
 	}
 	
-	//TODO pass this
 	@Test
 	public void addTimedTest5() {
 		try {
