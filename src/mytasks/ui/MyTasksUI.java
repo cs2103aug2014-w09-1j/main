@@ -54,6 +54,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 
 	private Mode mode = Mode.INSERT;
 	private List<String> words;
+	private ArrayList<String> commands;
 
 	private static enum Mode {
 		INSERT, COMPLETION
@@ -151,8 +152,21 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		ActionMap am = textField.getActionMap();
 		im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
 		am.put("commit", new CommitAction());
+		
+		commands = new ArrayList<String>();
+		commands.add("ad");
+		commands.add("se");
+		commands.add("de");
+		commands.add("do");
+		commands.add("un");
+		commands.add("re");
+		commands.add("up");
+		commands.add("so");
+		commands.add("?");
+		commands.add("he");
+		commands.add("help");
 
-		words = new ArrayList<String>();
+		words = new ArrayList<String>(commands);
 		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
@@ -228,7 +242,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
 		
-		words = new ArrayList<String>();
+		words = new ArrayList<String>(commands);
 		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
@@ -311,7 +325,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		}
 
 		// Too few chars
-		if (pos - w < 2)
+		if (pos - w < 1)
 			return;
 
 		String prefix = content.substring(w + 1).toLowerCase();
@@ -344,7 +358,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				textField.setCaretPosition(pos + 1);
 				mode = Mode.INSERT;
 			} else {
-				textField.replaceSelection(textField.getText());
+				textField.replaceSelection("");
 			}
 		}
 	}
