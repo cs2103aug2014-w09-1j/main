@@ -274,6 +274,39 @@ public class ParserTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void addTimedTest6() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String nextXDayOnly = MyTasksParser.dateFormats.get(0).format(nextXDay);
+			Date nextXDay1 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 16:00");
+			Date nextXDay2 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 17:00");
+			Command test21 = new AddCommand("play more", nextXDay1, nextXDay2,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("add play more next monday from 4pm to 5pm"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void deleteTest1() {
