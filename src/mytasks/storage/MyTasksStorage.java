@@ -8,10 +8,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.*;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
-import mytasks.file.Logger;
 import mytasks.file.MyTasks;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
@@ -30,6 +30,8 @@ public class MyTasksStorage implements IStorage, Serializable {
 	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
+	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+			.getName());
 
 	// Constructor
 	private MyTasksStorage() {
@@ -84,8 +86,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks%sizeBlocks != 0){
-			Logger logger = Logger.getInstance();
-			logger.log(MESSAGE_CORPTDATA);
+			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA);
 			return result;
 		}
 		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
@@ -177,8 +178,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 			writer.print(output);
 			writer.close();
 		} catch (IOException e) {
-			Logger logger = Logger.getInstance();
-			logger.log(MESSAGE_FILEERROR);
+			LOGGER.log(Level.SEVERE, MESSAGE_FILEERROR, e);
 		}
 	}
 }

@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.*;
 
 import mytasks.parser.MyTasksParser;
 
@@ -21,6 +22,10 @@ public class Task {
 	private Date mFromDateTime = null;
 	private Date mToDateTime = null;
 	private ArrayList<String> mLabels;
+	
+	private static final Logger LOGGER = Logger.getLogger(Task.class
+			.getName());
+	private final String MESSAGE_UNEXPERROR = "Unexpected error in dates";
 
 	// Constructor
 	public Task(String details, Date fromDateTime, Date toDateTime,
@@ -90,7 +95,7 @@ public class Task {
 				newDate2 = form.parse(form.format(mToDateTime));
 			}
 		} catch (ParseException e) {
-			Logger.getInstance().log("Task: Unexpected Error");
+			LOGGER.log(Level.SEVERE, MESSAGE_UNEXPERROR, e);
 		}
 		ArrayList<String> newLabels = null;
 		if (mLabels!=null){
