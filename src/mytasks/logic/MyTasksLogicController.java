@@ -186,5 +186,20 @@ public class MyTasksLogicController implements ILogic {
 		}
 		return result;
 	}
-
+	
+	@Override
+	public ArrayList<String> obtainAllLabels() {
+		ArrayList<String> labelsResult = new ArrayList<String>();
+		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
+			if(mLocalMem.getLocalMem().get(i).getLabels() != null) {
+				if(!mLocalMem.getLocalMem().get(i).getLabels().isEmpty()) {
+					for(int k = 0; k < mLocalMem.getLocalMem().get(i).getLabels().size(); k++) {
+						String curLabels = mLocalMem.getLocalMem().get(i).getLabels().get(k);
+						labelsResult.add(curLabels);
+					}
+				}
+			}			
+		}
+		return labelsResult;
+	}
 }

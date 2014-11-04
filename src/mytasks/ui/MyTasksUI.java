@@ -33,7 +33,7 @@ import mytasks.logic.MyTasksLogicController;
  * MyTasksUI is the GUI for MyTasks.
  *
  * 
- * @author Huiwen
+ * @author A0115034X Huiwen
  *
  */
 public class MyTasksUI extends JPanel implements ActionListener,
@@ -156,6 +156,9 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
+		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
+			words.add(mLogic.obtainAllLabels().get(i));
+		}
 		Collections.sort(words);
 
 		// Add Components to this panel.
@@ -210,7 +213,6 @@ public class MyTasksUI extends JPanel implements ActionListener,
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
-		words = new ArrayList<String>();
 		String text = textField.getText();
 		String feedbackText = mLogic.executeCommand(text);
 
@@ -224,9 +226,13 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
-
-		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
+		
+		words = new ArrayList<String>();
+		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
+		}
+		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
+			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);
 
