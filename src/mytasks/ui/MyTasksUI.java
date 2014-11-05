@@ -92,25 +92,18 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);
-			Border colourLine = BorderFactory.createLineBorder(new Color(
-					(int) (Math.random() * 200), (int) (Math.random() * 255),
-					(int) (Math.random() * 255)), 3);
-			titled = BorderFactory.createTitledBorder(colourLine,
-					"Welcome! Add your tasks below (:");
+			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				String firstWord = mLogic.obtainPrintableOutput().get(i)
-						.split("\\s+")[0];
-
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+  
 				textArea = new JTextArea();
 				textArea.setEditable(false);
 
-				Border colourLine = BorderFactory.createLineBorder(new Color(
-						(int) (Math.random() * 200),
-						(int) (Math.random() * 255),
-						(int) (Math.random() * 255)), 3);
+				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 				titled = BorderFactory
 						.createTitledBorder(colourLine, firstWord);
 
@@ -227,15 +220,20 @@ public class MyTasksUI extends JPanel implements ActionListener,
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
+		boolean isRed = false;
+		Border colourLine;
+		
 		String text = textField.getText();
-		String feedbackText = mLogic.executeCommand(text);
-		if (feedbackText != null){
-			if (feedbackText.equals("Invalid input")) {
+		FeedbackObject feedback = mLogic.executeCommand(text);		
+//		String feedbackText = mLogic.executeCommand(text);
+		
+		if (feedback != null){
+			if (feedback.getValidity().equals(true)) {
 				textAreaFeedback.setForeground(new Color(255, 0, 0));
-				textAreaFeedback.setText(feedbackText);
+				textAreaFeedback.setText(feedback.getString());
 			} else {
 				textAreaFeedback.setForeground(new Color(0, 0, 0));
-				textAreaFeedback.setText(feedbackText);
+				textAreaFeedback.setText(feedback.getString());
 			}
 		}
 		textAreaPanel.removeAll();
@@ -249,34 +247,42 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
-		Collections.sort(words);
-
+		Collections.sort(words);		
+		
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);
-			titled = BorderFactory
-					.createTitledBorder("Welcome! Add your tasks below (:");
+			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				String firstWord = mLogic.obtainPrintableOutput().get(i)
-						.split("\\s+")[0];
 				textArea = new JTextArea();
-				textArea.setEditable(false);
-
-				Border colourLine = BorderFactory.createLineBorder(new Color(
-						(int) (Math.random() * 200),
-						(int) (Math.random() * 255),
-						(int) (Math.random() * 255)), 3);
-				titled = BorderFactory
-						.createTitledBorder(colourLine, firstWord);
-
-				String content = mLogic.obtainPrintableOutput().get(i)
-						.replace(firstWord, "").trim();
-				textArea.setText(content);
-				textArea.setBorder(titled);
-				textAreaPanel.add(textArea);
+				textArea.setEditable(false);				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				
+				if(firstWord.equals("#important")) {
+					isRed = true;
+					colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
+					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+					
+					String content = mLogic.obtainPrintableOutput().get(i);
+					textArea.setText(content);
+					textArea.setBorder(titled);
+					textAreaPanel.add(textArea);
+				} else {
+					if(isRed) {
+						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+					} else {
+						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+					}
+					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+					String content = mLogic.obtainPrintableOutput().get(i);
+					textArea.setText(content);
+					textArea.setBorder(titled);
+					textAreaPanel.add(textArea);
+				}
+//				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 			}
 		}
 
