@@ -134,19 +134,33 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		int scrollIncrement = textArea.getScrollableUnitIncrement(scrollPane.getVisibleRect(), SwingConstants.VERTICAL, 1);
 		
 		//add key bindings to scroll pane 
-		InputMap inMap = scrollPane.getInputMap();
-		ActionMap actMap = scrollPane.getActionMap();
+		InputMap scrollPaneInmap = scrollPane.getInputMap();
+		ActionMap scrollPaneActmap = scrollPane.getActionMap();
 		
-		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
-        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
-        actMap.put("up", new UpDownAction("up", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));
-        actMap.put("down", new UpDownAction("down", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));        
+		
+		scrollPaneInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
+        scrollPaneInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
+        scrollPaneActmap.put("up", new UpDownAction("up", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));
+        scrollPaneActmap.put("down", new UpDownAction("down", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));     
+        
+       
         
 		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
-		textAreaFeedback = new JTextArea(10, 50);
+		textAreaFeedback = new JTextArea(10, 40);
 		textAreaFeedback.setEditable(false);
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
 		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		// have JTextArea tell us how tall a line of text is.
+        int scrollableIncrement = textAreaFeedback.getScrollableUnitIncrement(scrollPaneFeedback.getVisibleRect(), SwingConstants.VERTICAL, 1);
+		
+		InputMap feedbackInmap = scrollPaneFeedback.getInputMap();
+		ActionMap feedbackActmap = scrollPaneFeedback.getActionMap();
+		
+		feedbackInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
+	    feedbackInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
+	    feedbackActmap.put("up", new UpDownAction("up", scrollPaneFeedback.getVerticalScrollBar().getModel(), scrollableIncrement));
+	    feedbackActmap.put("down", new UpDownAction("down", scrollPaneFeedback.getVerticalScrollBar().getModel(), scrollableIncrement));
 
 		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
 		textField = new JTextField(20);
