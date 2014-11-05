@@ -12,6 +12,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import mytasks.file.FeedbackObject;
+
 /**
  * HelpCommand extends Command object to follow OOP standards.
  * 
@@ -34,19 +36,19 @@ public class HelpCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		// TODO Auto-generated method stub
 		HelpWindow help = new HelpWindow(null);
 		help.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		help.setSize(300,300);
 		help.setLocation(300, 300);
 		help.setVisible(true);
-		
-		return "Opening help";
+		FeedbackObject result = new FeedbackObject("Opening help", true);
+		return result;
 	}
 
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Help does not have an undo function");
 	}

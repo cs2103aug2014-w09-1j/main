@@ -3,6 +3,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
@@ -27,12 +28,12 @@ public class DeleteCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		if (haveSearched == true
 				&& isNumeric(super.getTaskDetails())
 				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem
 						.getSearchList().size())) {
-			String feedback = new DeleteCommand(mLocalMem.getSearchList()
+			FeedbackObject feedback = new DeleteCommand(mLocalMem.getSearchList()
 					.get(Integer.parseInt(super.getTaskDetails()) - 1)
 					.getDescription(), null, null, null, null).execute();
 			haveSearched = false;
@@ -58,22 +59,27 @@ public class DeleteCommand extends Command {
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
 		if (hasTask) {
-			return String
+			String resultString = String
 					.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,true);
 		} else {
-			return String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
+			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,false);
 		}
+		return null;
 	}
 
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		Task prevState = super.getTask();
 		Command toRedo = new DeleteCommand(prevState.getDescription(), null,
 				null, null, null);
 		mLocalMem.add(prevState);
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
-		return this.getTask().getDescription() + " added";
+		String resultString = this.getTask().getDescription() + " added"; 
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
 	}
 
 	public static boolean isNumeric(String str) {

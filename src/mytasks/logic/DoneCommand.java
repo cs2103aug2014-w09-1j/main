@@ -2,6 +2,8 @@ package mytasks.logic;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
@@ -26,9 +28,9 @@ public class DoneCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		if (haveSearched == true && isNumeric(super.getTaskDetails()) && Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
-			String feedback = new DoneCommand(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
+			FeedbackObject feedback = new DoneCommand(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
 			haveSearched = false;
 			return feedback;
 		}
@@ -57,18 +59,24 @@ public class DoneCommand extends Command {
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
 		if (hasTask && isDone(super.getTask())){
-			return String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
+			String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
 		}
 		else if (hasTask){
-			return String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
+			String resultString = String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
 		}
 		else{
-			return String.format(MESSAGE_DONE_FAIL, super.getTaskDetails());
+			String resultString = String.format(MESSAGE_DONE_FAIL, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
 		}
 	}
 
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		return null;
 	}
 	

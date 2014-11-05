@@ -3,6 +3,8 @@ package mytasks.logic;
 //@author A0114302A
 import java.util.List;
 
+import mytasks.file.FeedbackObject;
+
 /**
  * ILogic interface defines abstract methods to be used by logic component
  */
@@ -13,7 +15,7 @@ public interface ILogic {
 	 * @param userInput
 	 * @return message/updated UI to be printed
 	 */
-	public String executeCommand(String userInput);
+	public FeedbackObject executeCommand(String userInput);
 	
 	/**
 	 * obtainPrintableOutput reads and converts local memory into a form that is directly printable by UI.

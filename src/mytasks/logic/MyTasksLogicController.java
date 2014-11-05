@@ -4,6 +4,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import mytasks.file.FeedbackObject;
 import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
 import mytasks.storage.MyTasksStorage;
@@ -56,15 +57,16 @@ public class MyTasksLogicController implements ILogic {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String executeCommand(String input) {
+	public FeedbackObject executeCommand(String input) {
 		mLocalMem.print();
 		Command commandObject = parseInput(input);
 		// String output = removeFirstWord(input);
 
 		if (commandObject == null) {
-			return "Invalid input";
+			FeedbackObject result = new FeedbackObject("Invalid input", false);
+			return result;
 		}
-		String feedback = commandObject.execute();
+		FeedbackObject feedback = commandObject.execute();
 		//mLocalMem.print();
 		return feedback;
 	}

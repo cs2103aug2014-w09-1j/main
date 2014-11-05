@@ -4,6 +4,8 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.FeedbackObject;
+
 /**
  * UndoCommand extends Command object to follow OOP standards.Undo command does not exist within the stack
  * for undo/redo but is used to manipulate these stacks 
@@ -20,21 +22,22 @@ public class UndoCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		String feedback;
-
+		FeedbackObject result = null;
 		if (mLocalMem.getUndoStack().isEmpty()) {
 			feedback = "No changes yet";
+			result = new FeedbackObject(feedback, false);
 		} else {
 			Command commandToRevert = mLocalMem.getUndoStack().pop();
-			feedback = commandToRevert.undo();
+			result = commandToRevert.undo();
 		}
 		haveSearched = false;
-		return feedback;
+		return result;
 	}
 
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		throw new UnsupportedOperationException("UndoCommand does not have an undo function");
 	}
 

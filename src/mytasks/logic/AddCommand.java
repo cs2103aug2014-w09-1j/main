@@ -3,6 +3,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
@@ -24,19 +25,21 @@ public class AddCommand extends Command {
 
 	//@author A0108543J
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		mLocalMem.add(super.getTask());
 		AddCommand commandToUndo = new AddCommand(null, null, null, null, super
 				.getTask().getDescription());
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.saveLocalMemory();
 		haveSearched = false;
-		return super.getTaskDetails() + " added";
+		String resultString = super.getTaskDetails() + " added";
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
 	}
 	
 	//@author A0114302A
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
@@ -50,6 +53,8 @@ public class AddCommand extends Command {
 				prevState.getLabels(), null);
 		mLocalMem.saveLocalMemory();
 		mLocalMem.redoPush(toRedo);
-		return this.getToUpdateTaskDesc() + " deleted";
+		String resultString =this.getToUpdateTaskDesc() + " deleted";
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
 	}
 }

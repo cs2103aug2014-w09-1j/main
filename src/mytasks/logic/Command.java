@@ -4,6 +4,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
@@ -45,7 +46,7 @@ public abstract class Command {
 		return mToUpdateTaskDesc;
 	}
 
-	abstract String execute();
+	abstract FeedbackObject execute();
 
-	abstract String undo();
+	abstract FeedbackObject undo();
 }

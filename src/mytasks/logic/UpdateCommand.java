@@ -3,6 +3,7 @@ package mytasks.logic;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
@@ -26,9 +27,9 @@ public class UpdateCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) && Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
-			String feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), super.getTask().getToDateTime(), 
+			FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), super.getTask().getToDateTime(), 
 					super.getTask().getLabels(), mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
 			haveSearched = false;
 			return feedback;
@@ -44,7 +45,9 @@ public class UpdateCommand extends Command {
 			}
 		}
 		if (!hasTask){
-			return String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc());
+			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
 		}
 		
 		UpdateCommand commandToUndo = null;
@@ -90,12 +93,14 @@ public class UpdateCommand extends Command {
 		}
 		mLocalMem.saveLocalMemory();
 		haveSearched = false;
-		return String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
 	}
 
 	//@author A0108543J
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
@@ -111,7 +116,9 @@ public class UpdateCommand extends Command {
 				prevState.getLabels(), this.getTask().getDescription());
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
-		return this.getToUpdateTaskDesc() + " reverted";
+		String resultString = this.getToUpdateTaskDesc() + " reverted";
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
 	}
 	
 	public static boolean isNumeric(String str)  

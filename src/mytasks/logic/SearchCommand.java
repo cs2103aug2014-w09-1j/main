@@ -1,14 +1,12 @@
 package mytasks.logic;
 
 import java.util.ArrayList;
-
 import java.util.Date;
+
+import mytasks.file.FeedbackObject;
 
 /**
  * SearchCommand extends Command object to follow OOP standards
- * 
- * @author Wilson
- *
  */
 
 //@author A0112139R
@@ -25,20 +23,23 @@ public class SearchCommand extends Command {
 	}
 
 	@Override
-	String execute() {
+	FeedbackObject execute() {
 		String searchedTasks = mLocalMem.search(super.getTask());
+		FeedbackObject result = null;
 		if (!searchedTasks.isEmpty()) {
 			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
+			result = new FeedbackObject(searchedTasks,true);
 			haveSearched = true;
 		} else {
 			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
+			result = new FeedbackObject(searchedTasks,false);
 			haveSearched = false;
 		}
-		return searchedTasks;
+		return result;
 	}
 
 	@Override
-	String undo() {
+	FeedbackObject undo() {
 		throw new UnsupportedOperationException("Search does not have an undo function");
 	}
 }
