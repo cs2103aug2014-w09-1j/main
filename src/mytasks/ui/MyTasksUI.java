@@ -13,9 +13,11 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -25,7 +27,13 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
+import java.awt.event.*;
+
+import javax.swing.*;
+
+import mytasks.file.FeedbackObject;
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogicController;
 
@@ -75,12 +83,10 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		super(new GridBagLayout());
 
 		mLogic = MyTasksLogicController.getInstance(false);
-		textAreaLabel = new JLabel("<html><center>"
-				+ "<font color=#7c5cff>Tasks</font>");
+		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
 
-		// A border that puts 10 extra pixels at the sides and bottom of each
-		// pane.
+		// A border that puts 10 extra pixels at the sides and bottom of each pane.
 		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
@@ -104,14 +110,12 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				textArea.setEditable(false);
 
 				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-				titled = BorderFactory
-						.createTitledBorder(colourLine, firstWord);
-
-				String content = mLogic.obtainPrintableOutput().get(i)
-						.replace(firstWord, "").trim();
+				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+				
+				String content = mLogic.obtainPrintableOutput().get(i);
+//				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 				textArea.setText(content);
 				textArea.setBorder(titled);
-				textAreaPanel.add(textArea);
 
 				GridBagConstraints c = new GridBagConstraints();
 				c.gridwidth = GridBagConstraints.REMAINDER;
@@ -126,17 +130,25 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(500, 400));
-
-		feedbackLabel = new JLabel("<html><center>"
-				+ "<font color=#7c5cff>Feedback Box</font>");
+		
+		int scrollIncrement = textArea.getScrollableUnitIncrement(scrollPane.getVisibleRect(), SwingConstants.VERTICAL, 1);
+		
+		//add key bindings to scroll pane 
+		InputMap inMap = scrollPane.getInputMap();
+		ActionMap actMap = scrollPane.getActionMap();
+		
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
+        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
+        actMap.put("up", new UpDownAction("up", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));
+        actMap.put("down", new UpDownAction("down", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));        
+        
+		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
 		textAreaFeedback = new JTextArea(10, 50);
 		textAreaFeedback.setEditable(false);
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
-		scrollPaneFeedback.setBorder(BorderFactory
-				.createLineBorder(Color.black));
+		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		textfieldLabel = new JLabel("<html><center>"
-				+ "<font color=#7c5cff>Input Tasks</font>");
+		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
@@ -203,6 +215,34 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		c.weighty = 1.0;
 		add(textField, c);
 	}
+	
+	// What happens when page down/page up key is pressed 
+    private class UpDownAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		private BoundedRangeModel vScrollBarModel;
+        private int scrollableIncrement;
+        public UpDownAction(String name, BoundedRangeModel model, int scrollableIncrement) {
+            super(name);
+            this.vScrollBarModel = model;
+            this.scrollableIncrement = scrollableIncrement;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            String name = getValue(AbstractAction.NAME).toString();
+            int value = vScrollBarModel.getValue();
+            if (name.equals("up")) {
+                value -= scrollableIncrement;
+                vScrollBarModel.setValue(value);
+            } else if (name.equals("down")) {
+                value += scrollableIncrement;
+                vScrollBarModel.setValue(value);
+            } else {
+            	vScrollBarModel.setValue(0);
+            }
+        }
+    }
+
 
 	/**
 	 * run starts the process of accepting and executing input
@@ -225,15 +265,14 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);		
-//		String feedbackText = mLogic.executeCommand(text);
 		
 		if (feedback != null){
-			if (feedback.getValidity().equals(true)) {
+			if (feedback.getValidity() == false) {
 				textAreaFeedback.setForeground(new Color(255, 0, 0));
-				textAreaFeedback.setText(feedback.getString());
+				textAreaFeedback.setText(feedback.getFeedback());
 			} else {
 				textAreaFeedback.setForeground(new Color(0, 0, 0));
-				textAreaFeedback.setText(feedback.getString());
+				textAreaFeedback.setText(feedback.getFeedback());
 			}
 		}
 		textAreaPanel.removeAll();
@@ -248,7 +287,8 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);		
-		
+		textArea.setCaretPosition(0);
+
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);
@@ -280,13 +320,20 @@ public class MyTasksUI extends JPanel implements ActionListener,
 					String content = mLogic.obtainPrintableOutput().get(i);
 					textArea.setText(content);
 					textArea.setBorder(titled);
-					textAreaPanel.add(textArea);
+
+					GridBagConstraints c = new GridBagConstraints();
+					c.gridwidth = GridBagConstraints.REMAINDER;
+					c.fill = GridBagConstraints.VERTICAL;
+					c.gridx = 0;
+					c.weightx = 1.0;
+					c.weighty = 1.0;
+
+					textAreaPanel.add(textArea, c);
+					textArea.setCaretPosition(0);
 				}
 //				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 			}
 		}
-
-		textArea.setCaretPosition(0);
 		textField.selectAll();
 	}
 
