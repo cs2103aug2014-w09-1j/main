@@ -13,11 +13,9 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -27,12 +25,8 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-
-import java.awt.event.*;
 
 import javax.swing.*;
-
 import mytasks.file.FeedbackObject;
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogicController;
@@ -81,10 +75,12 @@ public class MyTasksUI extends JPanel implements ActionListener,
 	
 	private MyTasksUI() {
 		super(new GridBagLayout());
-
 		mLogic = MyTasksLogicController.getInstance(false);
+		
+		// for tasks label and box 
 		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
+		textAreaLabel.setFocusable(false);
 
 		// A border that puts 10 extra pixels at the sides and bottom of each pane.
 		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
@@ -94,26 +90,31 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
+		textAreaPanel.setFocusable(false);
 
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);
-			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			textArea.setFocusable(false);
+
+			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
+			textArea.setFocusable(false);
 			textAreaPanel.add(textArea);
+			textArea.setCaretPosition(0);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
   
 				textArea = new JTextArea();
 				textArea.setEditable(false);
+				textArea.setFocusable(false);
 
 				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 				
 				String content = mLogic.obtainPrintableOutput().get(i);
-//				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 				textArea.setText(content);
 				textArea.setBorder(titled);
 
@@ -125,48 +126,33 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				c.weighty = 1.0;
 
 				textAreaPanel.add(textArea, c);
+				textArea.setCaretPosition(0);
 			}
 		}
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(500, 400));
-		
-		int scrollIncrement = textArea.getScrollableUnitIncrement(scrollPane.getVisibleRect(), SwingConstants.VERTICAL, 1);
-		
-		//add key bindings to scroll pane 
-		InputMap scrollPaneInmap = scrollPane.getInputMap();
-		ActionMap scrollPaneActmap = scrollPane.getActionMap();
-		
-		
-		scrollPaneInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
-        scrollPaneInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
-        scrollPaneActmap.put("up", new UpDownAction("up", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));
-        scrollPaneActmap.put("down", new UpDownAction("down", scrollPane.getVerticalScrollBar().getModel(), scrollIncrement));     
+		scrollPane.setFocusable(true);       
         
-       
-        
+		// for feedback label and box 
 		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
+		feedbackLabel.setFocusable(false);
 		textAreaFeedback = new JTextArea(10, 40);
 		textAreaFeedback.setEditable(false);
+		textAreaFeedback.setFocusable(false);
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
 		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPaneFeedback.setFocusable(true);
 		
-		// have JTextArea tell us how tall a line of text is.
-        int scrollableIncrement = textAreaFeedback.getScrollableUnitIncrement(scrollPaneFeedback.getVisibleRect(), SwingConstants.VERTICAL, 1);
-		
-		InputMap feedbackInmap = scrollPaneFeedback.getInputMap();
-		ActionMap feedbackActmap = scrollPaneFeedback.getActionMap();
-		
-		feedbackInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "up");
-	    feedbackInmap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "down");
-	    feedbackActmap.put("up", new UpDownAction("up", scrollPaneFeedback.getVerticalScrollBar().getModel(), scrollableIncrement));
-	    feedbackActmap.put("down", new UpDownAction("down", scrollPaneFeedback.getVerticalScrollBar().getModel(), scrollableIncrement));
-
+		// for textfield label and box 
 		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
+		textfieldLabel.setFocusable(false);
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
+		textField.setFocusable(true);
 
+		// for autocomplete 
 		InputMap im = textField.getInputMap();
 		ActionMap am = textField.getActionMap();
 		im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
@@ -230,34 +216,6 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		add(textField, c);
 	}
 	
-	// What happens when page down/page up key is pressed 
-    private class UpDownAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		private BoundedRangeModel vScrollBarModel;
-        private int scrollableIncrement;
-        public UpDownAction(String name, BoundedRangeModel model, int scrollableIncrement) {
-            super(name);
-            this.vScrollBarModel = model;
-            this.scrollableIncrement = scrollableIncrement;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            String name = getValue(AbstractAction.NAME).toString();
-            int value = vScrollBarModel.getValue();
-            if (name.equals("up")) {
-                value -= scrollableIncrement;
-                vScrollBarModel.setValue(value);
-            } else if (name.equals("down")) {
-                value += scrollableIncrement;
-                vScrollBarModel.setValue(value);
-            } else {
-            	vScrollBarModel.setValue(0);
-            }
-        }
-    }
-
-
 	/**
 	 * run starts the process of accepting and executing input
 	 */
@@ -284,9 +242,11 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			if (feedback.getValidity() == false) {
 				textAreaFeedback.setForeground(new Color(255, 0, 0));
 				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
 			} else {
 				textAreaFeedback.setForeground(new Color(0, 0, 0));
 				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
 			}
 		}
 		textAreaPanel.removeAll();
@@ -300,19 +260,23 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
-		Collections.sort(words);		
-		textArea.setCaretPosition(0);
-
+		Collections.sort(words);
+		
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();
 			textArea.setEditable(false);
+			textArea.setFocusable(false);
+			
 			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			textArea.setBorder(titled);
 			textAreaPanel.add(textArea);
+			textArea.setCaretPosition(0);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
 				textArea = new JTextArea();
 				textArea.setEditable(false);				
+				textArea.setFocusable(false);
+
 				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				
 				if(firstWord.equals("#important")) {
