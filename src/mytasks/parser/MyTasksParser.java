@@ -18,6 +18,7 @@ import mytasks.logic.HelpCommand;
 import mytasks.logic.HideCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
+import mytasks.logic.ShowCommand;
 import mytasks.logic.SortCommand;
 import mytasks.logic.UndoCommand;
 import mytasks.logic.UpdateCommand;
@@ -127,7 +128,7 @@ public class MyTasksParser implements IParser {
             case "so":
             case "hi":
             case "sh":
-                Command temp3 = convertSort(withoutComdType, comdType);
+                Command temp3 = convertLabels(withoutComdType, comdType);
                 return temp3;
             case "?":
             case "he":
@@ -844,7 +845,7 @@ public class MyTasksParser implements IParser {
      * @param comdType
      * @return the command object representing the sortcommand
      */
-    private Command convertSort(String message, String comdType) {
+    private Command convertLabels(String message, String comdType) {
         ArrayList<String> labels = new ArrayList<String>();
         String[] words = message.trim().split("\\s+");
         if (words.length > 0) {
@@ -853,6 +854,15 @@ public class MyTasksParser implements IParser {
                 labels.add(words[i]);
             }
         }
-        return new SortCommand(null, null, null, labels, null);
+        Command toReturn = null;
+        if (comdType == "sh") {
+        	toReturn = new ShowCommand(null, null, null, labels, null);
+        } else if (comdType == "hi") {
+        	toReturn = new HideCommand(null, null, null, labels, null);
+        } else if (comdType == "so") {
+        	toReturn = new SortCommand(null, null, null, labels, null);
+        	
+        }
+        return toReturn;
     }
 }

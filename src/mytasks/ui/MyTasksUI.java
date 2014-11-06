@@ -4,6 +4,7 @@ import java.awt.*;
 //waits for user to do something
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,8 +26,6 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-
-import javax.swing.*;
 import mytasks.file.FeedbackObject;
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogicController;
@@ -39,7 +38,7 @@ import mytasks.logic.MyTasksLogicController;
  *
  */
 public class MyTasksUI extends JPanel implements ActionListener,
-		DocumentListener {
+		DocumentListener, Serializable {
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
 	protected JTextArea textArea;
