@@ -15,6 +15,7 @@ import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
 import mytasks.logic.DoneCommand;
 import mytasks.logic.HelpCommand;
+import mytasks.logic.HideCommand;
 import mytasks.logic.RedoCommand;
 import mytasks.logic.SearchCommand;
 import mytasks.logic.SortCommand;
@@ -108,6 +109,7 @@ public class MyTasksParser implements IParser {
             case "se":
             case "de":
             case "do":
+            case "hi":
                 Command temp = convertStandard(withoutComdType, comdType);
                 return temp;
             case "un":
@@ -184,6 +186,8 @@ public class MyTasksParser implements IParser {
             return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
         case "do":
             return new DoneCommand(taskDesc, dateFrom, dateTo, labels, null);
+        case "hi":
+        	return new HideCommand(taskDesc, dateFrom, dateTo, labels, null);
         }
         return null;
     }

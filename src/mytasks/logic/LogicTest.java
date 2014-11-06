@@ -209,6 +209,14 @@ public class LogicTest {
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 
+	//@author A0108543J
+	@Test
+	public void testHideCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun");
+		taskLogic.executeCommand("ad homework");
+		assertEquals("Label with 'fun' hidden", taskLogic.executeCommand("hi fun"));
+	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1
 }
