@@ -1,9 +1,15 @@
 package mytasks.logic;
 
 //@author A0114302A
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import mytasks.file.FeedbackObject;
 import mytasks.parser.IParser;
@@ -25,6 +31,9 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private boolean isDeveloper;
 	private static MyTasksLogicController INSTANCE = null;
 	private HideCommand mHideCommand;
+	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+			.getName());
+	private Handler fh = null;
 
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
@@ -41,6 +50,27 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	protected Object readResolve() {
 		return INSTANCE;
 	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
+	}
+
 
 	/**
 	 * initProgram initializes all local variables to prevent and data overflow
@@ -69,8 +99,14 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			FeedbackObject result = new FeedbackObject("Invalid input", false);
 			return result;
 		}
-		FeedbackObject feedback = commandObject.execute();
-		//mLocalMem.print();
+		FeedbackObject feedback = null;
+		try {
+			feedback = commandObject.execute();
+		} catch (UnsupportedOperationException e) {
+			runLogger();
+			LOGGER.log(Level.SEVERE, "unsup");
+			closeHandler();
+		}
 		return feedback;
 	}
 	

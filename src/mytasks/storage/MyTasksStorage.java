@@ -19,12 +19,11 @@ import mytasks.parser.MyTasksParser;
 
 /**
  * MyTasksStorage handles the storage of tasks into external memory as well as
- * converting it to readable
- * local memory for logical processes
+ * converting it to readable local memory for logical processes
  */
 @SuppressWarnings("serial")
 public class MyTasksStorage implements IStorage, Serializable {
-	
+
 	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
@@ -35,21 +34,22 @@ public class MyTasksStorage implements IStorage, Serializable {
 	// Constructor
 	private MyTasksStorage() {
 	}
-	
-	public static MyTasksStorage getInstance(){
-		if (INSTANCE == null){
-			INSTANCE= new MyTasksStorage();
+
+	public static MyTasksStorage getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new MyTasksStorage();
 		}
 		return INSTANCE;
 	}
-	
+
 	protected Object readResolve() {
 		return INSTANCE;
 	}
-	
+
 	private void runLogger() {
 		try {
-			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
 			LOGGER.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
@@ -60,7 +60,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void closeHandler() {
 		fh.flush();
 		fh.close();
@@ -79,7 +79,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 		ArrayList<Task> result = convertToTasks(pastMem);
 		return result;
 	}
-	
+
 	private String readString(String fileName) throws IOException {
 		File tempFile = new File(fileName);
 		String result = null;
@@ -90,32 +90,38 @@ public class MyTasksStorage implements IStorage, Serializable {
 		}
 		return result;
 	}
-	
+
 	protected ArrayList<Task> convertToTasks(String memString) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		if (memString == null) {
 			return result;
 		}
-		if (memString.length()==0) {
+		if (memString.length() == 0) {
 			return result;
 		}
 		String delims = "(//)";
 		String[] memBlock = memString.split(delims);
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
-		if (noBlocks%sizeBlocks != 0){
+		if (noBlocks % sizeBlocks != 0) {
 			runLogger();
 			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA);
 			closeHandler();
 			return result;
 		}
-		for (int i = 0; i<noBlocks/sizeBlocks; i++) {
+		handleIndivBlocks(result, memBlock, noBlocks, sizeBlocks);
+		return result;
+	}
+
+	public void handleIndivBlocks(ArrayList<Task> result, String[] memBlock,
+			int noBlocks, int sizeBlocks) {
+		for (int i = 0; i < noBlocks / sizeBlocks; i++) {
 			String taskDesc = null;
 			Date dateFrom = null;
 			Date dateTo = null;
 			ArrayList<String> labels = null;
-			for (int j = 0; j<sizeBlocks; j++) {
-				int temp = (i*sizeBlocks)+j;
+			for (int j = 0; j < sizeBlocks; j++) {
+				int temp = (i * sizeBlocks) + j;
 				String curBlock = memBlock[temp];
 				if (j == 0) {
 					taskDesc = curBlock;
@@ -129,15 +135,14 @@ public class MyTasksStorage implements IStorage, Serializable {
 			}
 			result.add(new Task(taskDesc, dateFrom, dateTo, labels));
 		}
-		return result;
 	}
 
 	public ArrayList<String> getLabels(ArrayList<String> labels, String curBlock) {
 		if (!curBlock.equals(" ")) {
 			String delims2 = "[,]+";
 			String[] indivLabels = curBlock.split(delims2);
-			ArrayList<String> tempLabels = new ArrayList<String> ();
-			for (int k = 0; k<indivLabels.length; k++) {
+			ArrayList<String> tempLabels = new ArrayList<String>();
+			for (int k = 0; k < indivLabels.length; k++) {
 				tempLabels.add(indivLabels[k]);
 			}
 			labels = tempLabels;
@@ -145,13 +150,12 @@ public class MyTasksStorage implements IStorage, Serializable {
 		return labels;
 	}
 
-	public Date getDate(Date dateFrom, String curBlock) {
+	public Date getDate(Date prevDate, String curBlock) {
 		try {
-			dateFrom = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
+			prevDate = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
 		} catch (ParseException e) {
-			//Implying empty space which is null date
 		}
-		return dateFrom;
+		return prevDate;
 	}
 
 	/**
@@ -161,30 +165,32 @@ public class MyTasksStorage implements IStorage, Serializable {
 		String output = determineOutput(localMemory);
 		printOutput(output, MyTasksController.DEFAULT_FILENAME);
 	}
-	
-	protected String determineOutput(ArrayList<Task> localMem){
+
+	protected String determineOutput(ArrayList<Task> localMem) {
 		String result = "";
-		for (int i = 0; i<localMem.size(); i++){
+		for (int i = 0; i < localMem.size(); i++) {
 			Task currentTask = localMem.get(i);
 			result += currentTask.getDescription();
 			result += addBreak();
-			if (currentTask.getFromDateTime() == null){
+			if (currentTask.getFromDateTime() == null) {
 				result += " ";
 			} else {
-				result += MyTasksParser.dateTimeFormats.get(0).format(currentTask.getFromDateTime());
+				result += MyTasksParser.dateTimeFormats.get(0).format(
+						currentTask.getFromDateTime());
 			}
 			result += addBreak();
-			if (currentTask.getToDateTime() == null){
+			if (currentTask.getToDateTime() == null) {
 				result += " ";
 			} else {
-				result += MyTasksParser.dateTimeFormats.get(0).format(currentTask.getToDateTime());
+				result += MyTasksParser.dateTimeFormats.get(0).format(
+						currentTask.getToDateTime());
 			}
 			result += addBreak();
 			ArrayList<String> labels = currentTask.getLabels();
 			if (labels == null) {
 				result += " ";
 			} else {
-				for (int j = 0; j<labels.size(); j++) {
+				for (int j = 0; j < labels.size(); j++) {
 					result += labels.get(j);
 					result += ",";
 				}
@@ -193,12 +199,12 @@ public class MyTasksStorage implements IStorage, Serializable {
 		}
 		return result;
 	}
-	
+
 	private String addBreak() {
 		return "//";
 	}
-	
-	private void printOutput(String output, String fileName){
+
+	private void printOutput(String output, String fileName) {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			writer.print(output);
