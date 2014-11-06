@@ -1,7 +1,6 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
-
 import mytasks.file.Task;
 
 import org.junit.After;
@@ -12,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class LogicTest {
 
@@ -231,14 +231,12 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play #fun");
 		taskLogic.executeCommand("ad homework");
+		taskLogic.executeCommand("so fun");
 		taskLogic.executeCommand("hi fun");
-		String output = "";
-		// TODO run this test case and the error will appear below
-		System.out.println("--------------" + taskLogic.obtainPrintableOutputAfterHide().size());
-		for (int i=0; i<taskLogic.obtainPrintableOutputAfterHide().size(); i++) {
-			output += taskLogic.obtainPrintableOutputAfterHide().get(i);
-		}
-		assertEquals("N.A.\n" + "homework\n", output);
+		assertEquals(true,taskLogic.labelsHidden);
+		ArrayList<String> testcase = new ArrayList<String>();
+		testcase.add("fun");
+		assertEquals(testcase, taskLogic.toHide);
 	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1
