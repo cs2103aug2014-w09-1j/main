@@ -260,7 +260,14 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
+		
 		Collections.sort(words);
+		
+//		System.out.println("-------------------");
+//		for (int i=0; i<mLogic.obtainPrintableOutput().size(); i++) {
+//			System.out.println(i + ": " + mLogic.obtainPrintableOutput().get(i));
+//		}
+//		System.out.println("-------------------");
 		
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			textArea = new JTextArea();

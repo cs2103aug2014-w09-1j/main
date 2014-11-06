@@ -22,6 +22,7 @@ public class MyTasksLogicController implements ILogic {
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
 	private static MyTasksLogicController INSTANCE = null;
+	private HideCommand mHideCommand;
 
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
@@ -127,4 +128,10 @@ public class MyTasksLogicController implements ILogic {
 		}
 		return labelsResult;
 	}
+	
+	//@author A0108543J
+	public List<String> obtainPrintableOutputAfterHide() {
+		return mHideCommand.getList();
+	}
+	
 }

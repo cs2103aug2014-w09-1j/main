@@ -5,6 +5,13 @@ import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 
+/**
+ * HideCommand extends Command object to follow OOP standards
+ * 
+ * @author Shuan Siang
+ *
+ */
+
 public class ShowCommand extends Command {
 
 	public ShowCommand(String comdDes, Date fromDateTime, Date toDateTime,
