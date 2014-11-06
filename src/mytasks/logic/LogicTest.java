@@ -215,7 +215,12 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play #fun");
 		taskLogic.executeCommand("ad homework");
-		assertEquals("Label with 'fun' hidden", taskLogic.executeCommand("hi fun"));
+		taskLogic.executeCommand("hi fun");
+		String output = "";
+		for (int i=0; i<taskLogic.obtainPrintableOutputAfterHide().size(); i++) {
+			output += taskLogic.obtainPrintableOutput().get(i);
+		}
+		assertEquals("N.A.\n" + "homework\n", output);
 	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1
