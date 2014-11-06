@@ -50,7 +50,7 @@ public class HideCommand extends Command {
 			}
 			
 			for (int j=0; j<labels.size(); j++) {
-				if (!labels.get(j).contains(super.getTaskDetails())) {
+				if (!labels.get(j).equals(super.getTaskDetails())) {
 					System.out.println("insdie");
 					listOfStringAfterHiding.add(temp.get(i));
 					break;

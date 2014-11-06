@@ -17,7 +17,6 @@ public class LogicTest {
 
 	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
 
-
 	@Test
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();	
@@ -215,7 +214,14 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play #fun");
 		taskLogic.executeCommand("ad homework");
-		assertEquals("Label with 'fun' hidden", taskLogic.executeCommand("hi fun"));
+		taskLogic.executeCommand("hi fun");
+		String output = "";
+		// TODO run this test case and the error will appear below
+		System.out.println("--------------" + taskLogic.obtainPrintableOutputAfterHide().size());
+		for (int i=0; i<taskLogic.obtainPrintableOutputAfterHide().size(); i++) {
+			output += taskLogic.obtainPrintableOutputAfterHide().get(i);
+		}
+		assertEquals("N.A.\n" + "homework\n", output);
 	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1
