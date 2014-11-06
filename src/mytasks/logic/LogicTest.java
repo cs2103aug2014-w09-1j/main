@@ -17,7 +17,6 @@ public class LogicTest {
 
 	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
 
-
 	@Test
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();	
@@ -217,8 +216,10 @@ public class LogicTest {
 		taskLogic.executeCommand("ad homework");
 		taskLogic.executeCommand("hi fun");
 		String output = "";
+		// TODO run this test case and the error will appear below
+		System.out.println("--------------" + taskLogic.obtainPrintableOutputAfterHide().size());
 		for (int i=0; i<taskLogic.obtainPrintableOutputAfterHide().size(); i++) {
-			output += taskLogic.obtainPrintableOutput().get(i);
+			output += taskLogic.obtainPrintableOutputAfterHide().get(i);
 		}
 		assertEquals("N.A.\n" + "homework\n", output);
 	}
