@@ -109,7 +109,6 @@ public class MyTasksParser implements IParser {
             case "se":
             case "de":
             case "do":
-            case "hi":
                 Command temp = convertStandard(withoutComdType, comdType);
                 return temp;
             case "un":
@@ -126,6 +125,8 @@ public class MyTasksParser implements IParser {
                 Command temp2 = convertUpdate(withoutComdType, comdType);
                 return temp2;
             case "so":
+            case "hi":
+            case "sh":
                 Command temp3 = convertSort(withoutComdType, comdType);
                 return temp3;
             case "?":
@@ -186,8 +187,6 @@ public class MyTasksParser implements IParser {
             return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
         case "do":
             return new DoneCommand(taskDesc, dateFrom, dateTo, labels, null);
-        case "hi":
-        	return new HideCommand(taskDesc, dateFrom, dateTo, labels, null);
         }
         return null;
     }
