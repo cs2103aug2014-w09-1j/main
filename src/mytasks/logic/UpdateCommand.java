@@ -29,8 +29,10 @@ public class UpdateCommand extends Command {
 	@Override
 	FeedbackObject execute() {
 		if (canUpdateFromSearchResults()){
-			updateFromSearchResults();
+			FeedbackObject result = updateFromSearchResults();
+			return result;
 		}
+		
 		Task prevState = null;
 		boolean hasTask = false;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {

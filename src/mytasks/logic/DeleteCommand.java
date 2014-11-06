@@ -30,7 +30,8 @@ public class DeleteCommand extends Command {
 	@Override
 	FeedbackObject execute() {
 		if (canDeleteFromSearchResults()) {
-			deleteFromSearchResults();
+			FeedbackObject result = deleteFromSearchResults();
+			return result;
 		}
 		
 		boolean hasTask = false;
