@@ -173,6 +173,23 @@ public class LogicTest {
 	}
 	
 	@Test
+	public void testUndoRedoDone(){
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		// test 1 - undo once
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// test 2 - undo multiple times
+		taskLogic.executeCommand("do meeting");
+		taskLogic.executeCommand("do do homework");
+		taskLogic.executeCommand("do written quiz 2");
+		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	@Test
 	public void testUpdateCommand() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
