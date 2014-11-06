@@ -56,11 +56,12 @@ public class DeleteCommand extends Command {
 			String resultString = String
 					.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
 			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
 		} else {
 			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
 			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
 		}
-		return null;
 	}
 
 	@Override
