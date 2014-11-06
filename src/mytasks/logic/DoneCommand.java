@@ -77,7 +77,33 @@ public class DoneCommand extends Command {
 
 	@Override
 	FeedbackObject undo() {
-		return null;
+		Task prevState = null;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(this.getTaskDetails())) {
+				prevState = mLocalMem.getLocalMem().get(i).getClone();
+				ArrayList<String> labels = new ArrayList<String>();
+				for (int j=0; j < prevState.getLabels().size(); j++){
+					if (prevState.getLabels().get(j).equals("done")){
+						continue;
+					}
+					labels.add(prevState.getLabels().get(j));
+				}	
+				prevState.setLabels(labels);
+				mLocalMem.getLocalMem().remove(i);
+				mLocalMem.getLocalMem().add(prevState);
+				break;
+			}
+		}
+		Command toRedo = new DoneCommand(prevState.getDescription(),
+				prevState.getFromDateTime(), prevState.getToDateTime(),
+				prevState.getLabels(), null);
+	
+		mLocalMem.redoPush(toRedo);
+		mLocalMem.saveLocalMemory();
+		String resultString = this.getTask().getDescription() + " undone"; 
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
 	}
 	
 	private boolean isDone(Task task){

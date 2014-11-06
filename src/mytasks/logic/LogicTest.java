@@ -1,16 +1,9 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
-import mytasks.file.Task;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class LogicTest {
@@ -36,9 +29,9 @@ public class LogicTest {
 	public void testUndoRedoAdd() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting 22.09.2014 #important");
-		assertEquals("meeting deleted", taskLogic.executeCommand("un"));
+		assertEquals("meeting deleted", taskLogic.executeCommand("un").getFeedback());
 		// The following essentially tests undo function for delete
-		assertEquals("meeting added", taskLogic.executeCommand("re"));
+		assertEquals("meeting added", taskLogic.executeCommand("re").getFeedback());
 	}
 
 	//@author A0112139R
@@ -46,18 +39,18 @@ public class LogicTest {
 	public void testSearchCommand() {
 		taskLogic.getMemory().clearMemory();
 		// test 1 - search for 1 keyword
-		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("se meeting"));
+		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("se meeting").getFeedback());
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		taskLogic.executeCommand("ad important");
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
-				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting"));
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
 		// test 2 - search for multiple keywords
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "3. important\n"
-				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important"));
+				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
 	}
 
 	@Test
@@ -122,9 +115,9 @@ public class LogicTest {
 		output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014 #important\n" 
-				+ "CS2101 meeting on 29.09.2014 #important\n" 
-				+ "CS2100 Midterm on 25.09.2014 #important #urgent\n" 
+		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
+				+ "CS2101 meeting on 29.09.2014\n" 
+				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
 				+ "N.A.\n" + "play badminton #anytime\n" 
 				+ "medical check up on 01.10.2014 13:00 #$100\n" 
 				+ "pay acceptance fee from 28.09.2014 to 29.09.2014 #$200\n" 
@@ -146,15 +139,15 @@ public class LogicTest {
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
 		assertEquals("#CS2103#important\n" 
-				+ "demo on 05.11.2014 #CS2103 #important\n"
+				+ "demo on 05.11.2014\n"
 				+ "#CS2100#important\n"
-				+ "lab #CS2100 #important\n"
+				+ "lab\n"
 				+ "#CS2103\n"
-				+ "tutorial #CS2103\n"
+				+ "tutorial\n"
 				+ "#CS2100\n"
-				+ "tutorial #CS2100\n"
+				+ "tutorial\n"
 				+ "#important\n"
-				+ "meeting on 03.11.2014 #CS2101 #important\n"
+				+ "meeting on 03.11.2014 #CS2101\n"
 				+ "N.A.\n"
 				+ "video making #CS2101\n", output);
 	}
@@ -168,7 +161,24 @@ public class LogicTest {
 		String output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#done\n" + "meeting #done\n", output);
+		assertEquals("#done\n" + "meeting\n", output);
+	}
+	
+	@Test
+	public void testUndoRedoDone(){
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		// test 1 - undo once
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// test 2 - undo multiple times
+		taskLogic.executeCommand("do meeting");
+		taskLogic.executeCommand("do do homework");
+		taskLogic.executeCommand("do written quiz 2");
+		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
 	}
 	
 	@Test
@@ -176,7 +186,7 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
 		assertEquals("'meeting' updated",
-				taskLogic.executeCommand("up meeting - CS2103T #important"));
+				taskLogic.executeCommand("up meeting - CS2103T #important").getFeedback());
 	}
 
 	@Test
@@ -184,16 +194,16 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play");
 		taskLogic.executeCommand("up play - do homework");
-		assertEquals("do homework reverted", taskLogic.executeCommand("un"));
-		assertEquals("'play' updated", taskLogic.executeCommand("re"));
-		assertEquals("do homework reverted", taskLogic.executeCommand("un"));
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("'play' updated", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
 	}
 	
 	@Test
 	public void testDeleteCommand() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play");
-		assertEquals("'play' deleted", taskLogic.executeCommand("de play"));
+		assertEquals("'play' deleted", taskLogic.executeCommand("de play").getFeedback());
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 	
@@ -202,9 +212,9 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play");
 		taskLogic.executeCommand("de play");
-		assertEquals("play added", taskLogic.executeCommand("un"));
+		assertEquals("play added", taskLogic.executeCommand("un").getFeedback());
 		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
-		assertEquals("'play' deleted", taskLogic.executeCommand("re"));
+		assertEquals("'play' deleted", taskLogic.executeCommand("re").getFeedback());
 		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
 	}
 

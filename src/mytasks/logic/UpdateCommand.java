@@ -16,7 +16,7 @@ public class UpdateCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update";
+	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
 
 
@@ -28,12 +28,11 @@ public class UpdateCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) && Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
-			FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), super.getTask().getToDateTime(), 
-					super.getTask().getLabels(), mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
-			haveSearched = false;
-			return feedback;
+		if (canUpdateFromSearchResults()){
+			FeedbackObject result = updateFromSearchResults();
+			return result;
 		}
+		
 		Task prevState = null;
 		boolean hasTask = false;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
@@ -45,8 +44,10 @@ public class UpdateCommand extends Command {
 			}
 		}
 		if (!hasTask){
-			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc());
-			FeedbackObject result = new FeedbackObject(resultString,false);
+			FeedbackObject result = autoSearch();
+			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc()) + "\n";
+			resultString += result.getFeedback();
+			result = new FeedbackObject(resultString,false);
 			return result;
 		}
 		
@@ -120,18 +121,38 @@ public class UpdateCommand extends Command {
 		FeedbackObject result = new FeedbackObject(resultString,true);
 		return result;
 	}
-	
-	public static boolean isNumeric(String str)  
+
+	//@author A0112139R
+	private boolean canUpdateFromSearchResults(){
+		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) 
+				&& Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject updateFromSearchResults(){
+		FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), 
+				super.getTask().getToDateTime(), super.getTask().getLabels(), 
+				mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
+		haveSearched = false;
+		return feedback;
+	}
+
+	private boolean isNumeric(String str)  
 	{  
-	  try  
-	  {  
-	     int i = Integer.parseInt(str);  
-	  }  
-	  catch(NumberFormatException nfe)  
-	  {  
-	    return false;  
-	  }  
-	  return true;  
+		try  {  
+			int i = Integer.parseInt(str);  
+		} catch(NumberFormatException nfe)  {  
+			return false;  
+		}  
+		return true;  
+	}
+	
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(), null, null, null, null).execute();
+		return result;
 	}
 
 }

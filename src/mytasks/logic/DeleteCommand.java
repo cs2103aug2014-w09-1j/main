@@ -18,7 +18,7 @@ public class DeleteCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete";
+	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
@@ -29,16 +29,11 @@ public class DeleteCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		if (haveSearched == true
-				&& isNumeric(super.getTaskDetails())
-				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem
-						.getSearchList().size())) {
-			FeedbackObject feedback = new DeleteCommand(mLocalMem.getSearchList()
-					.get(Integer.parseInt(super.getTaskDetails()) - 1)
-					.getDescription(), null, null, null, null).execute();
-			haveSearched = false;
-			return feedback;
+		if (canDeleteFromSearchResults()) {
+			FeedbackObject result = deleteFromSearchResults();
+			return result;
 		}
+		
 		boolean hasTask = false;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
@@ -62,11 +57,14 @@ public class DeleteCommand extends Command {
 			String resultString = String
 					.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
 			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
 		} else {
-			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,false);
+			FeedbackObject result = autoSearch();
+			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails()) + "\n";
+			resultString += result.getFeedback();
+			result = new FeedbackObject(resultString,false);
+			return result;
 		}
-		return null;
 	}
 
 	@Override
@@ -82,12 +80,36 @@ public class DeleteCommand extends Command {
 		return result;
 	}
 
-	public static boolean isNumeric(String str) {
+	//@author A0112139R
+	private boolean canDeleteFromSearchResults(){
+		if (haveSearched == true && isNumeric(super.getTaskDetails())
+				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem.getSearchList().size())) {
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject deleteFromSearchResults(){
+		FeedbackObject feedback = new DeleteCommand(mLocalMem.getSearchList()
+				.get(Integer.parseInt(super.getTaskDetails()) - 1)
+				.getDescription(), null, null, null, null).execute();
+		haveSearched = false;
+		return feedback;
+	}
+
+	private boolean isNumeric(String str) {
 		try {
 			int i = Integer.parseInt(str);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}
 		return true;
+	}
+
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), task.getToDateTime(), 
+				task.getLabels(), null).execute();
+		return result;
 	}
 }

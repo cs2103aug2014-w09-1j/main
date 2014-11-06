@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import mytasks.file.MyTasksController;
 import mytasks.file.Task;
+import mytasks.parser.MyTasksParser;
 
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
@@ -163,6 +164,7 @@ class MemorySnapshotHandler {
 
 	private ArrayList<String> convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){		
 		ArrayList<String> output = new ArrayList<String>();
+		ArrayList<String> labelsNotWanted;
 
 		for (int i=0; i < snapshotList.size(); i++){
 			if (!wantDoneTasks() && isDone(snapshotList.get(i))){
@@ -183,8 +185,10 @@ class MemorySnapshotHandler {
 				break;
 			}
 			else{
+				labelsNotWanted = new ArrayList<String>();
 				for (int j=0; j < labelCombinations.get(order).size(); j++){
 					snapshot += "#" + labelCombinations.get(order).get(j);
+					labelsNotWanted.add(labelCombinations.get(order).get(j));
 				}
 				snapshot += "\n";
 				int j=i;
@@ -192,8 +196,7 @@ class MemorySnapshotHandler {
 					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
-
-					snapshot += snapshotList.get(j).toString() + "\n";
+					snapshot += taskToStringWithoutSpecifiedLabels(snapshotList.get(j), labelsNotWanted) + "\n";
 					j++;
 				}
 				i = j-1;
@@ -279,11 +282,58 @@ class MemorySnapshotHandler {
 
 		return String.format("%s %s%s", task.getDescription(), timeToString, labelsToString);
 	}
-	
+
+	private String taskToStringWithoutSpecifiedLabels(Task task, ArrayList<String> labelsNotWanted){
+		String labelsToString = "";
+		if (task.getLabels() != null) {
+			for (String s : task.getLabels()){
+				if (haveSameLabels(s ,labelsNotWanted)){
+					continue;
+				}
+				labelsToString += " " + "#" + s;
+			}
+		}
+
+		String dateFromString = "";
+		String dateToString = "";
+		if (task.getFromDateTime() != null) {
+			dateFromString = MyTasksParser.dateTimeFormats.get(0).format(task.getFromDateTime());
+		}
+		if (dateFromString.contains("00:00")) {
+			dateFromString = MyTasksParser.dateFormats.get(0).format(task.getFromDateTime());
+		}
+		if (task.getToDateTime() != null) {
+			dateToString = MyTasksParser.dateTimeFormats.get(0).format(task.getToDateTime());
+		}
+		if (dateToString.contains("00:00")) {
+			dateToString = MyTasksParser.dateFormats.get(0).format(task.getToDateTime());
+		}
+
+		String result = "";
+		if (dateFromString.equals("")) {
+			result = String.format("%s%s ", task.getDescription(), labelsToString);
+		} else if (dateToString.equals("")) {
+			result = String.format("%s on %s%s", task.getDescription(), dateFromString,labelsToString);
+		} else {
+			result = String.format("%s from %s to %s%s", task.getDescription(),
+							dateFromString, dateToString, labelsToString);
+		}
+		return result.trim();
+	}
+
+	private boolean haveSameLabels(String str, ArrayList<String> labels){
+		for (int i=0; i < labels.size(); i++){
+			if (str.equals(labels.get(i))){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private String getTime(Task task){		
 		String timeToString = "";
 		assert task.getFromDateTime() != null;
-		
+
 		if (!timeFormat.format(task.getFromDateTime()).equals("00:00")){
 			timeToString += timeFormat.format(task.getFromDateTime());
 		}
