@@ -855,11 +855,11 @@ public class MyTasksParser implements IParser {
             }
         }
         Command toReturn = null;
-        if (comdType == "sh") {
+        if (comdType.equals("sh")) {
         	toReturn = new ShowCommand(null, null, null, labels, null);
-        } else if (comdType == "hi") {
+        } else if (comdType.equals("hi")) {
         	toReturn = new HideCommand(null, null, null, labels, null);
-        } else if (comdType == "so") {
+        } else if (comdType.equals("so")) {
         	toReturn = new SortCommand(null, null, null, labels, null);
         	
         }
