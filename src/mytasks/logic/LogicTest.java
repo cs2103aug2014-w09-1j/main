@@ -1,16 +1,9 @@
 package mytasks.logic;
 
 import static org.junit.Assert.*;
-import mytasks.file.Task;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class LogicTest {
@@ -122,9 +115,9 @@ public class LogicTest {
 		output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014 #important\n" 
-				+ "CS2101 meeting on 29.09.2014 #important\n" 
-				+ "CS2100 Midterm on 25.09.2014 #important #urgent\n" 
+		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
+				+ "CS2101 meeting on 29.09.2014\n" 
+				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
 				+ "N.A.\n" + "play badminton #anytime\n" 
 				+ "medical check up on 01.10.2014 13:00 #$100\n" 
 				+ "pay acceptance fee from 28.09.2014 to 29.09.2014 #$200\n" 
@@ -146,15 +139,15 @@ public class LogicTest {
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
 		assertEquals("#CS2103#important\n" 
-				+ "demo on 05.11.2014 #CS2103 #important\n"
+				+ "demo on 05.11.2014\n"
 				+ "#CS2100#important\n"
-				+ "lab #CS2100 #important\n"
+				+ "lab\n"
 				+ "#CS2103\n"
-				+ "tutorial #CS2103\n"
+				+ "tutorial\n"
 				+ "#CS2100\n"
-				+ "tutorial #CS2100\n"
+				+ "tutorial\n"
 				+ "#important\n"
-				+ "meeting on 03.11.2014 #CS2101 #important\n"
+				+ "meeting on 03.11.2014 #CS2101\n"
 				+ "N.A.\n"
 				+ "video making #CS2101\n", output);
 	}
@@ -168,7 +161,7 @@ public class LogicTest {
 		String output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#done\n" + "meeting #done\n", output);
+		assertEquals("#done\n" + "meeting\n", output);
 	}
 	
 	@Test
