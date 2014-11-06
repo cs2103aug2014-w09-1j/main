@@ -31,10 +31,11 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private boolean isDeveloper;
 	private final String MESSAGE_UNSUP = "Unsupported command function";
 	private static MyTasksLogicController INSTANCE = null;
-	private HideCommand mHideCommand;
 	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
 			.getName());
 	private Handler fh = null;
+	protected boolean labelsHidden = false;
+	protected ArrayList<String> toHide;
 
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
@@ -86,6 +87,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			mLocalMem.loadLocalMemory();
 		}
 		mViewHandler = MemorySnapshotHandler.getInstance();
+		toHide = new ArrayList<String>();
 	}
 
 	/**
@@ -169,8 +171,12 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	}
 	
 	//@author A0108543J
-	public List<String> obtainPrintableOutputAfterHide() {
-		return mHideCommand.getList();
+	protected void toggleHide(boolean hideOrNot) {
+		labelsHidden = hideOrNot;
+	}
+	
+	protected void hideLabels(ArrayList<String> labels){
+		toHide = labels;
 	}
 	
 }

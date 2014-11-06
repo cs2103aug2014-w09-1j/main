@@ -12,94 +12,64 @@ import mytasks.file.FeedbackObject;
  *
  */
 
-//@author A0108543J
+// @author A0108543J
 public class HideCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
+	private MyTasksLogicController mController;
 	private MemorySnapshotHandler mViewHandler;
-	private ArrayList<String> listOfStringAfterHiding = new ArrayList<String>();
-	private boolean ifContainLabels;
 
 	public HideCommand(String comdDes, Date fromDateTime, Date toDateTime,
-					ArrayList<String> comdLabels, String updateDesc) {
+			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		// TODO Auto-generated constructor stub
 		mLocalMem = LocalMemory.getInstance();
+		mController = MyTasksLogicController.getInstance(false);
 		mViewHandler = MemorySnapshotHandler.getInstance();
 	}
 
 	@Override
 	FeedbackObject execute() {
-		// TODO Auto-generated method stub
-		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
-		ArrayList<String> labels = new ArrayList<String>();
-
-		System.out.println("--- checking temp ---");
-		for (int i=0; i<temp.size(); i++) {
-			System.out.println(i + ": " + temp.get(i));
+		ArrayList<String> temp = new ArrayList<String>(
+				mViewHandler.getSnapshot(mLocalMem));
+		ArrayList<String> availableLabels = new ArrayList<String>();
+		ArrayList<String> toHide = super.getTask().getLabels();
+		for (int i = 0; i < temp.size(); i++) {
+			availableLabels.add(locateLabels(temp.get(i)));
 		}
-		System.out.println("--- checking temp ---");
-
-		for (int i=0; i<temp.size(); i++) {
-			labels = locateLabels(temp.get(i));
-
-			if (!ifContainLabels) {
-				listOfStringAfterHiding.add(temp.get(i));
-				continue;
-			}
-			
-			for (int j=0; j<labels.size(); j++) {
-				if (!labels.get(j).equals(super.getTaskDetails())) {
-					System.out.println("insdie");
-					listOfStringAfterHiding.add(temp.get(i));
-					break;
-				}
-			}
-
-			System.out.println("--- checking listOfStringAfterHiding --- start");
-			for (int k=0; k<listOfStringAfterHiding.size(); k++) {
-				System.out.println(k + ": " + listOfStringAfterHiding.get(k));
-			}
-			System.out.println("--- checking listOfStringAfterHiding --- end");
-
+		if (toHide == null) {
+			FeedbackObject toReturn = new FeedbackObject("No arguments found",
+					false);
+			return toReturn;
 		}
-		String resultString = "Label with '" + super.getTaskDetails() + "' hidden";
-		FeedbackObject result = new FeedbackObject(resultString, true);
-		return result;
+		for (int i = 0; i < toHide.size(); i++) {
+			if (!availableLabels.contains(toHide.get(i))) {
+				FeedbackObject toReturn = new FeedbackObject("Invalid label",
+						false);
+				return toReturn;
+			}
+		}
+		mController.toggleHide(true);
+		mController.hideLabels(toHide);
+		// Hw has to check toggleValue to see if she needs to hide anything.
+		// She will checks content of hidelabels for what to hide
+		// Remember to toggle off when view is changed. (think of cases when need to toggle
+		// Do the converse for showlabels
+		FeedbackObject toReturn = new FeedbackObject("Labels hidden", true);
+		return toReturn;
 	}
 
-	ArrayList<String> locateLabels(String temp) {
-		ifContainLabels = false;
-		ArrayList<String> results = new ArrayList<String>();
-
-		if (!temp.contains("#")) {
-			return null;
+	private String locateLabels(String temp) {
+		String firstWord = null;
+		if (temp != null) {
+			firstWord = temp.split("\\s+")[0];
 		}
-		
-		String[] words = temp.split("\\s+");
-		for (int i=0; i<words.length; i++) {
-			String currentWord = words[i];
-			char firstLetter = currentWord.charAt(0);
-			if (firstLetter == '#') {
-				results.add(currentWord.substring(1));
-				ifContainLabels = true;
-			}
-		}
-		if (results.size() != 0) {
-			return results;
-		}
-		return null;
+		return firstWord;
 	}
 
-	public ArrayList<String> getList() {
-		return listOfStringAfterHiding;
-	}
-	
 	@Override
 	FeedbackObject undo() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 }
