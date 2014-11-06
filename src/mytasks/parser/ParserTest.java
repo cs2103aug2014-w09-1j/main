@@ -12,6 +12,8 @@ import mytasks.file.Task;
 import mytasks.logic.AddCommand;
 import mytasks.logic.Command;
 import mytasks.logic.DeleteCommand;
+import mytasks.logic.HideCommand;
+import mytasks.logic.ShowCommand;
 import mytasks.logic.SortCommand;
 import mytasks.logic.UpdateCommand;
 
@@ -502,6 +504,26 @@ public class ParserTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void hideTest1() {
+		ArrayList<String> list1 = new ArrayList<String>();
+		list1.add("18.09.2014");
+		list1.add("important");
+		list1.add("all");
+		Command test1 = new HideCommand(null, null, null, list1, null);
+		assertObjFields(test1, tester.parseInput("hi 18.09.2014 important all"));
+	}
+	
+	@Test
+	public void showTest1() {
+		ArrayList<String> list1 = new ArrayList<String>();
+		list1.add("18.09.2014");
+		list1.add("important");
+		list1.add("all");
+		Command test1 = new ShowCommand(null, null, null, list1, null);
+		assertObjFields(test1, tester.parseInput("sh 18.09.2014 important all"));
 	}
 	
 	@Test
