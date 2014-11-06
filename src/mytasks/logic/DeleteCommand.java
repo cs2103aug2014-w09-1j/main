@@ -18,7 +18,7 @@ public class DeleteCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete";
+	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
@@ -59,8 +59,10 @@ public class DeleteCommand extends Command {
 			FeedbackObject result = new FeedbackObject(resultString,true);
 			return result;
 		} else {
-			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,false);
+			FeedbackObject result = autoSearch();
+			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails()) + "\n";
+			resultString += result.getFeedback();
+			result = new FeedbackObject(resultString,false);
 			return result;
 		}
 	}
@@ -102,5 +104,12 @@ public class DeleteCommand extends Command {
 			return false;
 		}
 		return true;
+	}
+
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), task.getToDateTime(), 
+				task.getLabels(), null).execute();
+		return result;
 	}
 }

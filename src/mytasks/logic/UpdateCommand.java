@@ -16,7 +16,7 @@ public class UpdateCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update";
+	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
 
 
@@ -44,8 +44,10 @@ public class UpdateCommand extends Command {
 			}
 		}
 		if (!hasTask){
-			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc());
-			FeedbackObject result = new FeedbackObject(resultString,false);
+			FeedbackObject result = autoSearch();
+			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc()) + "\n";
+			resultString += result.getFeedback();
+			result = new FeedbackObject(resultString,false);
 			return result;
 		}
 		
@@ -145,6 +147,12 @@ public class UpdateCommand extends Command {
 			return false;  
 		}  
 		return true;  
+	}
+	
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(), null, null, null, null).execute();
+		return result;
 	}
 
 }
