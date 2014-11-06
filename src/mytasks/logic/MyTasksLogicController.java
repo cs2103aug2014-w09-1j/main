@@ -1,6 +1,7 @@
 package mytasks.logic;
 
 //@author A0114302A
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import mytasks.storage.MyTasksStorage;
  * execution of commands
  */
 
-public class MyTasksLogicController implements ILogic {
+@SuppressWarnings("serial")
+public class MyTasksLogicController implements ILogic, Serializable {
 
 	// Private variables
 	private IParser mParser;

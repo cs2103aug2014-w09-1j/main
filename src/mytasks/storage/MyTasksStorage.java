@@ -120,32 +120,38 @@ public class MyTasksStorage implements IStorage, Serializable {
 				if (j == 0) {
 					taskDesc = curBlock;
 				} else if (j == 1) {
-					try {
-						dateFrom = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
-					} catch (ParseException e) {
-						//Implying empty space which is null date
-					}
+					dateFrom = getDate(dateFrom, curBlock);
 				} else if (j == 2) {
-					try {
-						dateTo = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
-					} catch (ParseException e) {
-						//Implying empty space which is null date
-					}
+					dateTo = getDate(dateTo, curBlock);
 				} else {
-					if (!curBlock.equals(" ")) {
-						String delims2 = "[,]+";
-						String[] indivLabels = curBlock.split(delims2);
-						ArrayList<String> tempLabels = new ArrayList<String> ();
-						for (int k = 0; k<indivLabels.length; k++) {
-							tempLabels.add(indivLabels[k]);
-						}
-						labels = tempLabels;
-					}
+					labels = getLabels(labels, curBlock);
 				}
 			}
 			result.add(new Task(taskDesc, dateFrom, dateTo, labels));
 		}
 		return result;
+	}
+
+	public ArrayList<String> getLabels(ArrayList<String> labels, String curBlock) {
+		if (!curBlock.equals(" ")) {
+			String delims2 = "[,]+";
+			String[] indivLabels = curBlock.split(delims2);
+			ArrayList<String> tempLabels = new ArrayList<String> ();
+			for (int k = 0; k<indivLabels.length; k++) {
+				tempLabels.add(indivLabels[k]);
+			}
+			labels = tempLabels;
+		}
+		return labels;
+	}
+
+	public Date getDate(Date dateFrom, String curBlock) {
+		try {
+			dateFrom = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
+		} catch (ParseException e) {
+			//Implying empty space which is null date
+		}
+		return dateFrom;
 	}
 
 	/**
