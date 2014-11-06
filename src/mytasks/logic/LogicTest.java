@@ -216,10 +216,39 @@ public class LogicTest {
 		taskLogic.executeCommand("ad homework");
 		taskLogic.executeCommand("so fun");
 		taskLogic.executeCommand("hi fun");
-		assertEquals(true,taskLogic.labelsHidden);
-		ArrayList<String> testcase = new ArrayList<String>();
-		testcase.add("fun");
-		assertEquals(testcase, taskLogic.toHide);
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> toHide = new ArrayList<String>();
+		toHide.add("fun");
+		assertEquals(toHide, taskLogic.toHide);
+		
+		taskLogic.executeCommand("hi all");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> allTasks = new ArrayList<String>();
+		allTasks.add("fun");
+		allTasks.add("N.A.");
+		assertEquals(allTasks, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsShown);
+		ArrayList<String> toShow = new ArrayList<String>();
+		toShow.add("boring");
+		assertEquals(toShow, taskLogic.toShow);
+		
+		taskLogic.executeCommand("sh all");
+		assertEquals(true, taskLogic.labelsShown);
+		ArrayList<String> allTasks = new ArrayList<String>();
+		allTasks.add("boring");
+		allTasks.add("N.A.");
+		assertEquals(allTasks, taskLogic.toShow);
 	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1

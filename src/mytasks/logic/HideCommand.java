@@ -30,25 +30,51 @@ public class HideCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		ArrayList<String> temp = new ArrayList<String>(
-				mViewHandler.getSnapshot(mLocalMem));
+		mController.toggleHide(false);
+		mController.clearHideLabels();
+		
+		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
 		ArrayList<String> availableLabels = new ArrayList<String>();
 		ArrayList<String> toHide = super.getTask().getLabels();
+
+		// if there are no labels to hide
+		if (toHide == null) {
+			FeedbackObject toReturn = new FeedbackObject("No arguments found", false);
+			return toReturn;
+		}
+		
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("all");
+		ShowCommand commandToUndo = new ShowCommand(null, null, null, labels, null);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.saveLocalMemory();
+		
+		// to hide all labels
+		// TODO address issue where there will be a label #all (clash)
+		if (toHide.get(0).equals("all")) {
+			toHide.remove(0);
+			for (int i=0; i<temp.size(); i++) {
+				toHide.add(locateLabels(temp.get(i)));
+			}
+			mController.toggleHide(true);
+			mController.hideLabels(toHide);
+			
+			FeedbackObject toReturn = new FeedbackObject("All labels hidden", true);
+			return toReturn;
+		}
+		
+		
 		for (int i = 0; i < temp.size(); i++) {
 			availableLabels.add(locateLabels(temp.get(i)));
 		}
-		if (toHide == null) {
-			FeedbackObject toReturn = new FeedbackObject("No arguments found",
-					false);
-			return toReturn;
-		}
+		// if labels to hide not found in current list
 		for (int i = 0; i < toHide.size(); i++) {
 			if (!availableLabels.contains(toHide.get(i))) {
-				FeedbackObject toReturn = new FeedbackObject("Invalid label",
-						false);
+				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
 				return toReturn;
 			}
 		}
+		
 		mController.toggleHide(true);
 		mController.hideLabels(toHide);
 		// Hw has to check toggleValue to see if she needs to hide anything.
@@ -63,10 +89,16 @@ public class HideCommand extends Command {
 		String firstWord = null;
 		if (temp != null) {
 			firstWord = temp.split("\\s+")[0];
+			char firstLetter = firstWord.charAt(0);
+			if (firstLetter == '#') {
+				firstWord = firstWord.substring(1);
+			}
 		}
 		return firstWord;
 	}
 
+	//TODO implement showing of time
+	
 	@Override
 	FeedbackObject undo() {
 		throw new UnsupportedOperationException();
