@@ -29,6 +29,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
+	private final String MESSAGE_UNSUP = "Unsupported command function";
 	private static MyTasksLogicController INSTANCE = null;
 	private HideCommand mHideCommand;
 	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
@@ -104,7 +105,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			feedback = commandObject.execute();
 		} catch (UnsupportedOperationException e) {
 			runLogger();
-			LOGGER.log(Level.SEVERE, "unsup");
+			LOGGER.log(Level.SEVERE, MESSAGE_UNSUP, e);
 			closeHandler();
 		}
 		return feedback;

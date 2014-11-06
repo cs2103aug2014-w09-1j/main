@@ -172,30 +172,34 @@ public class MyTasksStorage implements IStorage, Serializable {
 			Task currentTask = localMem.get(i);
 			result += currentTask.getDescription();
 			result += addBreak();
-			if (currentTask.getFromDateTime() == null) {
-				result += " ";
-			} else {
-				result += MyTasksParser.dateTimeFormats.get(0).format(
-						currentTask.getFromDateTime());
-			}
+			result = addDate(currentTask.getFromDateTime(), result);
 			result += addBreak();
-			if (currentTask.getToDateTime() == null) {
-				result += " ";
-			} else {
-				result += MyTasksParser.dateTimeFormats.get(0).format(
-						currentTask.getToDateTime());
-			}
+			result = addDate(currentTask.getToDateTime(), result);
 			result += addBreak();
-			ArrayList<String> labels = currentTask.getLabels();
-			if (labels == null) {
-				result += " ";
-			} else {
-				for (int j = 0; j < labels.size(); j++) {
-					result += labels.get(j);
-					result += ",";
-				}
-			}
+			result = addLabels(result, currentTask);
 			result += addBreak();
+		}
+		return result;
+	}
+
+	public String addLabels(String result, Task currentTask) {
+		ArrayList<String> labels = currentTask.getLabels();
+		if (labels == null) {
+			result += " ";
+		} else {
+			for (int j = 0; j < labels.size(); j++) {
+				result += labels.get(j);
+				result += ",";
+			}
+		}
+		return result;
+	}
+
+	private String addDate(Date currentDate, String result) {
+		if (currentDate == null) {
+			result += " ";
+		} else {
+			result += MyTasksParser.dateTimeFormats.get(0).format(currentDate);
 		}
 		return result;
 	}
