@@ -28,11 +28,8 @@ public class UpdateCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) && Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
-			FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), super.getTask().getToDateTime(), 
-					super.getTask().getLabels(), mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
-			haveSearched = false;
-			return feedback;
+		if (canUpdateFromSearchResults()){
+			updateFromSearchResults();
 		}
 		Task prevState = null;
 		boolean hasTask = false;
@@ -120,18 +117,32 @@ public class UpdateCommand extends Command {
 		FeedbackObject result = new FeedbackObject(resultString,true);
 		return result;
 	}
-	
-	public static boolean isNumeric(String str)  
+
+	//@author A0112139R
+	private boolean canUpdateFromSearchResults(){
+		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) 
+				&& Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject updateFromSearchResults(){
+		FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), 
+				super.getTask().getToDateTime(), super.getTask().getLabels(), 
+				mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
+		haveSearched = false;
+		return feedback;
+	}
+
+	private boolean isNumeric(String str)  
 	{  
-	  try  
-	  {  
-	     int i = Integer.parseInt(str);  
-	  }  
-	  catch(NumberFormatException nfe)  
-	  {  
-	    return false;  
-	  }  
-	  return true;  
+		try  {  
+			int i = Integer.parseInt(str);  
+		} catch(NumberFormatException nfe)  {  
+			return false;  
+		}  
+		return true;  
 	}
 
 }
