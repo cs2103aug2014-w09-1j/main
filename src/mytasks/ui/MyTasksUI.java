@@ -113,7 +113,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 				
-				String content = mLogic.obtainPrintableOutput().get(i);
+				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 				textArea.setText(content);
 				textArea.setBorder(titled);
 
@@ -284,7 +284,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 					colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
 					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
 					
-					String content = mLogic.obtainPrintableOutput().get(i);
+					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 					textArea.setText(content);
 					textArea.setBorder(titled);
 					textAreaPanel.add(textArea);
@@ -295,7 +295,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 					}
 					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					String content = mLogic.obtainPrintableOutput().get(i);
+					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 					textArea.setText(content);
 					textArea.setBorder(titled);
 
@@ -309,7 +309,6 @@ public class MyTasksUI extends JPanel implements ActionListener,
 					textAreaPanel.add(textArea, c);
 					textArea.setCaretPosition(0);
 				}
-//				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 			}
 		}
 		textField.selectAll();
