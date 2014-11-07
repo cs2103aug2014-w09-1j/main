@@ -11,9 +11,6 @@ import mytasks.parser.MyTasksParser;
 
 /**
  * HideCommand extends Command object to follow OOP standards
- * 
- * @author Shuan Siang
- *
  */
 
 // @author A0108543J
@@ -32,8 +29,11 @@ public class HideCommand extends Command {
 	FeedbackObject execute() {
 		
 		List<String> temp = mController.obtainPrintableOutput();
+		ArrayList<String> referenceLabels = new ArrayList<String>();
 		ArrayList<String> availableLabels = new ArrayList<String>();
 		ArrayList<String> toHide = super.getTask().getLabels();
+		ArrayList<String> toReturnArray = new ArrayList<String>();
+		ArrayList<Integer> toUse = new ArrayList<Integer>();
 		addHashtags(toHide);
 
 		if (toHide == null) {
@@ -41,23 +41,39 @@ public class HideCommand extends Command {
 			return toReturn;
 		}
 		// TODO known bug: cannot use all as label
-		System.out.println(temp.size());
 		for (int i = 0; i < temp.size(); i++) {
-			System.out.println(temp.get(i));
 			availableLabels.add(locateLabels(temp.get(i)));
+			referenceLabels.add(locateLabels(temp.get(i)));
 		}
 		
 		for (int i = 0; i < toHide.size(); i++) {
-			if (!availableLabels.contains(toHide.get(i)) && !toHide.get(i).equals("#all")) {
+			boolean haveThisWord = false;
+			String thisWord = toHide.get(i);
+			for (int j = 0; j<availableLabels.size(); j++){
+				String curLabel = availableLabels.get(j);
+				if (curLabel.equals(thisWord)){
+					haveThisWord = true;
+					toUse.add(j);
+				} else if (curLabel.contains(thisWord)){
+					haveThisWord = true;
+					curLabel = curLabel.replace(thisWord, "");
+					availableLabels.set(j, curLabel);
+				}
+			}
+			if (!haveThisWord && !thisWord.equals("#all")) {
 				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
 				return toReturn;
 			}
 		}
 		if(toHide.contains("#all")){
-			toHide = availableLabels;
+			toReturnArray = referenceLabels;
+		} else {
+			for (int i = 0; i<toUse.size(); i++){
+				toReturnArray.add(referenceLabels.get(toUse.get(i)));
+			}
 		}
 		mController.toggleHide(true);
-		mController.hideLabels(toHide);
+		mController.hideLabels(toReturnArray);
 		FeedbackObject toReturn = new FeedbackObject("Labels hidden", true);
 		return toReturn;
 	}
