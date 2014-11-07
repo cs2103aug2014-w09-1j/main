@@ -6,11 +6,9 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author 
 /**
  * UpdateCommand extends Command to follow OOP standards
- * 
- * @author Huiwen, Shuan Siang
- *
  */
 public class UpdateCommand extends Command {
 
@@ -18,7 +16,7 @@ public class UpdateCommand extends Command {
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
-	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to update the specific one";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to update the specific one.";
 
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -28,6 +26,18 @@ public class UpdateCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
+		if(isRedo){
+			int indexOfTaskToUpdated = mLocalMem.getLocalMem().size()-1;
+			Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
+			Command commandToUndo = createUpdateUndo(taskToUpdated);
+			mLocalMem.undoPush(commandToUndo);			
+			updateTask(super.getTask(), taskToUpdated);
+			mLocalMem.saveLocalMemory();
+			String resultString = String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
+		}
+		
 		if (canUpdateFromSearchResults()) {
 			FeedbackObject result = updateFromSearchResults();
 			return result;
@@ -62,20 +72,6 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	public UpdateCommand createUpdateUndo(Task prevState) {
-		UpdateCommand commandToUndo = null;
-		if (this.getTaskDetails() == null) {
-			commandToUndo = new UpdateCommand(prevState.getDescription(),
-					prevState.getFromDateTime(), prevState.getToDateTime(),
-					prevState.getLabels(), super.getToUpdateTaskDesc());
-		} else {
-			commandToUndo = new UpdateCommand(prevState.getDescription(),
-					prevState.getFromDateTime(), prevState.getToDateTime(),
-					prevState.getLabels(), super.getTaskDetails());
-		}
-		return commandToUndo;
-	}
-
 	public Task savePrevState() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
@@ -87,35 +83,48 @@ public class UpdateCommand extends Command {
 		}
 		return prevState;
 	}
+	
+	public UpdateCommand createUpdateUndo(Task prevState) {
+		UpdateCommand commandToUndo = null;
+		if (this.getTaskDetails() == null) {
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), prevState.getDescription());
+		} else {
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), super.getTaskDetails());
+		}
+		return commandToUndo;
+	}
 
 	public void updateSingleTask() {
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (super.getToUpdateTaskDesc().equals(
 					mLocalMem.getLocalMem().get(i).getDescription())) {
 				Task currentTask = super.getTask();
-				if (currentTask.getDescription() != null) {
-					mLocalMem.getLocalMem().get(i)
-							.setDescription(currentTask.getDescription());
-				}
-				if (currentTask.getFromDateTime() != null
-						&& currentTask.getToDateTime() != null) {
-					mLocalMem.getLocalMem().get(i)
-							.setFromDateTime(currentTask.getFromDateTime());
-					mLocalMem.getLocalMem().get(i)
-							.setToDateTime(currentTask.getToDateTime());
-				}
-				if (currentTask.getFromDateTime() != null
-						&& currentTask.getToDateTime() == null) {
-					mLocalMem.getLocalMem().get(i)
-							.setFromDateTime(currentTask.getFromDateTime());
-					mLocalMem.getLocalMem().get(i).setToDateTime(null);
-				}
-				if (currentTask.getLabels() != null) {
-					if (!super.getTask().getLabels().isEmpty()) {
-						mLocalMem.getLocalMem().get(i)
-								.setLabels(currentTask.getLabels());
-					}
-				}
+				updateTask(currentTask, mLocalMem.getLocalMem().get(i));
+			}
+		}
+	}
+	
+	private void updateTask(Task currentTask, Task tasktoUpdated){
+		if (currentTask.getDescription() != null) {
+			tasktoUpdated.setDescription(currentTask.getDescription());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() != null) {
+			tasktoUpdated.setFromDateTime(currentTask.getFromDateTime());
+			tasktoUpdated.setToDateTime(currentTask.getToDateTime());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() == null) {
+			tasktoUpdated.setFromDateTime(currentTask.getFromDateTime());
+			tasktoUpdated.setToDateTime(null);
+		}
+		if (currentTask.getLabels() != null) {
+			if (!super.getTask().getLabels().isEmpty()) {
+				tasktoUpdated.setLabels(currentTask.getLabels());
 			}
 		}
 	}
@@ -169,42 +178,11 @@ public class UpdateCommand extends Command {
 		int indexOfTaskToUpdated = mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1);
 		Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
 		
-		UpdateCommand commandToUndo = null;
-		if (this.getTaskDetails() == null) {
-			commandToUndo = new UpdateCommand(taskToUpdated.getDescription(),
-					taskToUpdated.getFromDateTime(), taskToUpdated.getToDateTime(),
-					taskToUpdated.getLabels(), taskToUpdated.getDescription());
-		} else {
-			commandToUndo = new UpdateCommand(taskToUpdated.getDescription(),
-					taskToUpdated.getFromDateTime(), taskToUpdated.getToDateTime(),
-					taskToUpdated.getLabels(), super.getTaskDetails());
-		}
+		UpdateCommand commandToUndo = createUpdateUndo(taskToUpdated);
 		mLocalMem.undoPush(commandToUndo);
 		
 		Task currentTask = super.getTask();
-		if (currentTask.getDescription() != null) {
-			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
-					.setDescription(currentTask.getDescription());
-		}
-		if (currentTask.getFromDateTime() != null
-				&& currentTask.getToDateTime() != null) {
-			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
-					.setFromDateTime(currentTask.getFromDateTime());
-			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
-					.setToDateTime(currentTask.getToDateTime());
-		}
-		if (currentTask.getFromDateTime() != null
-				&& currentTask.getToDateTime() == null) {
-			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
-					.setFromDateTime(currentTask.getFromDateTime());
-			mLocalMem.getLocalMem().get(indexOfTaskToUpdated).setToDateTime(null);
-		}
-		if (currentTask.getLabels() != null) {
-			if (!super.getTask().getLabels().isEmpty()) {
-				mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
-						.setLabels(currentTask.getLabels());
-			}
-		}
+		updateTask(currentTask, taskToUpdated);
 		
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
