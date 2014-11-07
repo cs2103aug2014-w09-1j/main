@@ -1,11 +1,11 @@
 package mytasks.logic;
 
-//@author A0114302A
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 
+//@author A0114302A
 /**
  * RedoCommand extends Command to follow OOP standard. Redo command does not exist within the stack
  * for undo/redo but is used to manipulate these stacks 
@@ -16,7 +16,7 @@ public class RedoCommand extends Command {
 	
 	public RedoCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
-		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc, true);
 		mLocalMem = LocalMemory.getInstance();
 	}
 

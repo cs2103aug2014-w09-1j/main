@@ -1,6 +1,5 @@
 package mytasks.storage;
 
-//@author A0114302A
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
+//@author A0114302A
 /**
  * MyTasksStorage handles the storage of tasks into external memory as well as
  * converting it to readable local memory for logical processes
@@ -27,7 +27,8 @@ public class MyTasksStorage implements IStorage, Serializable {
 	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
-	private final String DELIMS = "//";
+	private final String TEXT_DELIMS = "//";
+	private final String TEXT_EMPTYFIELD = " ";
 	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
 			.getName());
 	private Handler fh = null;
@@ -104,16 +105,17 @@ public class MyTasksStorage implements IStorage, Serializable {
 		if (memString.length() == 0) {
 			return result;
 		}
-		String[] memBlock = memString.split(DELIMS);
+		String[] memBlock = memString.split(TEXT_DELIMS);
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks % sizeBlocks != 0) {
 			runLogger();
-			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA);
+			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA + " " + noBlocks);
 			closeHandler();
 			return result;
 		}
 		handleIndivBlocks(result, memBlock, noBlocks, sizeBlocks);
+		assert result != null;
 		return result;
 	}
 	
@@ -149,7 +151,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	}
 
 	public ArrayList<String> getLabels(ArrayList<String> labels, String curBlock) {
-		if (!curBlock.equals(" ")) {
+		if (!curBlock.equals(TEXT_EMPTYFIELD)) {
 			String delims2 = "[,]+";
 			String[] indivLabels = curBlock.split(delims2);
 			ArrayList<String> tempLabels = new ArrayList<String>();
@@ -203,7 +205,9 @@ public class MyTasksStorage implements IStorage, Serializable {
 	public String addLabels(String result, Task currentTask) {
 		ArrayList<String> labels = currentTask.getLabels();
 		if (labels == null) {
-			result += " ";
+			result += TEXT_EMPTYFIELD;
+		} else if (labels.size()==0){
+			result += TEXT_EMPTYFIELD;
 		} else {
 			for (int j = 0; j < labels.size(); j++) {
 				result += labels.get(j);
@@ -215,7 +219,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 
 	private String addDate(Date currentDate, String result) {
 		if (currentDate == null) {
-			result += " ";
+			result += TEXT_EMPTYFIELD;
 		} else {
 			result += MyTasksParser.dateTimeFormats.get(0).format(currentDate);
 		}
@@ -223,7 +227,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	}
 
 	private String addBreak() {
-		return DELIMS;
+		return TEXT_DELIMS;
 	}
 	
 	/**

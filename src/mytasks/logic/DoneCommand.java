@@ -6,14 +6,10 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author A0112139R
 /**
  * DoneCommand extends Command object to follow OOP standards
- * 
- * @author Michael
- *
  */
-
-//@author A0112139R
 public class DoneCommand extends Command {
 	
 	private LocalMemory mLocalMem;

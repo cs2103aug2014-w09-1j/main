@@ -11,14 +11,11 @@ import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
+//@author A0112139R
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
  * It is required to be able to categorize by labels that is listed in the currentSettings
- * @author Michael
- *
  */
-
-//@author A0112139R
 class MemorySnapshotHandler {
 	
 	private static MemorySnapshotHandler INSTANCE = null;
@@ -84,7 +81,7 @@ class MemorySnapshotHandler {
 		
 		if (!labelsInSortedOrder.isEmpty()){
 			combinationOfLabels();
-			computeLabelOrder();
+			computeLabelOrderOfAllTasks();
 			sortByLabels();
 			return convertSnapshotListToStringInLabelsFormat(snapshotList);
 		}
@@ -118,6 +115,13 @@ class MemorySnapshotHandler {
 		}
 	}
 
+	/**
+	 * convert the list of sorted task to an array list of string
+	 * that follows the date format
+	 * 
+	 * @param snapshotList 
+	 * @return array list of string with date format
+	 */
 	private ArrayList<String> convertSnapshotListToStringInDateFormat(ArrayList<Task> snapshotList){	
 		ArrayList<String> output = new ArrayList<String>();
 
@@ -162,6 +166,13 @@ class MemorySnapshotHandler {
 		return output;
 	}
 
+	/**
+	 * convert the list of sorted task to an array list of string
+	 * that follows the label format
+	 * 
+	 * @param snapshotList 
+	 * @return array list of string with label format
+	 */
 	private ArrayList<String> convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){		
 		ArrayList<String> output = new ArrayList<String>();
 		ArrayList<String> labelsNotWanted;
@@ -207,6 +218,13 @@ class MemorySnapshotHandler {
 		return output;
 	}
 
+	/**
+	 * convert timed tasks to individual schedule task
+	 * in the range of the date and time
+	 * 
+	 * @param 
+	 * @return 
+	 */
 	private void timedTaskToNormalTask(){	
 		for (int i=0; i < snapshotList.size(); i++){
 			if (snapshotList.get(i).getFromDateTime() != null && snapshotList.get(i).getToDateTime() != null){
@@ -232,6 +250,13 @@ class MemorySnapshotHandler {
 		}
 	}
 
+	/**
+	 * find all the possible combination of labels
+	 * that is given
+	 * 
+	 * @param 
+	 * @return labelCombinations
+	 */
 	private void combinationOfLabels(){
 		ArrayList<String> chosen = new ArrayList<String>();
 		ArrayList<String> remaining = new ArrayList<String>();		
@@ -251,6 +276,13 @@ class MemorySnapshotHandler {
 		}
 	}
 
+	/**
+	 * Recursive method to
+	 * find all the possible combination of labels
+	 * 
+	 * @param 
+	 * @return labelCombinations
+	 */
 	private void combinationOfLabelsRec(ArrayList<String> remaining, ArrayList<String> chosen){
 		if (remaining.isEmpty()){
 			labelCombinations.add(chosen);
@@ -261,11 +293,17 @@ class MemorySnapshotHandler {
 			ArrayList<String> c2 = (ArrayList<String>) chosen.clone();
 			c2.add(s);
 			combinationOfLabelsRec(r2, c2);
-			combinationOfLabelsRec(r2, chosen);
-			
+			combinationOfLabelsRec(r2, chosen);			
 		}
 	}
 
+	/**
+	 * convert the given task to string
+	 * without including its date but preserving its time
+	 * 
+	 * @param task
+	 * @return string of task
+	 */
 	private String taskToStringWithoutDate(Task task){
 		String labelsToString = "";
 		if (task.getLabels() != null) {
@@ -283,6 +321,13 @@ class MemorySnapshotHandler {
 		return String.format("%s %s%s", task.getDescription(), timeToString, labelsToString);
 	}
 
+	/**
+	 * convert the given task to string
+	 * without including the given labels
+	 * 
+	 * @param task
+	 * @return string of task
+	 */
 	private String taskToStringWithoutSpecifiedLabels(Task task, ArrayList<String> labelsNotWanted){
 		String labelsToString = "";
 		if (task.getLabels() != null) {
@@ -330,6 +375,13 @@ class MemorySnapshotHandler {
 		return false;
 	}
 
+	/**
+	 * extract the time from the given task
+	 * and convert it to string
+	 * 
+	 * @param task
+	 * @return string of time
+	 */
 	private String getTime(Task task){		
 		String timeToString = "";
 		assert task.getFromDateTime() != null;
@@ -350,6 +402,13 @@ class MemorySnapshotHandler {
 		return timeToString;
 	}
 
+	/**
+	 * extract the date from the given Date object
+	 * without including its time
+	 * 
+	 * @param date
+	 * @return string of date
+	 */
 	private Date getDate(Date date){
 		String dateToString = dateFormat.format(date);
 		Date dateWithoutTime = null;
@@ -361,14 +420,27 @@ class MemorySnapshotHandler {
 		return dateWithoutTime;
 	}
 	
-	private void computeLabelOrder(){
+	/**
+	 * compute the label order of all tasks
+	 * and store it inside a hash map
+	 * 
+	 * @param 
+	 * @return 
+	 */
+	private void computeLabelOrderOfAllTasks(){
 		for (int i=0; i < snapshotList.size(); i++){
 			Task currentTask = snapshotList.get(i);
-			tasksToLabelOrders.put(currentTask, labelOrder(currentTask));		
+			tasksToLabelOrders.put(currentTask, computeLabelOrder(currentTask));		
 		}
 	}
 
-	private int labelOrder(Task task){
+	/**
+	 * compute the label order of the given task tasks
+	 * 
+	 * @param task
+	 * @return an integer represent the task label order
+	 */
+	private int computeLabelOrder(Task task){
 		int order = labelCombinations.size();
 		if (task.getLabels() == null){
 			return order;
@@ -404,6 +476,12 @@ class MemorySnapshotHandler {
 		return order;
 	}
 	
+	/**
+	 * check if need to show done tasks
+	 * 
+	 * @param 
+	 * @return boolean
+	 */
 	private boolean wantDoneTasks(){
 		for (int i=0; i < currentSettings.length; i++){
 			if (currentSettings[i].toLowerCase().equals("done")){
@@ -413,6 +491,12 @@ class MemorySnapshotHandler {
 		return false;
 	}
 
+	/**
+	 * check if the given task is mark as done
+	 * 
+	 * @param task
+	 * @return boolean
+	 */
 	private boolean isDone(Task task){
 		if (task.getLabels() == null){
 			return false;
@@ -426,6 +510,12 @@ class MemorySnapshotHandler {
 		return false;
 	}
 
+	/**
+	 * increase the day of the given date by 1
+	 * 
+	 * @param date
+	 * @return date with 1 more day
+	 */
 	private Date incrementDate(Date date){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);

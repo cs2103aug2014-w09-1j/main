@@ -5,11 +5,10 @@ import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 
+//@author A0112139R
 /**
  * SortCommand extends Command object to follow OOP standards
  */
-
-//@author A0112139R
 public class SortCommand extends Command {
 	
 	private MemorySnapshotHandler mViewHandler;

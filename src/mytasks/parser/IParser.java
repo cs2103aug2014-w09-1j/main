@@ -1,8 +1,8 @@
 package mytasks.parser;
 
-//@author A0114302A
 import mytasks.logic.Command;
 
+//@author A0114302A
 public interface IParser {
 	
 	/**
