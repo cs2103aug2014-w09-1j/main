@@ -238,14 +238,21 @@ public class LogicTest {
 		taskLogic.executeCommand("hi fun");
 		assertEquals(true, taskLogic.labelsHidden);
 		ArrayList<String> toHide = new ArrayList<String>();
-		toHide.add("fun");
+		toHide.add("#fun");
 		assertEquals(toHide, taskLogic.toHide);
 		
 		taskLogic.executeCommand("hi all");
 		assertEquals(true, taskLogic.labelsHidden);
 		ArrayList<String> allTasks = new ArrayList<String>();
-		allTasks.add("fun");
+		allTasks.add("#fun");
 		allTasks.add("N.A.");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+		taskLogic.executeCommand("hi all fun");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+		allTasks.remove(0);
+		taskLogic.executeCommand("hi N.A.");
 		assertEquals(allTasks, taskLogic.toHide);
 	}
 	
