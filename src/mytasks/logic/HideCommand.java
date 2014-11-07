@@ -43,12 +43,6 @@ public class HideCommand extends Command {
 			return toReturn;
 		}
 		
-		ArrayList<String> labels = new ArrayList<String>();
-		labels.add("all");
-		ShowCommand commandToUndo = new ShowCommand(null, null, null, labels, null);
-		mLocalMem.undoPush(commandToUndo);
-		mLocalMem.saveLocalMemory();
-		
 		// to hide all labels
 		// TODO address issue where there will be a label #all (clash)
 		if (toHide.get(0).equals("all")) {
@@ -58,6 +52,12 @@ public class HideCommand extends Command {
 			}
 			mController.toggleHide(true);
 			mController.hideLabels(toHide);
+			
+			ArrayList<String> labels = new ArrayList<String>();
+			labels.add("all");
+			ShowCommand commandToUndo = new ShowCommand(null, null, null, labels, null);
+			mLocalMem.undoPush(commandToUndo);
+			mLocalMem.saveLocalMemory();
 			
 			FeedbackObject toReturn = new FeedbackObject("All labels hidden", true);
 			return toReturn;
@@ -74,6 +74,14 @@ public class HideCommand extends Command {
 				return toReturn;
 			}
 		}
+		
+		ArrayList<String> labels = new ArrayList<String>();
+		for (int i=0; i<toHide.size(); i++) {
+			labels.add(toHide.get(i));
+		}
+		ShowCommand commandToUndo = new ShowCommand(null, null, null, labels, null);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.saveLocalMemory();
 		
 		mController.toggleHide(true);
 		mController.hideLabels(toHide);
@@ -98,10 +106,22 @@ public class HideCommand extends Command {
 	}
 
 	//TODO implement showing of time
-	
+	// TODO implement undo and redo
 	@Override
 	FeedbackObject undo() {
-		throw new UnsupportedOperationException();
+		ArrayList<String> labelsToRevert = super.getTask().getLabels();
+		if (labelsToRevert.get(0).equals("all")) {
+			ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
+			ArrayList<String> toShow = new ArrayList<String>();
+			for (int i=0; i<temp.size(); i++) {
+				toShow.add(locateLabels(temp.get(i)));
+			}
+			mController.toggleShow(true);
+			mController.showLabels(toShow);
+		}
+		
+		FeedbackObject toReturn = new FeedbackObject("All labels shown", true);
+		return toReturn;
 	}
 
 }

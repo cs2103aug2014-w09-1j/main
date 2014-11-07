@@ -260,6 +260,18 @@ public class LogicTest {
 		allTasks.add("N.A.");
 		assertEquals(allTasks, taskLogic.toShow);
 	}
+	
+	@Test
+	public void testHideShowUndoCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("go shopping #money");
+		taskLogic.executeCommand("go school");
+		taskLogic.executeCommand("so money");
+		taskLogic.executeCommand("hi money");
+		
+		assertEquals("Hiding undone", taskLogic.executeCommand("un").getFeedback());
+		
+	}
 	// TODO: add test cases for the working functions. Ie. search and update.
 	// Follow conventions stated in v0.1
 }

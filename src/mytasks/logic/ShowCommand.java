@@ -43,12 +43,6 @@ public class ShowCommand extends Command {
 			return toReturn;
 		}
 		
-		ArrayList<String> labels = new ArrayList<String>();
-		labels.add("all");
-		HideCommand commandToUndo = new HideCommand(null, null, null, labels, null);			
-		mLocalMem.undoPush(commandToUndo);
-		mLocalMem.saveLocalMemory();
-		
 		// to show all labels
 		if (toShow.get(0).equals("all")) {
 			toShow.remove(0);
@@ -57,6 +51,12 @@ public class ShowCommand extends Command {
 			}
 			mController.toggleShow(true);
 			mController.showLabels(toShow);
+			
+			ArrayList<String> labels = new ArrayList<String>();
+			labels.add("all");
+			HideCommand commandToUndo = new HideCommand(null, null, null, labels, null);			
+			mLocalMem.undoPush(commandToUndo);
+			mLocalMem.saveLocalMemory();
 			
 			FeedbackObject toReturn = new FeedbackObject("All labels shown", true);
 			return toReturn;
@@ -73,6 +73,13 @@ public class ShowCommand extends Command {
 			}
 		}
 		
+		ArrayList<String> labels = new ArrayList<String>();
+		for (int i=0; i<toShow.size(); i++) {
+			labels.add(toShow.get(i));
+		}
+		HideCommand commandToUndo = new HideCommand(null, null, null, labels, null);			
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.saveLocalMemory();
 		mController.toggleShow(true);
 		mController.showLabels(toShow);
 		
