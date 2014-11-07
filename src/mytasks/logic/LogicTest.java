@@ -241,6 +241,7 @@ public class LogicTest {
 		
 	}
 	
+	//@author A0114302A
 	@Test
 	public void testHideCommand2() {
 		taskLogic.getMemory().clearMemory();
@@ -269,6 +270,19 @@ public class LogicTest {
 		taskLogic.executeCommand("hi fun gg");
 		assertEquals(true, taskLogic.labelsHidden);
 		assertEquals(newTasks, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testHideCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
+		taskLogic.executeCommand("so fun gg");
+		taskLogic.executeCommand("hi fun gg");
+		taskLogic.executeCommand("so date");
+		assertEquals(false, taskLogic.labelsHidden);
 	}
 	
 	@Test
@@ -304,6 +318,23 @@ public class LogicTest {
 		taskLogic.executeCommand("hi all");
 		
 		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial #fun");
+		taskLogic.executeCommand("ad sleep #boring #fun");
+		taskLogic.executeCommand("ad randomcomd");
+		taskLogic.executeCommand("so boring fun");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring fun");
 		assertEquals(true, taskLogic.labelsHidden);
 		ArrayList<String> labels = new ArrayList<String>();
 		labels.add("N.A.");

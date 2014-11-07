@@ -11,9 +11,6 @@ import mytasks.parser.MyTasksParser;
 
 /**
  * HideCommand extends Command object to follow OOP standards
- * 
- * @author Shuan Siang
- *
  */
 
 // @author A0108543J
@@ -69,7 +66,7 @@ public class HideCommand extends Command {
 			}
 		}
 		if(toHide.contains("#all")){
-			toReturnArray = availableLabels;
+			toReturnArray = referenceLabels;
 		} else {
 			for (int i = 0; i<toUse.size(); i++){
 				toReturnArray.add(referenceLabels.get(toUse.get(i)));

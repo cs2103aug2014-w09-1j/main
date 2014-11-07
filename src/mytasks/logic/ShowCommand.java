@@ -4,15 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import mytasks.file.FeedbackObject;
 import mytasks.parser.MyTasksParser;
 
 /**
  * HideCommand extends Command object to follow OOP standards
- * 
- * @author Shuan Siang
- *
  */
 
 // @author A0108543J
@@ -30,8 +28,10 @@ public class ShowCommand extends Command {
 	@Override
 	FeedbackObject execute() {
 
-		ArrayList<String> availableLabelsToShow = mController.getHideLabels();
+		ArrayList<String> referenceLabelsToShow = cloneList(mController.getHideLabels());
+		ArrayList<String> availableLabelsToShow = cloneList(mController.getHideLabels());
 		ArrayList<String> toShow = super.getTask().getLabels();
+		ArrayList<Integer> toUse = new ArrayList<Integer>(); 
 		addHashtags(toShow);
 
 		if (toShow == null) {
@@ -41,10 +41,21 @@ public class ShowCommand extends Command {
 		}
 
 		for (int i = 0; i < toShow.size(); i++) {
-			if (!availableLabelsToShow.contains(toShow.get(i))
-					&& !toShow.get(i).equals("#all")) {
-				FeedbackObject toReturn = new FeedbackObject("Invalid label",
-						false);
+			boolean haveThisWord = false;
+			String thisWord = toShow.get(i);
+			for (int j = 0; j<availableLabelsToShow.size(); j++){
+				String curLabel = availableLabelsToShow.get(j);
+				if (curLabel.equals(thisWord)){
+					haveThisWord = true;
+					toUse.add(j);
+				} else if (curLabel.contains(thisWord)){
+					haveThisWord = true;
+					curLabel = curLabel.replace(thisWord, "");
+					availableLabelsToShow.set(j, curLabel);
+				}
+			}
+			if (!haveThisWord && !thisWord.equals("#all")) {
+				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
 				return toReturn;
 			}
 		}
@@ -55,15 +66,22 @@ public class ShowCommand extends Command {
 			FeedbackObject toReturn = new FeedbackObject("All labels shown",
 					true);
 			return toReturn;
-		}
+		} 
 
-		for (int i = 0; i < toShow.size(); i++) {
-			availableLabelsToShow.remove(toShow.get(i));
+		ArrayList<String> newToHide = new ArrayList<String>();
+		for (int i = 0; i < referenceLabelsToShow.size(); i++) {
+			if (!toUse.contains(i)) {
+				newToHide.add(referenceLabelsToShow.get(i));
+			}
 		}
-		if (availableLabelsToShow.size()==0) {
+		if (newToHide.size()==0) {
+			mController.clearHideLabels();
 			mController.toggleHide(false);
+			FeedbackObject toReturn = new FeedbackObject("All labels shown",
+					true);
+			return toReturn;
 		}
-		
+		mController.hideLabels(newToHide);
 		FeedbackObject toReturn = new FeedbackObject("Labels shown", true);
 		return toReturn;
 	}
@@ -76,13 +94,18 @@ public class ShowCommand extends Command {
 			}
 		}
 	}
+	
+	private ArrayList<String> cloneList(ArrayList<String> list) {
+	    ArrayList<String> clone = new ArrayList<String>(list.size());
+	    for(String item: list) clone.add(item);
+	    return clone;
+	}
 
 	private boolean isDates(String toCheck) {
 		try {
 			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
 			curDateForm.parse(toCheck);
 		} catch (ParseException e) {
-			System.out.println("should see this");
 			return false;
 		}
 		return true;
