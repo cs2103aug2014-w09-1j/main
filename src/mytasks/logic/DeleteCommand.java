@@ -59,10 +59,9 @@ public class DeleteCommand extends Command {
 			FeedbackObject result = new FeedbackObject(resultString,true);
 			return result;
 		} else {
-			FeedbackObject result = autoSearch();
 			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails()) + "\n";
-			resultString += result.getFeedback();
-			result = new FeedbackObject(resultString,false);
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString,false);
 			return result;
 		}
 	}

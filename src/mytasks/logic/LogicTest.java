@@ -148,25 +148,19 @@ public class LogicTest {
 		output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#CS2103#important\n" 
-				+ "demo on 05.11.2014\n"
-				+ "#CS2100#important\n"
-				+ "lab\n"
-				+ "#CS2103\n"
-				+ "tutorial\n"
-				+ "#CS2100\n"
-				+ "tutorial\n"
-				+ "#important\n"
-				+ "meeting on 03.11.2014 #CS2101\n"
-				+ "N.A.\n"
-				+ "video making #CS2101\n", output);
+		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
+				+ "#CS2100#important\n" + "lab\n"
+				+ "#CS2103\n" + "tutorial\n"
+				+ "#CS2100\n" + "tutorial\n"
+				+ "#important\n" + "meeting on 03.11.2014 #CS2101\n"
+				+ "N.A.\n" + "video making #CS2101\n", output);
 	}
 	
 	@Test
 	public void testDoneCommand(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
-        taskLogic.executeCommand("do meeting");
+        assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
         taskLogic.executeCommand("so done");
 		String output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
@@ -189,6 +183,8 @@ public class LogicTest {
 		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
 	}
 	
 	@Test

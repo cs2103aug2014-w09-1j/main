@@ -18,7 +18,7 @@ public class DoneCommand extends Command {
 	
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_DONE_SUCCESS = "'%1$s' mark as done";
-	private static String MESSAGE_DONE_FAIL = "Task '%1$s' does not exist. Unable to mark as done.";
+	private static String MESSAGE_DONE_FAIL = "Task '%1$s' does not exist. Unable to mark as done. Auto search for similar tasks.";
 	private static String MESSAGE_DONE_ALREADY = "Task '%1$s' had already been marked as done.";
 
 	public DoneCommand(String comdDes, Date fromDateTime,
@@ -29,16 +29,18 @@ public class DoneCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		if (haveSearched == true && isNumeric(super.getTaskDetails()) && Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
-			FeedbackObject feedback = new DoneCommand(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
-			haveSearched = false;
-			return feedback;
+		if (canDoneFromSearchResults()){
+			FeedbackObject result = doneFromSearchResults();
+			return result;
 		}
+		System.out.println("Task:" + super.getTask() + "@@@@@@@@@@@@@@@@@");
 		boolean hasTask = false;
+		boolean isDone = true;
 		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
 				hasTask = true;
 				Task currentTask = mLocalMem.getLocalMem().get(i);
+				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				Command commandToUndo = new DoneCommand(currentTask.getDescription(),
 						currentTask.getFromDateTime(), currentTask.getToDateTime(), 
 						currentTask.getLabels(), null);
@@ -48,17 +50,20 @@ public class DoneCommand extends Command {
 				if (currentTask.getLabels() != null){
 					labels = currentTask.getLabels();
 				}
+				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				if (!isDone(currentTask)){
+					isDone = false;
 					labels.add("done");
 				}
 				currentTask.setLabels(labels);
+				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				break;
 			}
 		}
 
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();
-		if (hasTask && isDone(super.getTask())){
+		if (hasTask && isDone){
 			String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
 			FeedbackObject result = new FeedbackObject(resultString,false);
 			return result;
@@ -69,7 +74,8 @@ public class DoneCommand extends Command {
 			return result;
 		}
 		else{
-			String resultString = String.format(MESSAGE_DONE_FAIL, super.getTaskDetails());
+			String resultString = String.format(MESSAGE_DONE_FAIL, super.getTaskDetails()) + "\n";
+			resultString += autoSearch().getFeedback();
 			FeedbackObject result = new FeedbackObject(resultString,false);
 			return result;
 		}
@@ -119,16 +125,34 @@ public class DoneCommand extends Command {
 		return false;
 	}
 	
-	public static boolean isNumeric(String str)  
-	{  
-	  try  
-	  {  
-	     int i = Integer.parseInt(str);  
-	  }  
-	  catch(NumberFormatException nfe)  
-	  {  
-	    return false;  
-	  }  
-	  return true;  
+	private boolean canDoneFromSearchResults(){
+		if (haveSearched == true && isNumeric(super.getTaskDetails()) && 
+				Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject doneFromSearchResults(){
+		FeedbackObject feedback = new DoneCommand(mLocalMem.getSearchList().get
+				(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
+		haveSearched = false;
+		return feedback;
+	}
+
+	private boolean isNumeric(String str) {
+		try {
+			int i = Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), task.getToDateTime(), 
+				task.getLabels(), null).execute();
+		return result;
 	}
 }

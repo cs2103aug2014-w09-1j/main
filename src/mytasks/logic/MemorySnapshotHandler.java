@@ -360,36 +360,6 @@ class MemorySnapshotHandler {
 		}	
 		return dateWithoutTime;
 	}
-
-	private boolean haveLabel(int listIndex, int labelIndex){
-		if (snapshotList.get(listIndex).getLabels() == null){
-			return false;
-		}
-
-		for (int i=0; i < snapshotList.get(listIndex).getLabels().size(); i++){
-			if (snapshotList.get(listIndex).getLabels().get(i).equals(labelsInSortedOrder.get(labelIndex))){
-				return true;
-			}
-		}
-
-		return false;
-	}
-	
-	private boolean haveLabels(int index){
-		if (snapshotList.get(index).getLabels() == null){
-			return false;
-		}
-		
-		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
-			for (int j=0; j < labelsInSortedOrder.size(); j++){
-				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
-					return true;
-				}
-			}
-		}
-		
-		return false;	
-	}
 	
 	private void computeLabelOrder(){
 		for (int i=0; i < snapshotList.size(); i++){
@@ -461,5 +431,35 @@ class MemorySnapshotHandler {
 		calendar.setTime(date);
 		calendar.add(Calendar.DATE, 1);
 		return calendar.getTime();
+	}
+	
+	private boolean haveLabel(int listIndex, int labelIndex){
+		if (snapshotList.get(listIndex).getLabels() == null){
+			return false;
+		}
+
+		for (int i=0; i < snapshotList.get(listIndex).getLabels().size(); i++){
+			if (snapshotList.get(listIndex).getLabels().get(i).equals(labelsInSortedOrder.get(labelIndex))){
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	private boolean haveLabels(int index){
+		if (snapshotList.get(index).getLabels() == null){
+			return false;
+		}
+		
+		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
+			for (int j=0; j < labelsInSortedOrder.size(); j++){
+				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
+					return true;
+				}
+			}
+		}
+		
+		return false;	
 	}
 }
