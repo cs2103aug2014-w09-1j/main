@@ -33,14 +33,12 @@ public class DoneCommand extends Command {
 			FeedbackObject result = doneFromSearchResults();
 			return result;
 		}
-		System.out.println("Task:" + super.getTask() + "@@@@@@@@@@@@@@@@@");
 		boolean hasTask = false;
 		boolean isDone = true;
 		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
 				hasTask = true;
 				Task currentTask = mLocalMem.getLocalMem().get(i);
-				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				Command commandToUndo = new DoneCommand(currentTask.getDescription(),
 						currentTask.getFromDateTime(), currentTask.getToDateTime(), 
 						currentTask.getLabels(), null);
@@ -50,13 +48,11 @@ public class DoneCommand extends Command {
 				if (currentTask.getLabels() != null){
 					labels = currentTask.getLabels();
 				}
-				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				if (!isDone(currentTask)){
 					isDone = false;
 					labels.add("done");
 				}
 				currentTask.setLabels(labels);
-				System.out.println("currentTask:" + currentTask + "@@@@@@@@@@@@@@@@@@");
 				break;
 			}
 		}

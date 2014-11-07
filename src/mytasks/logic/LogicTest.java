@@ -18,6 +18,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad OP2 3.11.2014");
 		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #V0.4");
 		taskLogic.executeCommand("ad lab quiz 11.11.2014 #MA1101R");
+		taskLogic.executeCommand("ad gaka from 5.11.2014 to 11.11.2014 #gama #gabu");
 		//assertEquals("meeting added",
 		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
 		//assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
@@ -53,14 +54,14 @@ public class LogicTest {
 				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
 		// test 3 - search for startDate
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
-				+ "task(s) with keyword '22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
+				+ "task(s) with keyword 'on 22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
 		// test 4 - search for tasks between startDate and endDate
 		taskLogic.executeCommand("ad do project from 24.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("ad pay electric bill from 1.10.2014 to 3.10.2014");
-		assertEquals("1. CS2101 meeting on 29.09.2014 #important\n" 
+		assertEquals("1. CS2101 meeting on 29.09.2014\n" 
 				+ "2. do project from 24.09.2014 to 30.09.2014\n"
-				+ "3. pay electric bill from 1.10.2014 to 3.10.2014\n"
-				+ "task(s) with keyword '22.09.2014' searched", taskLogic.executeCommand("se from 27.09.2014 to 1.10.2014").getFeedback());
+				+ "3. pay electric bill from 01.10.2014 to 03.10.2014\n"
+				+ "task(s) with keyword 'from 27.09.2014 to 01.10.2014' searched", taskLogic.executeCommand("se from 27.09.2014 to 1.10.2014").getFeedback());
 	}
 
 	@Test
@@ -170,6 +171,7 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoRedoDone(){
+		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
 		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
 		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
