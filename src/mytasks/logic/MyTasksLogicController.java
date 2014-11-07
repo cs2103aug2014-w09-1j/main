@@ -34,7 +34,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
 	protected ArrayList<String> toHide;
-	
 	private final String MESSAGE_UNSUP = "Unsupported command function";
 	
 	// Constructor
