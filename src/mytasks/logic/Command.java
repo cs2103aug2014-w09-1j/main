@@ -18,6 +18,8 @@ public abstract class Command {
 	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
 	protected static boolean haveSearched;
+	
+	public final static String MESSAGE_NOTASK = "Unexpected Error: No Task Found to undo";
 
 	// Constructor
 	public Command(String comdDes, Date fromDateTime, Date toDateTime,

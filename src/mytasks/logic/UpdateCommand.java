@@ -19,7 +19,6 @@ public class UpdateCommand extends Command {
 	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
 
-
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
@@ -28,28 +27,30 @@ public class UpdateCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		if (canUpdateFromSearchResults()){
-			FeedbackObject result = updateFromSearchResults();
-			return result;
-		}
-		
-		Task prevState = null;
-		boolean hasTask = false;
-		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription()
-					.equals(super.getToUpdateTaskDesc())) {
-				hasTask = true;
-				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				break;
+		int timesAppear = countTimesAppear();
+		if (timesAppear != 1) {
+			if (canUpdateFromSearchResults()) {
+				FeedbackObject result = updateFromSearchResults();
+				return result;
+			} else {
+				//Direct to search
 			}
+		} else {
+			Task prevState = savePrevState();
+			UpdateCommand commandToUndo = createUpdateUndo(prevState);
+			mLocalMem.undoPush(commandToUndo);
+			updateSingleTask();
 		}
-		if (!hasTask){
-			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc()) + "\n";
-			resultString += autoSearch().getFeedback();
-			FeedbackObject result = new FeedbackObject(resultString,false);
-			return result;
-		}
-		
+
+		mLocalMem.saveLocalMemory();
+		haveSearched = false;
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
+				super.getToUpdateTaskDesc());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	public UpdateCommand createUpdateUndo(Task prevState) {
 		UpdateCommand commandToUndo = null;
 		if (this.getTaskDetails() == null) {
 			commandToUndo = new UpdateCommand(prevState.getDescription(),
@@ -60,8 +61,22 @@ public class UpdateCommand extends Command {
 					prevState.getFromDateTime(), prevState.getToDateTime(),
 					prevState.getLabels(), super.getTaskDetails());
 		}
-		mLocalMem.undoPush(commandToUndo);
+		return commandToUndo;
+	}
 
+	public Task savePrevState() {
+		Task prevState = null;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(super.getToUpdateTaskDesc())) {
+				prevState = mLocalMem.getLocalMem().get(i).getClone();
+				break;
+			}
+		}
+		return prevState;
+	}
+
+	public void updateSingleTask() {
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (super.getToUpdateTaskDesc().equals(
 					mLocalMem.getLocalMem().get(i).getDescription())) {
@@ -91,14 +106,20 @@ public class UpdateCommand extends Command {
 				}
 			}
 		}
-		mLocalMem.saveLocalMemory();
-		haveSearched = false;
-		String resultString = String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
-		FeedbackObject result = new FeedbackObject(resultString,true);
-		return result;
 	}
 
-	//@author A0108543J
+	public int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getToUpdateTaskDesc().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	// @author A0108543J
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
@@ -117,40 +138,45 @@ public class UpdateCommand extends Command {
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
 		String resultString = this.getToUpdateTaskDesc() + " reverted";
-		FeedbackObject result = new FeedbackObject(resultString,true);
+		FeedbackObject result = new FeedbackObject(resultString, true);
 		return result;
 	}
 
-	//@author A0112139R
-	private boolean canUpdateFromSearchResults(){
-		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc()) 
-				&& Integer.parseInt(super.getToUpdateTaskDesc())-1 < (mLocalMem.getSearchList().size())){
+	// @author A0112139R
+	private boolean canUpdateFromSearchResults() {
+		if (haveSearched == true
+				&& isNumeric(super.getToUpdateTaskDesc())
+				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem
+						.getSearchList().size())) {
 			return true;
 		}
 		return false;
 	}
 
-	private FeedbackObject updateFromSearchResults(){
-		FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(), super.getTask().getFromDateTime(), 
-				super.getTask().getToDateTime(), super.getTask().getLabels(), 
-				mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1).getDescription()).execute();
+	private FeedbackObject updateFromSearchResults() {
+		FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(),
+				super.getTask().getFromDateTime(), super.getTask()
+						.getToDateTime(), super.getTask().getLabels(),
+				mLocalMem.getSearchList()
+						.get(Integer.parseInt(super.getToUpdateTaskDesc()) - 1)
+						.getDescription()).execute();
 		haveSearched = false;
 		return feedback;
 	}
 
-	private boolean isNumeric(String str)  
-	{  
-		try  {  
-			int i = Integer.parseInt(str);  
-		} catch(NumberFormatException nfe)  {  
-			return false;  
-		}  
-		return true;  
+	private boolean isNumeric(String str) {
+		try {
+			int i = Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
 	}
-	
-	private FeedbackObject autoSearch(){
+
+	private FeedbackObject autoSearch() {
 		Task task = super.getTask();
-		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(), null, null, null, null).execute();
+		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(),
+				null, null, null, null).execute();
 		return result;
 	}
 
