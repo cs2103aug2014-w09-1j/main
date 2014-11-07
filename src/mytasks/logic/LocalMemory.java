@@ -29,7 +29,7 @@ class LocalMemory implements Serializable {
 	private Stack<Command> undoStack = new Stack<Command>();
 	private Stack<Command> redoStack = new Stack<Command>();
 	private IStorage mStore;
-	private static ArrayList<Task> searchList;
+	private static ArrayList<Integer> searchList;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 
 	// Constructor
@@ -60,7 +60,7 @@ class LocalMemory implements Serializable {
 		return mLocalMem;
 	}
 	
-	protected ArrayList<Task> getSearchList(){
+	protected ArrayList<Integer> getSearchList(){
 		return searchList;
 	}
 
@@ -75,6 +75,10 @@ class LocalMemory implements Serializable {
 				mLocalMem.remove(i);
 			}
 		}
+	}
+	
+	protected void remove(int index) {
+		mLocalMem.remove(index);
 	}
 
 	protected void update(String mToUpdateTaskDesc, Task userUpdate) {
@@ -128,7 +132,7 @@ class LocalMemory implements Serializable {
 	//@author A0112139R
 	protected String search(Task userRequest) {
 		String searchedTasks = "";
-		searchList = new ArrayList<Task>();
+		searchList = new ArrayList<Integer>();
 		String[] keywords = null;
 		
 		if (userRequest.getDescription() != null && !userRequest.getDescription().equals("")){
@@ -138,15 +142,19 @@ class LocalMemory implements Serializable {
 		for (int i = 0; i < mLocalMem.size(); i++) {
 			Task currentTask = mLocalMem.get(i);
 			if (haveSameDesc(keywords, currentTask)) {
+				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
 			else if (haveSameLabels(keywords, currentTask)) {
+				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
 			else if (isBetweenStartDateAndEndDate(userRequest.getFromDateTime(), userRequest.getToDateTime(), currentTask)){
+				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
 			else if (haveSameDate(userRequest.getFromDateTime(), currentTask)){
+				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
 		}
@@ -163,7 +171,6 @@ class LocalMemory implements Serializable {
 			String desc = keywords[i];
 
 			if (currentTask.getDescription().toLowerCase().contains(desc.toLowerCase())) {
-				searchList.add(currentTask);
 				return true;
 			}
 		}
@@ -180,7 +187,6 @@ class LocalMemory implements Serializable {
 
 			for (int j=0; j < currentTask.getLabels().size(); j++){
 				if (currentTask.getLabels().get(j).toLowerCase().contains(desc.toLowerCase())){
-					searchList.add(currentTask);
 					return true;
 				}
 			}
@@ -195,14 +201,12 @@ class LocalMemory implements Serializable {
 
 		if (currentTask.getToDateTime() == null){
 			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0){
-				searchList.add(currentTask);
 				return true;
 			}
 		}
 		else{
 			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0 || 
 					fromDateTime.compareTo(currentTask.getToDateTime()) <= 0 && toDateTime.compareTo(currentTask.getToDateTime()) >= 0){
-				searchList.add(currentTask);
 				return true;
 			}
 		}
@@ -217,13 +221,11 @@ class LocalMemory implements Serializable {
 		
 		if (currentTask.getToDateTime() == null){
 			if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
-				searchList.add(currentTask);
 				return true;
 			}
 		}
 		else{
 			if (currentTask.getFromDateTime().compareTo(fromDateTime) <= 0 && currentTask.getToDateTime().compareTo(fromDateTime) >= 0){ 
-				searchList.add(currentTask);
 				return true;
 			}
 		}
