@@ -6,7 +6,7 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
-//@author 
+//@author A0112139R
 /**
  * UpdateCommand extends Command to follow OOP standards
  */
@@ -72,7 +72,8 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	public Task savePrevState() {
+	//@author A0108543J
+	private Task savePrevState() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
@@ -84,7 +85,7 @@ public class UpdateCommand extends Command {
 		return prevState;
 	}
 	
-	public UpdateCommand createUpdateUndo(Task prevState) {
+	private UpdateCommand createUpdateUndo(Task prevState) {
 		UpdateCommand commandToUndo = null;
 		if (this.getTaskDetails() == null) {
 			commandToUndo = new UpdateCommand(prevState.getDescription(),
@@ -98,7 +99,7 @@ public class UpdateCommand extends Command {
 		return commandToUndo;
 	}
 
-	public void updateSingleTask() {
+	private void updateSingleTask() {
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (super.getToUpdateTaskDesc().equals(
 					mLocalMem.getLocalMem().get(i).getDescription())) {
@@ -129,7 +130,7 @@ public class UpdateCommand extends Command {
 		}
 	}
 
-	public int countTimesAppear() {
+	private int countTimesAppear() {
 		int count = 0;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (super.getToUpdateTaskDesc().equals(
@@ -165,10 +166,8 @@ public class UpdateCommand extends Command {
 
 	//@author A0112139R
 	private boolean canUpdateFromSearchResults() {
-		if (haveSearched == true
-				&& isNumeric(super.getToUpdateTaskDesc())
-				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem
-						.getSearchList().size())) {
+		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc())
+				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem.getSearchList().size())) {
 			return true;
 		}
 		return false;
@@ -193,7 +192,7 @@ public class UpdateCommand extends Command {
 
 	private boolean isNumeric(String str) {
 		try {
-			int i = Integer.parseInt(str);
+			Integer.parseInt(str);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}

@@ -6,7 +6,7 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
-//@author A0108543J
+//@author A0112139R
 /**
  * DeleteCommand extends Command to follow OOP standards
  */
@@ -30,11 +30,9 @@ public class DeleteCommand extends Command {
 		if (isRedo){
 			int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
 			Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
-			Command commandToUndo = new DeleteCommand(taskToDeleted.getDescription(),
-					taskToDeleted.getFromDateTime(),taskToDeleted.getToDateTime(), 
-					taskToDeleted.getLabels(), null);
+			DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
 			mLocalMem.undoPush(commandToUndo);
-			mLocalMem.remove( indexOfTaskToDeleted);
+			mLocalMem.remove(indexOfTaskToDeleted);
 			String resultString = String.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
 			FeedbackObject result = new FeedbackObject(resultString, true);
 			return result;
@@ -61,26 +59,22 @@ public class DeleteCommand extends Command {
 			return result;
 		} else {
 			deleteSingleTask();
+			haveSearched = false;
+			mLocalMem.saveLocalMemory();
+			String resultString = String.format(MESSAGE_DELETE_SUCCESS, 
+					super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
 		} 
-
-		haveSearched = false;
-		mLocalMem.saveLocalMemory();
-		String resultString = String
-				.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
-		FeedbackObject result = new FeedbackObject(resultString,true);
-		return result;
 	}
 
-	public void deleteSingleTask(){
+	//@author A0108543J
+	private void deleteSingleTask(){
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getTask().getDescription())) {
 				Task currentTask = mLocalMem.getLocalMem().get(i);
-				Command commandToUndo = new DeleteCommand(
-						currentTask.getDescription(),
-						currentTask.getFromDateTime(),
-						currentTask.getToDateTime(), currentTask.getLabels(),
-						null);
+				DeleteCommand commandToUndo = createDeleteUndo(currentTask);
 				mLocalMem.undoPush(commandToUndo);
 				mLocalMem.remove(super.getTask());
 				break;
@@ -88,7 +82,14 @@ public class DeleteCommand extends Command {
 		}
 	}
 
-	public int countTimesAppear() {
+	private DeleteCommand createDeleteUndo(Task currentTask){
+		DeleteCommand commandToUndo = new DeleteCommand(currentTask.getDescription(),
+				currentTask.getFromDateTime(), currentTask.getToDateTime(), 
+				currentTask.getLabels(), null);
+		return commandToUndo;
+	}
+
+	private int countTimesAppear() {
 		int count = 0;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (super.getTaskDetails().equals(
@@ -102,8 +103,8 @@ public class DeleteCommand extends Command {
 	@Override
 	FeedbackObject undo() {
 		Task prevState = super.getTask();
-		Command toRedo = new DeleteCommand(prevState.getDescription(), null,
-				null, null, null);
+		Command toRedo = new DeleteCommand(prevState.getDescription(), 
+				null, null, null, null);
 		mLocalMem.add(prevState);
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
@@ -124,9 +125,7 @@ public class DeleteCommand extends Command {
 	private FeedbackObject deleteFromSearchResults(){
 		int indexOfTaskToDeleted = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
 		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
-		Command commandToUndo = new DeleteCommand(taskToDeleted.getDescription(),
-				taskToDeleted.getFromDateTime(),taskToDeleted.getToDateTime(), 
-				taskToDeleted.getLabels(), null);
+		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.remove(indexOfTaskToDeleted);
 		mLocalMem.saveLocalMemory();
@@ -138,7 +137,7 @@ public class DeleteCommand extends Command {
 
 	private boolean isNumeric(String str) {
 		try {
-			int i = Integer.parseInt(str);
+			Integer.parseInt(str);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}
@@ -147,8 +146,8 @@ public class DeleteCommand extends Command {
 
 	private FeedbackObject autoSearch(){
 		Task task = super.getTask();
-		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), task.getToDateTime(), 
-				task.getLabels(), null).execute();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), 
+				task.getToDateTime(), task.getLabels(), null).execute();
 		return result;
 	}
 }
