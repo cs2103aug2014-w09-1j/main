@@ -255,6 +255,21 @@ public class LogicTest {
 	}
 	
 	@Test
+	public void testHideCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("so fun gg");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("#fun#gg");
+		newTasks.add("#fun");
+		taskLogic.executeCommand("hi fun gg");
+		assertEquals(true, taskLogic.labelsHidden);
+		assertEquals(newTasks, taskLogic.toHide);
+	}
+	
+	@Test
 	public void testShowCommand1() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad watch webcast #boring");
