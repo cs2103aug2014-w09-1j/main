@@ -51,6 +51,16 @@ public class LogicTest {
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "3. important\n"
 				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
+		// test 3 - search for startDate
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "task(s) with keyword '22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
+		// test 4 - search for tasks between startDate and endDate
+		taskLogic.executeCommand("ad do project from 24.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad pay electric bill from 1.10.2014 to 3.10.2014");
+		assertEquals("1. CS2101 meeting on 29.09.2014 #important\n" 
+				+ "2. do project from 24.09.2014 to 30.09.2014\n"
+				+ "3. pay electric bill from 1.10.2014 to 3.10.2014\n"
+				+ "task(s) with keyword '22.09.2014' searched", taskLogic.executeCommand("se from 27.09.2014 to 1.10.2014").getFeedback());
 	}
 
 	@Test
