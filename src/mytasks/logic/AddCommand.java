@@ -1,6 +1,5 @@
 package mytasks.logic;
 
-//@author A0114302A
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +12,7 @@ import java.util.logging.SimpleFormatter;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author A0114302A
 /**
  * AddCommand extends Command object to follow OOP standards
  */

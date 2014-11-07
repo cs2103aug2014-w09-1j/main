@@ -6,14 +6,11 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author A0108543J
 /**
  * DeleteCommand extends Command to follow OOP standards
- * 
- * @author Huiwen, Shuan Siang
- *
  */
 
-//@author A0108543J
 public class DeleteCommand extends Command {
 
 	// private variables

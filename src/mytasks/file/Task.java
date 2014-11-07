@@ -1,6 +1,5 @@
 package mytasks.file;
 
-//@author A0114302A
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,6 +9,7 @@ import java.util.logging.*;
 
 import mytasks.parser.MyTasksParser;
 
+//@author A0114302A
 /**
  * Task object represents a single task with all the relevant fields that is
  * essential to a task
@@ -182,11 +182,11 @@ public class Task {
 			if (!sameDescription){
 				return sameDescription;
 			}
-			boolean sameDateFrom = compareDateTime(other.getFromDateTime());
+			boolean sameDateFrom = compareFromDateTime(other.getFromDateTime());
 			if (!sameDateFrom){
 				return sameDateFrom;
 			}
-			boolean sameDateTo = compareDateTime(other.getToDateTime());
+			boolean sameDateTo = compareToDateTime(other.getToDateTime());
 			if (!sameDateTo){
 				return sameDateTo;
 			}
@@ -215,7 +215,7 @@ public class Task {
 		return result;
 	}
 	
-	private boolean compareDateTime(Date other){
+	private boolean compareFromDateTime(Date other){
 		boolean result = true;
 		if (other == null) {
 			if (mFromDateTime != null) {
@@ -226,6 +226,23 @@ public class Task {
 				return false;
 			}
 			if (!other.equals(mFromDateTime)) {
+				return false;
+			}
+		}
+		return result;
+	}
+	
+	private boolean compareToDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mToDateTime != null) {
+				return false;
+			}
+		} else {
+			if (mToDateTime == null) {
+				return false;
+			}
+			if (!other.equals(mToDateTime)) {
 				return false;
 			}
 		}

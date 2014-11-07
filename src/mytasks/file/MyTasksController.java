@@ -1,10 +1,10 @@
 package mytasks.file;
 
-//@author A0114302A
 import java.util.Date;
 
 import mytasks.ui.MyTasksUI;
 
+//@author A0114302A
 /**
  * MyTasksController acts as the controller of MyTasks. However, this is shared with the UI
  * MyTasksController hides the creation of UI and simply runs it upon program call
