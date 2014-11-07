@@ -185,4 +185,18 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	protected ArrayList<String> getHideLabels() {
 		return toHide;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean checkIfToHide() {
+		return labelsHidden;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> labelsToHide() {
+		return toHide;
+	}
 }

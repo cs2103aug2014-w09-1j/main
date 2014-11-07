@@ -34,4 +34,18 @@ public interface ILogic {
 	 * @return a list of strings
 	 */
 	public List<String> obtainAllLabels();
+	
+	/**
+	 * checkIfToHide checks if there is a need to hide any labels. If so, call labelsToHide
+	 * @return boolean
+	 */
+	public boolean checkIfToHide();
+	
+	/**
+	 * labelsToHide returns the labels that should be hidden. Values are only accurate if
+	 * checkIfToHide is true. 
+	 * @return List of strings to hide
+	 */
+	public List<String> labelsToHide();
+	
 }
