@@ -116,7 +116,7 @@ public class HideCommand extends Command {
 			for (int i=0; i<temp.size(); i++) {
 				toShow.add(locateLabels(temp.get(i)));
 			}
-			mController.toggleShow(true);
+			mController.toggleHide(false);
 			mController.showLabels(toShow);
 		}
 		

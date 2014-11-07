@@ -30,7 +30,7 @@ public class ShowCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		mController.toggleShow(false);
+		mController.toggleHide(false);
 		mController.clearShowLabels();
 		
 		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
@@ -49,7 +49,7 @@ public class ShowCommand extends Command {
 			for (int i=0; i<temp.size(); i++) {
 				toShow.add(locateLabels(temp.get(i)));
 			}
-			mController.toggleShow(true);
+			mController.toggleHide(false);
 			mController.showLabels(toShow);
 			
 			ArrayList<String> labels = new ArrayList<String>();
@@ -80,7 +80,7 @@ public class ShowCommand extends Command {
 		HideCommand commandToUndo = new HideCommand(null, null, null, labels, null);			
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.saveLocalMemory();
-		mController.toggleShow(true);
+		mController.toggleHide(false);
 		mController.showLabels(toShow);
 		
 		FeedbackObject toReturn = new FeedbackObject("Labels hidden", true);

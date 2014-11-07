@@ -186,15 +186,20 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		toHide.clear();
 	}
 	
-	protected void toggleShow(boolean showOrNot) {
-		labelsShown = showOrNot;
-	}
-	
 	protected void showLabels(ArrayList<String> labels) {
 		toShow = labels;
 	}
 	
 	protected void clearShowLabels() {
 		toShow.clear();
+	}
+	
+	protected List<String> getHideShowList() {
+		if (labelsHidden) {
+			return toHide;
+		}
+		else {
+			return toShow;
+		}
 	}
 }
