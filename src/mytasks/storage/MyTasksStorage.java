@@ -110,7 +110,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 		int sizeBlocks = 4;
 		if (noBlocks % sizeBlocks != 0) {
 			runLogger();
-			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA);
+			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA + " " + noBlocks);
 			closeHandler();
 			return result;
 		}
@@ -205,6 +205,8 @@ public class MyTasksStorage implements IStorage, Serializable {
 	public String addLabels(String result, Task currentTask) {
 		ArrayList<String> labels = currentTask.getLabels();
 		if (labels == null) {
+			result += TEXT_EMPTYFIELD;
+		} else if (labels.size()==0){
 			result += TEXT_EMPTYFIELD;
 		} else {
 			for (int j = 0; j < labels.size(); j++) {
