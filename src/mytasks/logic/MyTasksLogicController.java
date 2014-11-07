@@ -93,7 +93,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	 * {@inheritDoc}
 	 */
 	public FeedbackObject executeCommand(String input) {
-		mLocalMem.print();
+		//mLocalMem.print();
 		Command commandObject = parseInput(input);
 		// String output = removeFirstWord(input);
 
@@ -180,5 +180,9 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	
 	protected void clearHideLabels() {
 		toHide.clear();
+	}
+	
+	protected ArrayList<String> getHideLabels() {
+		return toHide;
 	}
 }

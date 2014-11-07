@@ -262,45 +262,51 @@ public class LogicTest {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad play #fun 18.09.2014");
 		taskLogic.executeCommand("ad homework");
+		taskLogic.executeCommand("so date");
 		ArrayList<String> newTasks = new ArrayList<String>();
 		newTasks.add("18.Sep.2014");
 		taskLogic.executeCommand("hi 18.Sep.2014");
+		assertEquals(true, taskLogic.labelsHidden);
 		assertEquals(newTasks, taskLogic.toHide);
 	}
 	
-//	@Test
-//	public void testShowCommand() {
-//		taskLogic.getMemory().clearMemory();
-//		taskLogic.executeCommand("ad watch webcast #boring");
-//		taskLogic.executeCommand("ad do tutorial");
-//		taskLogic.executeCommand("so boring");
-//		taskLogic.executeCommand("hi boring");
-//		
-//		taskLogic.executeCommand("sh boring");
-//		assertEquals(true, taskLogic.labelsShown);
-//		ArrayList<String> toShow = new ArrayList<String>();
-//		toShow.add("boring");
-//		assertEquals(toShow, taskLogic.toShow);
-//		
-//		taskLogic.executeCommand("sh all");
-//		assertEquals(true, taskLogic.labelsShown);
-//		ArrayList<String> allTasks = new ArrayList<String>();
-//		allTasks.add("boring");
-//		allTasks.add("N.A.");
-//		assertEquals(allTasks, taskLogic.toShow);
-//	}
+	@Test
+	public void testShowCommand1() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
 	
 	@Test
-	public void testHideShowUndoCommand() {
+	public void testShowCommand2() {
 		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("go shopping #money");
-		taskLogic.executeCommand("go school");
-		taskLogic.executeCommand("so money");
-		taskLogic.executeCommand("hi money");
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
 		
-		assertEquals("Hiding undone", taskLogic.executeCommand("un").getFeedback());
+		taskLogic.executeCommand("sh all");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
 		
 	}
-	// TODO: add test cases for the working functions. Ie. search and update.
-	// Follow conventions stated in v0.1
 }

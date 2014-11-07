@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import mytasks.file.FeedbackObject;
 import mytasks.parser.MyTasksParser;
@@ -19,22 +20,18 @@ import mytasks.parser.MyTasksParser;
 public class HideCommand extends Command {
 
 	// private variables
-	private LocalMemory mLocalMem;
 	private MyTasksLogicController mController;
-	private MemorySnapshotHandler mViewHandler;
 
 	public HideCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		mLocalMem = LocalMemory.getInstance();
 		mController = MyTasksLogicController.getInstance(false);
-		mViewHandler = MemorySnapshotHandler.getInstance();
 	}
 
 	@Override
 	FeedbackObject execute() {
 		
-		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
+		List<String> temp = mController.obtainPrintableOutput();
 		ArrayList<String> availableLabels = new ArrayList<String>();
 		ArrayList<String> toHide = super.getTask().getLabels();
 		addHashtags(toHide);
@@ -44,7 +41,9 @@ public class HideCommand extends Command {
 			return toReturn;
 		}
 		// TODO known bug: cannot use all as label
+		System.out.println(temp.size());
 		for (int i = 0; i < temp.size(); i++) {
+			System.out.println(temp.get(i));
 			availableLabels.add(locateLabels(temp.get(i)));
 		}
 		
@@ -85,7 +84,6 @@ public class HideCommand extends Command {
 			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
 			curDateForm.parse(toCheck);
 		} catch (ParseException e) {
-			System.out.println("should see this");
 			return false;
 		}
 		return true;
