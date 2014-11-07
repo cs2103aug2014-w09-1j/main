@@ -1,6 +1,5 @@
 package mytasks.logic;
 
-// @author A0108543J
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -14,11 +13,9 @@ import javax.swing.KeyStroke;
 import mytasks.file.FeedbackObject;
 import mytasks.ui.HelpUI;
 
+//@author A0108543J
 /**
  * HelpCommand extends Command object to follow OOP standards.
- * 
- * @author Shuan Siang
- *
  */
 public class HelpCommand extends Command {
 

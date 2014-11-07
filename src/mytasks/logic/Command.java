@@ -1,21 +1,19 @@
 package mytasks.logic;
 
-//@author A0114302A
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author A0114302A
 /**
  * CommandType instance used to access different fields of a command that has
  * been parsed.
  */
 public abstract class Command {
 
-	// Private variables
 	private Task mTask;
-	// Variable used to store task description of task to be updated (if any)
 	private String mToUpdateTaskDesc;
 	protected static boolean haveSearched;
 	

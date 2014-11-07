@@ -9,11 +9,10 @@ import java.util.List;
 import mytasks.file.FeedbackObject;
 import mytasks.parser.MyTasksParser;
 
+//@author A0108543J
 /**
  * HideCommand extends Command object to follow OOP standards
  */
-
-// @author A0108543J
 public class HideCommand extends Command {
 
 	// private variables
