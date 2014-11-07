@@ -131,7 +131,7 @@ public class UpdateCommand extends Command {
 		return count;
 	}
 
-	// @author A0108543J
+	//@author A0108543J
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
@@ -154,7 +154,7 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	// @author A0112139R
+	//@author A0112139R
 	private boolean canUpdateFromSearchResults() {
 		if (haveSearched == true
 				&& isNumeric(super.getToUpdateTaskDesc())

@@ -25,7 +25,7 @@ class LocalMemory implements Serializable {
 
 	// Private variables
 	private static LocalMemory INSTANCE = null;
-	private ArrayList<Task> mLocalMem = new ArrayList<Task>();
+	private static ArrayList<Task> mLocalMem = new ArrayList<Task>();
 	private Stack<Command> undoStack = new Stack<Command>();
 	private Stack<Command> redoStack = new Stack<Command>();
 	private IStorage mStore;
@@ -42,6 +42,11 @@ class LocalMemory implements Serializable {
 			INSTANCE = new LocalMemory();
 		}
 		return INSTANCE;
+	}
+	
+	// for testing purposes 
+	protected static void clearLocalMem() {
+		mLocalMem = new ArrayList<Task>(); 
 	}
 
 	protected Object readResolve() {
