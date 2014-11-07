@@ -17,7 +17,7 @@ public class DeleteCommand extends Command {
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
-	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to delete the specific one";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to delete the specific one.";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -27,6 +27,19 @@ public class DeleteCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
+		if (isRedo){
+			int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
+			Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
+			Command commandToUndo = new DeleteCommand(taskToDeleted.getDescription(),
+					taskToDeleted.getFromDateTime(),taskToDeleted.getToDateTime(), 
+					taskToDeleted.getLabels(), null);
+			mLocalMem.undoPush(commandToUndo);
+			mLocalMem.remove( indexOfTaskToDeleted);
+			String resultString = String.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
+		}
+		
 		if (canDeleteFromSearchResults()) {
 			FeedbackObject result = deleteFromSearchResults();
 			return result;
@@ -109,15 +122,15 @@ public class DeleteCommand extends Command {
 	}
 
 	private FeedbackObject deleteFromSearchResults(){
-		Task taskToDeleted = mLocalMem.getLocalMem()
-				.get(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1));
+		int indexOfTaskToDeleted = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
+		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
 		Command commandToUndo = new DeleteCommand(taskToDeleted.getDescription(),
 				taskToDeleted.getFromDateTime(),taskToDeleted.getToDateTime(), 
 				taskToDeleted.getLabels(), null);
 		mLocalMem.undoPush(commandToUndo);
-		mLocalMem.remove(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1));
-		haveSearched = false;
+		mLocalMem.remove(indexOfTaskToDeleted);
 		mLocalMem.saveLocalMemory();
+		haveSearched = false;
 		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
 		FeedbackObject feedback = new FeedbackObject(resultString, true);
 		return feedback;

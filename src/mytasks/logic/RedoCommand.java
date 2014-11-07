@@ -16,7 +16,7 @@ public class RedoCommand extends Command {
 	
 	public RedoCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
-		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc, true);
 		mLocalMem = LocalMemory.getInstance();
 	}
 

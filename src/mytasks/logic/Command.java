@@ -16,6 +16,7 @@ public abstract class Command {
 	private Task mTask;
 	private String mToUpdateTaskDesc;
 	protected static boolean haveSearched;
+	protected static boolean isRedo;
 	
 	public final static String MESSAGE_NOTASK = "Unexpected Error: No Task Found to undo";
 
@@ -25,6 +26,15 @@ public abstract class Command {
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;
+		Command.isRedo = false;
+	}
+	
+	public Command(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc, boolean isRedo) {
+		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
+		mTask = thisTask;
+		mToUpdateTaskDesc = updateDesc;
+		Command.isRedo = isRedo;
 	}
 
 	protected String getTaskDetails() {
