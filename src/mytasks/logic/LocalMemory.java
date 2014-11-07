@@ -131,7 +131,7 @@ class LocalMemory implements Serializable {
 		searchList = new ArrayList<Task>();
 		String[] keywords = null;
 		
-		if (userRequest.getDescription() != null){
+		if (userRequest.getDescription() != null && !userRequest.getDescription().equals("")){
 			keywords = userRequest.getDescription().split("\\s+");	
 		}
 
@@ -215,9 +215,17 @@ class LocalMemory implements Serializable {
 			return false;
 		}
 		
-		if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
-			searchList.add(currentTask);
-			return true;
+		if (currentTask.getToDateTime() == null){
+			if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
+				searchList.add(currentTask);
+				return true;
+			}
+		}
+		else{
+			if (currentTask.getFromDateTime().compareTo(fromDateTime) <= 0 && currentTask.getToDateTime().compareTo(fromDateTime) >= 0){ 
+				searchList.add(currentTask);
+				return true;
+			}
 		}
 		
 		return false;
