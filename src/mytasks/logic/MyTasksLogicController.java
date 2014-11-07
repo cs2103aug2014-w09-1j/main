@@ -23,19 +23,20 @@ import mytasks.storage.MyTasksStorage;
 
 @SuppressWarnings("serial")
 public class MyTasksLogicController implements ILogic, Serializable {
-
-	// Private variables
+	
 	private IParser mParser;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
-	private final String MESSAGE_UNSUP = "Unsupported command function";
 	private static MyTasksLogicController INSTANCE = null;
 	private static final Logger LOGGER = Logger.getLogger(MyTasksLogicController.class
 			.getName());
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
 	protected ArrayList<String> toHide;
+	
+	private final String MESSAGE_UNSUP = "Unsupported command function";
+	
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
 		initLogic(isDeveloper);
@@ -66,7 +67,11 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
 	private void closeHandler() {
 		fh.flush();
 		fh.close();
@@ -138,7 +143,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		return mViewHandler;
 	}
 
-	//@author A0114302A
 	/**
 	 * {@inheritDoc}
 	 */

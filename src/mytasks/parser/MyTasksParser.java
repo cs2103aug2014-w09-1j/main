@@ -53,7 +53,10 @@ public class MyTasksParser implements IParser {
     private static final int DAYSINWEEK = 7;
     private static final Logger LOGGER = Logger.getLogger(MyTasksParser.class
             .getName());
+    
     private Handler fh = null;
+    private ArrayList<Integer> usedWords;
+    
     private final String MESSAGE_INVALIDTOFROM = "No time found after word 'to' or 'next': Taken as task description";
     private final String MESSAGE_INVALIDINDEX = "Unexpected error: Invalid indexes";
     private final String MESSAGE_INVALIDDATES = "Input dates do not follow order";
@@ -64,7 +67,6 @@ public class MyTasksParser implements IParser {
     private String[] dateWords = { "monday", "tuesday", "wednesday",
             "thursday", "friday", "saturday", "sunday", "month", "year" };
 
-    private ArrayList<Integer> usedWords;
 
     // Constructor
     public MyTasksParser() {
@@ -85,7 +87,11 @@ public class MyTasksParser implements IParser {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
     private void closeHandler() {
         fh.flush();
         fh.close();
