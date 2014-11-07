@@ -5,13 +5,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 
 /**
@@ -28,6 +34,14 @@ public class HelpUI extends JPanel {
 	private Border paneEdge;
 	private JScrollPane scrollPane;
 	private Border titled;
+	private static HelpUI INSTANCE = null;
+
+	public static HelpUI getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new HelpUI();
+		}
+		return INSTANCE;
+	}
 
 	public HelpUI() {
 		super(new GridBagLayout());
@@ -51,26 +65,26 @@ public class HelpUI extends JPanel {
 		textArea = new JTextArea();
 		textArea.setEditable(false);
 		textArea.setFocusable(false);
-		
+
 		// coloured border
 		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
-		
+
 		// main context
 		String content = "testing1\ntesting2\ntesting3\n";
 		textArea.setText(content);
 		textArea.setBorder(titled);
-		
+
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		
+
 		textAreaPanel.add(textArea, c);
 		textArea.setCaretPosition(0);
-		
+
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(400, 400));
@@ -80,7 +94,7 @@ public class HelpUI extends JPanel {
 		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
 		footerAreaLabel.setOpaque(true);
 		footerAreaLabel.setFocusable(false);
-		
+
 		// Add Components to this panel.
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
@@ -102,5 +116,38 @@ public class HelpUI extends JPanel {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		add(footerAreaLabel, c);
+	}
+
+	/**
+	 * run opens up the help window
+	 */
+	public void run() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+
+	private static void createAndShowGUI() {
+		// create and set up the window
+		JFrame frame = new JFrame("MyTasks Help");
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+		// add contents to the window
+		frame.add(new HelpUI());
+
+		// display the window
+		frame.pack();
+		frame.setVisible(true);
+
+		// pressing the esc key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+		.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
 	}
 }
