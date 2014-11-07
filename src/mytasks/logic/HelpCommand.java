@@ -1,16 +1,15 @@
 package mytasks.logic;
 
-//@author A0108543J
-import java.awt.FlowLayout;
+// @author A0108543J
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.JDialog;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import mytasks.file.FeedbackObject;
 import mytasks.ui.HelpUI;
@@ -39,19 +38,30 @@ public class HelpCommand extends Command {
 		// create and set up the window
 		JFrame frame = new JFrame("MyTasks Help");
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		
+
 		// add contents to the window
 		frame.add(new HelpUI());
-		
+
 		// display the window
 		frame.pack();
 		frame.setVisible(true);
+
+		// pressing the esc key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+						.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+		
 		return null;
 	}
 
 	@Override
 	FeedbackObject undo() {
-		throw new UnsupportedOperationException("Help does not have an undo function");
+		throw new UnsupportedOperationException(
+						"Help does not have an undo function");
 	}
-	
+
 }
