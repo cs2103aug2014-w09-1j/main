@@ -23,21 +23,19 @@ import mytasks.storage.MyTasksStorage;
 
 @SuppressWarnings("serial")
 public class MyTasksLogicController implements ILogic, Serializable {
-
-	// Private variables
+	
 	private IParser mParser;
 	private LocalMemory mLocalMem;
 	private MemorySnapshotHandler mViewHandler;
 	private boolean isDeveloper;
-	private final String MESSAGE_UNSUP = "Unsupported command function";
 	private static MyTasksLogicController INSTANCE = null;
-	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+	private static final Logger LOGGER = Logger.getLogger(MyTasksLogicController.class
 			.getName());
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
 	protected ArrayList<String> toHide;
-	protected ArrayList<String> toShow;
-
+	private final String MESSAGE_UNSUP = "Unsupported command function";
+	
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
 		initLogic(isDeveloper);
@@ -68,7 +66,11 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
 	private void closeHandler() {
 		fh.flush();
 		fh.close();
@@ -89,14 +91,13 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		}
 		mViewHandler = MemorySnapshotHandler.getInstance();
 		toHide = new ArrayList<String>();
-		toShow = new ArrayList<String>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public FeedbackObject executeCommand(String input) {
-		mLocalMem.print();
+		//mLocalMem.print();
 		Command commandObject = parseInput(input);
 		// String output = removeFirstWord(input);
 
@@ -141,7 +142,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		return mViewHandler;
 	}
 
-	//@author A0114302A
 	/**
 	 * {@inheritDoc}
 	 */
@@ -185,20 +185,21 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		toHide.clear();
 	}
 	
-	protected void showLabels(ArrayList<String> labels) {
-		toShow = labels;
+	protected ArrayList<String> getHideLabels() {
+		return toHide;
 	}
-	
-	protected void clearShowLabels() {
-		toShow.clear();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean checkIfToHide() {
+		return labelsHidden;
 	}
-	
-	protected List<String> getHideShowList() {
-		if (labelsHidden) {
-			return toHide;
-		}
-		else {
-			return toShow;
-		}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> labelsToHide() {
+		return toHide;
 	}
 }

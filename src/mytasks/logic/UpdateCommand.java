@@ -44,10 +44,9 @@ public class UpdateCommand extends Command {
 			}
 		}
 		if (!hasTask){
-			FeedbackObject result = autoSearch();
 			String resultString = String.format(MESSAGE_UPDATE_FAIL, super.getToUpdateTaskDesc()) + "\n";
-			resultString += result.getFeedback();
-			result = new FeedbackObject(resultString,false);
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString,false);
 			return result;
 		}
 		
