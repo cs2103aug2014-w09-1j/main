@@ -27,12 +27,14 @@ public class UpdateCommand extends Command {
 	@Override
 	FeedbackObject execute() {
 		if(isRedo){
-			int indexOfTaskToUpdated = mLocalMem.getLocalMem().size()-1;
-			Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
+			int indexOfTaskToUpdated = 0;
+			Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);		
 			Command commandToUndo = createUpdateUndo(taskToUpdated);
-			mLocalMem.undoPush(commandToUndo);			
-			updateTask(super.getTask(), taskToUpdated);
-			mLocalMem.saveLocalMemory();
+			mLocalMem.undoPush(commandToUndo);	
+			Task updatedTask = updateTask(super.getTask(), taskToUpdated);
+			mLocalMem.getLocalMem().remove(indexOfTaskToUpdated);
+			mLocalMem.getLocalMem().add(updatedTask);
+			mLocalMem.saveLocalMemory();			
 			String resultString = String.format(MESSAGE_UPDATE_SUCCESS, super.getToUpdateTaskDesc());
 			FeedbackObject result = new FeedbackObject(resultString, true);
 			return result;
@@ -72,7 +74,7 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	//@author A0108543J
+	//@author A0115034X
 	private Task savePrevState() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
@@ -104,30 +106,34 @@ public class UpdateCommand extends Command {
 			if (super.getToUpdateTaskDesc().equals(
 					mLocalMem.getLocalMem().get(i).getDescription())) {
 				Task currentTask = super.getTask();
-				updateTask(currentTask, mLocalMem.getLocalMem().get(i));
+				Task updatedTask = updateTask(currentTask, mLocalMem.getLocalMem().get(i));
+				mLocalMem.getLocalMem().remove(i);
+				mLocalMem.getLocalMem().add(updatedTask);
 			}
 		}
 	}
 	
-	private void updateTask(Task currentTask, Task tasktoUpdated){
+	private Task updateTask(Task currentTask, Task taskToUpdated){
 		if (currentTask.getDescription() != null) {
-			tasktoUpdated.setDescription(currentTask.getDescription());
+			taskToUpdated.setDescription(currentTask.getDescription());
 		}
 		if (currentTask.getFromDateTime() != null
 				&& currentTask.getToDateTime() != null) {
-			tasktoUpdated.setFromDateTime(currentTask.getFromDateTime());
-			tasktoUpdated.setToDateTime(currentTask.getToDateTime());
+			taskToUpdated.setFromDateTime(currentTask.getFromDateTime());
+			taskToUpdated.setToDateTime(currentTask.getToDateTime());
 		}
 		if (currentTask.getFromDateTime() != null
 				&& currentTask.getToDateTime() == null) {
-			tasktoUpdated.setFromDateTime(currentTask.getFromDateTime());
-			tasktoUpdated.setToDateTime(null);
+			taskToUpdated.setFromDateTime(currentTask.getFromDateTime());
+			taskToUpdated.setToDateTime(null);
 		}
 		if (currentTask.getLabels() != null) {
 			if (!super.getTask().getLabels().isEmpty()) {
-				tasktoUpdated.setLabels(currentTask.getLabels());
+				taskToUpdated.setLabels(currentTask.getLabels());
 			}
 		}
+		Task updatedTask = taskToUpdated;
+		return updatedTask;
 	}
 
 	private int countTimesAppear() {
@@ -145,15 +151,10 @@ public class UpdateCommand extends Command {
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
-		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription()
-					.equals(this.getToUpdateTaskDesc())) {
-				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				mLocalMem.getLocalMem().remove(i);
-				mLocalMem.getLocalMem().add(this.getTask());
-				break;
-			}
-		}
+		int i = mLocalMem.getLocalMem().size()-1;
+		prevState = mLocalMem.getLocalMem().get(i).getClone();
+		mLocalMem.getLocalMem().remove(i);
+		mLocalMem.getLocalMem().add(0, this.getTask());
 		Command toRedo = new UpdateCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), this.getTask().getDescription());
@@ -164,9 +165,9 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	//@author A0112139R
-	private boolean canUpdateFromSearchResults() {
-		if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc())
+//@author A0112139R
+private boolean canUpdateFromSearchResults() {
+	if (haveSearched == true && isNumeric(super.getToUpdateTaskDesc())
 				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem.getSearchList().size())) {
 			return true;
 		}
@@ -181,7 +182,9 @@ public class UpdateCommand extends Command {
 		mLocalMem.undoPush(commandToUndo);
 		
 		Task currentTask = super.getTask();
-		updateTask(currentTask, taskToUpdated);
+		Task updatedTask = updateTask(currentTask, taskToUpdated);
+		mLocalMem.getLocalMem().remove(indexOfTaskToUpdated);
+		mLocalMem.getLocalMem().add(updatedTask);
 		
 		haveSearched = false;
 		mLocalMem.saveLocalMemory();

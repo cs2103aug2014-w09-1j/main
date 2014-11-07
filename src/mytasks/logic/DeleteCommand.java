@@ -68,7 +68,7 @@ public class DeleteCommand extends Command {
 		} 
 	}
 
-	//@author A0108543J
+	//@author A0115034X
 	private void deleteSingleTask(){
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
