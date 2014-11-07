@@ -169,7 +169,9 @@ public class MyTasksParser implements IParser {
         }
         String taskDesc = removeDate(withoutLabels);
         if (taskDesc.equals("") || taskDesc.length() == 0) {
-            return null;
+        	if (!comdType.equals("se")){
+                return null;
+        	}
         }
         switch (comdType) {
         case "ad":

@@ -31,7 +31,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private boolean isDeveloper;
 	private final String MESSAGE_UNSUP = "Unsupported command function";
 	private static MyTasksLogicController INSTANCE = null;
-	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+	private static final Logger LOGGER = Logger.getLogger(MyTasksLogicController.class
 			.getName());
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
