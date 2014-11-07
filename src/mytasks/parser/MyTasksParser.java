@@ -1,6 +1,5 @@
 package mytasks.parser;
 
-//@author A0114302A
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +22,7 @@ import mytasks.logic.SortCommand;
 import mytasks.logic.UndoCommand;
 import mytasks.logic.UpdateCommand;
 
+//@author A0114302A
 /**
  * MyTasksParser interprets userinput to useable data structures to work with in
  * the Logic component.

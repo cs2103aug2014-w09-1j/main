@@ -1,6 +1,5 @@
 package mytasks.parser;
 
-//@author A0114302A
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
@@ -19,6 +18,7 @@ import mytasks.logic.UpdateCommand;
 
 import org.junit.Test;
 
+//@author A0114302A
 /**
  * ParserTest holds all unit test cases for the parser component. (Component testing only)
  */

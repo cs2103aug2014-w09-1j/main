@@ -1,6 +1,5 @@
 package mytasks.logic;
 
-//@author A0114302A
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import mytasks.parser.IParser;
 import mytasks.parser.MyTasksParser;
 import mytasks.storage.MyTasksStorage;
 
+//@author A0114302A
 /**
  * MyTasksLogic handles all logic related operations such as program flow and
  * execution of commands
@@ -97,9 +97,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	 * {@inheritDoc}
 	 */
 	public FeedbackObject executeCommand(String input) {
-		//mLocalMem.print();
 		Command commandObject = parseInput(input);
-		// String output = removeFirstWord(input);
 
 		if (commandObject == null) {
 			FeedbackObject result = new FeedbackObject("Invalid input", false);

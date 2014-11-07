@@ -1,6 +1,5 @@
 package mytasks.storage;
 
-//@author A0114302A
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
@@ -12,6 +11,7 @@ import mytasks.parser.MyTasksParser;
 
 import org.junit.Test;
 
+//@author A0114302A
 public class StorageTest {
 	
 	ArrayList<Task> mem1;

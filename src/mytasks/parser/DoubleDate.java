@@ -1,8 +1,8 @@
 package mytasks.parser;
 
-//@author A0114302A
 import java.util.Date;
 
+//@author A0114302A
 /**
  * DoubleDate is a data structure to hold 2 dates for the parser to use. This is
  * a protected class that cannot be accessed from outside package
@@ -35,25 +35,46 @@ class DoubleDate {
 			return false;
 		} else {
 			DoubleDate otherDate = (DoubleDate) otherTask;
-			if (otherDate.getDate1() == null) {
-				if (mDate1 != null) {
-					return false;
-				}
-			} else {
-				if (!otherDate.getDate1().equals(mDate1)) {
-					return false;
-				}
-			}
-			if (otherDate.getDate2() == null) {
-				if (mDate2 != null) {
-					return false;
-				}
-			} else {
-				if (!otherDate.getDate2().equals(mDate2)) {
-					return false;
-				}
+			boolean is1Equal = compareFromDateTime(otherDate.getDate1());
+			boolean is2Equal = compareToDateTime(otherDate.getDate2());
+			if (!is1Equal||!is2Equal) {
+				return false;
 			}
 		}
 		return true;
+	}
+	
+	private boolean compareFromDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mDate1 != null) {
+				return false;
+			}
+		} else {
+			if (mDate1 == null) {
+				return false;
+			}
+			if (!other.equals(mDate1)) {
+				return false;
+			}
+		}
+		return result;
+	}
+	
+	private boolean compareToDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mDate2 != null) {
+				return false;
+			}
+		} else {
+			if (mDate2 == null) {
+				return false;
+			}
+			if (!other.equals(mDate2)) {
+				return false;
+			}
+		}
+		return result;
 	}
 }

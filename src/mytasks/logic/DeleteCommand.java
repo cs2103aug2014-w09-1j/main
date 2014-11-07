@@ -6,20 +6,18 @@ import java.util.Date;
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
+//@author A0108543J
 /**
  * DeleteCommand extends Command to follow OOP standards
- * 
- * @author Huiwen, Shuan Siang
- *
  */
 
-//@author A0108543J
 public class DeleteCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to delete the specific one";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -33,12 +31,37 @@ public class DeleteCommand extends Command {
 			FeedbackObject result = deleteFromSearchResults();
 			return result;
 		}
-		
-		boolean hasTask = false;
+
+		int timesAppear = countTimesAppear();
+		if (timesAppear == 0){
+			String resultString = String.format(MESSAGE_DELETE_FAIL,
+					super.getTaskDetails()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, false);
+			return result;
+		}
+		else if (timesAppear > 1) {	
+			String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
+					super.getTaskDetails()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
+		} else {
+			deleteSingleTask();
+		} 
+
+		haveSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String
+				.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
+	}
+
+	public void deleteSingleTask(){
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getTask().getDescription())) {
-				hasTask = true;
 				Task currentTask = mLocalMem.getLocalMem().get(i);
 				Command commandToUndo = new DeleteCommand(
 						currentTask.getDescription(),
@@ -50,20 +73,17 @@ public class DeleteCommand extends Command {
 				break;
 			}
 		}
+	}
 
-		haveSearched = false;
-		mLocalMem.saveLocalMemory();
-		if (hasTask) {
-			String resultString = String
-					.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,true);
-			return result;
-		} else {
-			String resultString = String.format(MESSAGE_DELETE_FAIL, super.getTaskDetails()) + "\n";
-			resultString += autoSearch().getFeedback();
-			FeedbackObject result = new FeedbackObject(resultString,false);
-			return result;
+	public int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getTaskDetails().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
 		}
+		return count;
 	}
 
 	@Override
@@ -89,10 +109,17 @@ public class DeleteCommand extends Command {
 	}
 
 	private FeedbackObject deleteFromSearchResults(){
-		FeedbackObject feedback = new DeleteCommand(mLocalMem.getSearchList()
-				.get(Integer.parseInt(super.getTaskDetails()) - 1)
-				.getDescription(), null, null, null, null).execute();
+		Task taskToDeleted = mLocalMem.getLocalMem()
+				.get(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1));
+		Command commandToUndo = new DeleteCommand(taskToDeleted.getDescription(),
+				taskToDeleted.getFromDateTime(),taskToDeleted.getToDateTime(), 
+				taskToDeleted.getLabels(), null);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.remove(mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1));
 		haveSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
+		FeedbackObject feedback = new FeedbackObject(resultString, true);
 		return feedback;
 	}
 

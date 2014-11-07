@@ -18,6 +18,7 @@ public class UpdateCommand extends Command {
 	private LocalMemory mLocalMem;
 	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to update the specific one";
 
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
@@ -27,14 +28,25 @@ public class UpdateCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
+		if (canUpdateFromSearchResults()) {
+			FeedbackObject result = updateFromSearchResults();
+			return result;
+		}
+		
 		int timesAppear = countTimesAppear();
-		if (timesAppear != 1) {
-			if (canUpdateFromSearchResults()) {
-				FeedbackObject result = updateFromSearchResults();
-				return result;
-			} else {
-				//Direct to search
-			}
+		if (timesAppear == 0){
+			String resultString = String.format(MESSAGE_UPDATE_FAIL,
+					super.getToUpdateTaskDesc()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, false);
+			return result;
+		}
+		else if (timesAppear > 1) {
+			String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
+					super.getToUpdateTaskDesc()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
 		} else {
 			Task prevState = savePrevState();
 			UpdateCommand commandToUndo = createUpdateUndo(prevState);
@@ -119,7 +131,7 @@ public class UpdateCommand extends Command {
 		return count;
 	}
 
-	// @author A0108543J
+	//@author A0108543J
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
@@ -142,7 +154,7 @@ public class UpdateCommand extends Command {
 		return result;
 	}
 
-	// @author A0112139R
+	//@author A0112139R
 	private boolean canUpdateFromSearchResults() {
 		if (haveSearched == true
 				&& isNumeric(super.getToUpdateTaskDesc())
@@ -154,13 +166,50 @@ public class UpdateCommand extends Command {
 	}
 
 	private FeedbackObject updateFromSearchResults() {
-		FeedbackObject feedback = new UpdateCommand(super.getTaskDetails(),
-				super.getTask().getFromDateTime(), super.getTask()
-						.getToDateTime(), super.getTask().getLabels(),
-				mLocalMem.getSearchList()
-						.get(Integer.parseInt(super.getToUpdateTaskDesc()) - 1)
-						.getDescription()).execute();
+		int indexOfTaskToUpdated = mLocalMem.getSearchList().get(Integer.parseInt(super.getToUpdateTaskDesc())-1);
+		Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
+		
+		UpdateCommand commandToUndo = null;
+		if (this.getTaskDetails() == null) {
+			commandToUndo = new UpdateCommand(taskToUpdated.getDescription(),
+					taskToUpdated.getFromDateTime(), taskToUpdated.getToDateTime(),
+					taskToUpdated.getLabels(), taskToUpdated.getDescription());
+		} else {
+			commandToUndo = new UpdateCommand(taskToUpdated.getDescription(),
+					taskToUpdated.getFromDateTime(), taskToUpdated.getToDateTime(),
+					taskToUpdated.getLabels(), super.getTaskDetails());
+		}
+		mLocalMem.undoPush(commandToUndo);
+		
+		Task currentTask = super.getTask();
+		if (currentTask.getDescription() != null) {
+			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
+					.setDescription(currentTask.getDescription());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() != null) {
+			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
+					.setFromDateTime(currentTask.getFromDateTime());
+			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
+					.setToDateTime(currentTask.getToDateTime());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() == null) {
+			mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
+					.setFromDateTime(currentTask.getFromDateTime());
+			mLocalMem.getLocalMem().get(indexOfTaskToUpdated).setToDateTime(null);
+		}
+		if (currentTask.getLabels() != null) {
+			if (!super.getTask().getLabels().isEmpty()) {
+				mLocalMem.getLocalMem().get(indexOfTaskToUpdated)
+						.setLabels(currentTask.getLabels());
+			}
+		}
+		
 		haveSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS, taskToUpdated.getDescription());
+		FeedbackObject feedback = new FeedbackObject(resultString, true);
 		return feedback;
 	}
 
@@ -174,7 +223,6 @@ public class UpdateCommand extends Command {
 	}
 
 	private FeedbackObject autoSearch() {
-		Task task = super.getTask();
 		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(),
 				null, null, null, null).execute();
 		return result;

@@ -11,14 +11,11 @@ import mytasks.file.MyTasksController;
 import mytasks.file.Task;
 import mytasks.parser.MyTasksParser;
 
+//@author A0112139R
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
  * It is required to be able to categorize by labels that is listed in the currentSettings
- * @author Michael
- *
  */
-
-//@author A0112139R
 class MemorySnapshotHandler {
 	
 	private static MemorySnapshotHandler INSTANCE = null;

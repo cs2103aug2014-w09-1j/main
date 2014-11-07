@@ -5,11 +5,10 @@ import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 
+//@author A0112139R
 /**
  * SearchCommand extends Command object to follow OOP standards
  */
-
-//@author A0112139R
 public class SearchCommand extends Command {
 	
 	private LocalMemory mLocalMem;

@@ -1,6 +1,5 @@
 package mytasks.ui;
 
-//@author A0108543J
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -14,12 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
+//@author A0108543J
 /**
  * HelpUI is the GUI for HelpCommand.
- *
- * 
- * @author Shuan Siang
- *
  */
 public class HelpUI extends JPanel {
 	private JLabel textAreaLabel, footerAreaLabel;

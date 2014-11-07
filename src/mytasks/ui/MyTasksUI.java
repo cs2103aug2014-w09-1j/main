@@ -33,8 +33,10 @@ import mytasks.file.FeedbackObject;
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogicController;
 
++ //@author A0115034X
 /**
  * MyTasksUI is the GUI for MyTasks.
++ <<
  *
  * 
  * @author A0115034X 
