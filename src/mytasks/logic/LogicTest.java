@@ -248,13 +248,13 @@ public class LogicTest {
 		taskLogic.executeCommand("hi boring");
 		
 		taskLogic.executeCommand("sh boring");
-		assertEquals(true, taskLogic.labelsShown);
+		assertEquals(false, taskLogic.labelsHidden);
 		ArrayList<String> toShow = new ArrayList<String>();
 		toShow.add("boring");
 		assertEquals(toShow, taskLogic.toShow);
 		
 		taskLogic.executeCommand("sh all");
-		assertEquals(true, taskLogic.labelsShown);
+		assertEquals(false, taskLogic.labelsHidden);
 		ArrayList<String> allTasks = new ArrayList<String>();
 		allTasks.add("boring");
 		allTasks.add("N.A.");

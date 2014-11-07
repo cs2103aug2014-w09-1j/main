@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import mytasks.file.FeedbackObject;
+import mytasks.ui.HelpUI;
 
 /**
  * HelpCommand extends Command object to follow OOP standards.
@@ -25,43 +26,32 @@ public class HelpCommand extends Command {
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		// TODO Auto-generated constructor stub
 	}
 
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc,
 					boolean canDo) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	FeedbackObject execute() {
-		// TODO Auto-generated method stub
-		HelpWindow help = new HelpWindow(null);
-		help.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		help.setSize(300,300);
-		help.setLocation(300, 300);
-		help.setVisible(true);
-		FeedbackObject result = new FeedbackObject("Opening help", true);
-		return result;
+		// create and set up the window
+		JFrame frame = new JFrame("MyTasks Help");
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		
+		// add contents to the window
+		frame.add(new HelpUI());
+		
+		// display the window
+		frame.pack();
+		frame.setVisible(true);
+		return null;
 	}
 
 	@Override
 	FeedbackObject undo() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Help does not have an undo function");
 	}
 	
-	public class HelpWindow extends JDialog {
-		JLabel label;
-		
-		public HelpWindow(JFrame frame) {
-			super(frame, "Help", true);
-			setLayout(new FlowLayout());
-			
-			label = new JLabel("new window");
-			add(label);
-		}
-	}
 }

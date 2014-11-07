@@ -36,7 +36,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
 	protected ArrayList<String> toHide;
-	protected boolean labelsShown = false;
 	protected ArrayList<String> toShow;
 
 	// Constructor
