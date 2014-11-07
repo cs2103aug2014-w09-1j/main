@@ -16,6 +16,7 @@ public class DoneCommand extends Command {
 	private static String MESSAGE_DONE_SUCCESS = "'%1$s' mark as done";
 	private static String MESSAGE_DONE_FAIL = "Task '%1$s' does not exist. Unable to mark as done. Auto search for similar tasks.";
 	private static String MESSAGE_DONE_ALREADY = "Task '%1$s' had already been marked as done.";
+	private static String MESSAGE_DONE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to mark the specific one as done.";
 
 	public DoneCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
@@ -25,82 +26,130 @@ public class DoneCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
+		if (isRedo){
+			int indexOfTaskToDone = 0;
+			Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);		
+			Command commandToUndo = createDoneUndo(taskToDone);
+			mLocalMem.undoPush(commandToUndo);	
+			Task doneTask = doTask(taskToDone);
+			mLocalMem.getLocalMem().remove(indexOfTaskToDone);
+			mLocalMem.getLocalMem().add(doneTask);
+			mLocalMem.saveLocalMemory();			
+			String resultString = String.format(MESSAGE_DONE_SUCCESS, taskToDone.getDescription());
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
+		}
+		
 		if (canDoneFromSearchResults()){
 			FeedbackObject result = doneFromSearchResults();
 			return result;
 		}
-		boolean hasTask = false;
-		boolean isDone = true;
-		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
-			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
-				hasTask = true;
-				Task currentTask = mLocalMem.getLocalMem().get(i);
-				Command commandToUndo = new DoneCommand(currentTask.getDescription(),
-						currentTask.getFromDateTime(), currentTask.getToDateTime(), 
-						currentTask.getLabels(), null);
-				mLocalMem.undoPush(commandToUndo);
+		
+		int timesAppear = countTimesAppear();
+		if (timesAppear == 0){
+			String resultString = String.format(MESSAGE_DONE_FAIL,
+					super.getTaskDetails()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, false);
+			return result;
+		}
+		else if (timesAppear > 1) {	
+			String resultString = String.format(MESSAGE_DONE_DUPLICATE,
+					super.getTaskDetails()) + "\n";
+			resultString += autoSearch().getFeedback();
+			FeedbackObject result = new FeedbackObject(resultString, true);
+			return result;
+		}else{
+			boolean isDone = true;
+			for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
+				if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
+					Task currentTask = mLocalMem.getLocalMem().get(i);
+					Command commandToUndo = createDoneUndo(currentTask);
+					mLocalMem.undoPush(commandToUndo);
+					if (!isDone(currentTask)){
+						isDone = false;
+						doTask(currentTask);
+					}
+					mLocalMem.getLocalMem().remove(i);
+					mLocalMem.getLocalMem().add(currentTask);
+					break;
+				}
+			}
 
-				ArrayList<String> labels = new ArrayList<String>();
-				if (currentTask.getLabels() != null){
-					labels = currentTask.getLabels();
-				}
-				if (!isDone(currentTask)){
-					isDone = false;
-					labels.add("done");
-				}
-				currentTask.setLabels(labels);
-				break;
+			haveSearched = false;
+			mLocalMem.saveLocalMemory();
+			if (isDone){
+				String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
+				FeedbackObject result = new FeedbackObject(resultString,false);
+				return result;
+			} else{
+				String resultString = String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
+				FeedbackObject result = new FeedbackObject(resultString,true);
+				return result;
 			}
 		}
+	}
+	
 
-		haveSearched = false;
-		mLocalMem.saveLocalMemory();
-		if (hasTask && isDone){
-			String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,false);
-			return result;
+	private Task doTask(Task taskToDone) {
+		ArrayList<String> labels = new ArrayList<String>();
+		if (taskToDone.getLabels() != null){
+			for (int i=0; i < taskToDone.getLabels().size(); i++){
+				labels.add(taskToDone.getLabels().get(i));
+			}
 		}
-		else if (hasTask){
-			String resultString = String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,true);
-			return result;
+		if (!isDone(taskToDone)){
+			labels.add("done");
 		}
-		else{
-			String resultString = String.format(MESSAGE_DONE_FAIL, super.getTaskDetails()) + "\n";
-			resultString += autoSearch().getFeedback();
-			FeedbackObject result = new FeedbackObject(resultString,false);
-			return result;
+		taskToDone.setLabels(labels);
+		return taskToDone;
+	}
+
+	private Task undoTask(Task taskToUndone) {
+		if (taskToUndone.getLabels() == null){
+			return taskToUndone;
 		}
+		
+		for (int i=0; i < taskToUndone.getLabels().size(); i++){
+			if (taskToUndone.getLabels().get(i).toLowerCase().equals("done")){
+				taskToUndone.getLabels().remove(i);
+			}
+		}
+		return taskToUndone;
+	}
+
+	private DoneCommand createDoneUndo(Task currentTask) {
+		DoneCommand commandToUndo = new DoneCommand(currentTask.getDescription(),
+				currentTask.getFromDateTime(), currentTask.getToDateTime(), 
+				currentTask.getLabels(), null);
+		return commandToUndo;
+	}
+
+	public int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getTaskDetails().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
-		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
-			if (mLocalMem.getLocalMem().get(i).getDescription()
-					.equals(this.getTaskDetails())) {
-				prevState = mLocalMem.getLocalMem().get(i).getClone();
-				ArrayList<String> labels = new ArrayList<String>();
-				for (int j=0; j < prevState.getLabels().size(); j++){
-					if (prevState.getLabels().get(j).equals("done")){
-						continue;
-					}
-					labels.add(prevState.getLabels().get(j));
-				}	
-				prevState.setLabels(labels);
-				mLocalMem.getLocalMem().remove(i);
-				mLocalMem.getLocalMem().add(prevState);
-				break;
-			}
-		}
+		int indexOfTaskToUndone = mLocalMem.getLocalMem().size()-1;
+		prevState = mLocalMem.getLocalMem().get(indexOfTaskToUndone).getClone();
 		Command toRedo = new DoneCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);
-	
+		mLocalMem.getLocalMem().remove(indexOfTaskToUndone);
+		mLocalMem.getLocalMem().add(0, super.getTask());
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
-		String resultString = this.getTask().getDescription() + " undone"; 
-		FeedbackObject result = new FeedbackObject(resultString, true); 
+		String resultString = this.getTaskDetails() + " undone";
+		FeedbackObject result = new FeedbackObject(resultString, true);
 		return result;
 	}
 	
@@ -126,15 +175,34 @@ public class DoneCommand extends Command {
 	}
 
 	private FeedbackObject doneFromSearchResults(){
-		FeedbackObject feedback = new DoneCommand(mLocalMem.getSearchList().get
-				(Integer.parseInt(super.getTaskDetails())-1).getDescription(), null, null, null, null).execute();
+		int indexOfTaskToDone = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
+		Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);
+		DoneCommand commandToUndo = createDoneUndo(taskToDone);
+		mLocalMem.undoPush(commandToUndo);
+		
+		boolean isDone = true;
+		if (!isDone(taskToDone)){
+			isDone = false;
+			doTask(taskToDone);
+		}
+		mLocalMem.getLocalMem().remove(indexOfTaskToDone);
+		mLocalMem.getLocalMem().add(taskToDone);
 		haveSearched = false;
-		return feedback;
+		mLocalMem.saveLocalMemory();
+		if (isDone){
+			String resultString =  String.format(MESSAGE_DONE_ALREADY, taskToDone.getDescription());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
+		}else{
+			String resultString = String.format(MESSAGE_DONE_SUCCESS, taskToDone.getDescription());
+			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
+		}
 	}
 
 	private boolean isNumeric(String str) {
 		try {
-			int i = Integer.parseInt(str);
+			Integer.parseInt(str);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}

@@ -138,6 +138,50 @@ public class LogicTest {
 				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
 				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
 	}
+	
+	@Test
+	public void testDoneWithSearch(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		// test 1 - done by search results
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
+		assertEquals("'CS2103T meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		String output = obtainOutput();
+		assertEquals("#done\n" + "CS2103T meeting on 22.09.2014 #important\n"
+				+ "N.A.\n" + "CS2101 meeting on 29.09.2014\n", output);
+		// test 2 - done task with same description
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		assertEquals("There are multiple tasks 'meeting'. Auto search to mark the specific one as done.\n"
+				+ "1. meeting on 01.11.2014 #CS2101\n"
+				+ "2. meeting on 02.11.2014 #CS2103T\n"
+				+ "3. meeting on 03.11.2014 #MA1101R\n"
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("do meeting").getFeedback());
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		output = obtainOutput();
+		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+		// test 3 - undo
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		output = obtainOutput();
+		assertEquals("N.A.\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+		// test 4 - redo
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
+		output = obtainOutput();
+		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+	}
+
 
 	@Test
 	public void testGetSnapshot(){

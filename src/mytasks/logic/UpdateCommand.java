@@ -151,13 +151,13 @@ public class UpdateCommand extends Command {
 	@Override
 	FeedbackObject undo() {
 		Task prevState = null;
-		int i = mLocalMem.getLocalMem().size()-1;
-		prevState = mLocalMem.getLocalMem().get(i).getClone();
-		mLocalMem.getLocalMem().remove(i);
-		mLocalMem.getLocalMem().add(0, this.getTask());
+		int indexOfTaskToUpdate = mLocalMem.getLocalMem().size()-1;
+		prevState = mLocalMem.getLocalMem().get(indexOfTaskToUpdate).getClone();
 		Command toRedo = new UpdateCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), this.getTask().getDescription());
+		mLocalMem.getLocalMem().remove(indexOfTaskToUpdate);
+		mLocalMem.getLocalMem().add(0, this.getTask());
 		mLocalMem.redoPush(toRedo);
 		mLocalMem.saveLocalMemory();
 		String resultString = this.getToUpdateTaskDesc() + " reverted";
