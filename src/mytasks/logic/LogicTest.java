@@ -260,10 +260,12 @@ public class LogicTest {
 		taskLogic.executeCommand("ad play #fun 18.09.2014");
 		taskLogic.executeCommand("ad homework #fun #gg");
 		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
 		taskLogic.executeCommand("so fun gg");
 		ArrayList<String> newTasks = new ArrayList<String>();
-		newTasks.add("#fun#gg");
 		newTasks.add("#fun");
+		newTasks.add("#fun#gg");
+		newTasks.add("#gg");
 		taskLogic.executeCommand("hi fun gg");
 		assertEquals(true, taskLogic.labelsHidden);
 		assertEquals(newTasks, taskLogic.toHide);
