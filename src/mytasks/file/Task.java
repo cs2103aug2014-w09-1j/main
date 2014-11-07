@@ -128,7 +128,8 @@ public class Task {
 		}
 		return new Task(mDescription, newDate1, newDate2, newLabels);
 	}
-
+	
+	//@author A0112139R
 	@Override
 	public String toString() {
 		String dateToString = "";
@@ -166,71 +167,86 @@ public class Task {
 		}
 		return result.trim();
 	}
-
+	
+	//@author A0114302A
 	@Override
 	public boolean equals(Object otherTask) {
 		if (otherTask == this) {
 			return true;
 		}
-
 		if (!(otherTask instanceof Task)) {
 			return false;
 		} else {
 			Task other = (Task) otherTask;
-			if (other.getDescription() == null) {
-				if (mDescription != null) {
-					return false;
-				}
-			} else {
-				if (mDescription == null) {
-					return false;
-				}
-				if (!other.getDescription().equals(mDescription)) {
-					return false;
-				}
+			boolean sameDescription = compareDescription(other);
+			if (!sameDescription){
+				return sameDescription;
 			}
-
-			if (other.getFromDateTime() == null) {
-				if (mFromDateTime != null) {
-					return false;
-				}
-			} else {
-				if (mFromDateTime == null) {
-					return false;
-				}
-				if (!other.getFromDateTime().equals(mFromDateTime)) {
-					return false;
-				}
+			boolean sameDateFrom = compareDateTime(other.getFromDateTime());
+			if (!sameDateFrom){
+				return sameDateFrom;
 			}
-
-			if (other.getToDateTime() == null) {
-				if (mToDateTime != null) {
-					return false;
-				}
-			} else {
-				if (mToDateTime == null) {
-					return false;
-				}
-				if (!other.getToDateTime().equals(mToDateTime)) {
-					return false;
-				}
+			boolean sameDateTo = compareDateTime(other.getToDateTime());
+			if (!sameDateTo){
+				return sameDateTo;
 			}
-
-			if (other.getLabels() == null) {
-				if (mLabels != null) {
+			boolean sameLabels = compareLabels(other);
+			if (!sameLabels){
+				return sameLabels;
+			}
+		}
+		return true;
+	}
+	
+	private boolean compareDescription(Task other){
+		boolean result = true;
+		if (other.getDescription() == null) {
+			if (mDescription != null) {
+				result = false;
+			}
+		} else {
+			if (mDescription == null) {
+				result = false;
+			}
+			if (!other.getDescription().equals(mDescription)) {
+				result = false;
+			}
+		}
+		return result;
+	}
+	
+	private boolean compareDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mFromDateTime != null) {
+				return false;
+			}
+		} else {
+			if (mFromDateTime == null) {
+				return false;
+			}
+			if (!other.equals(mFromDateTime)) {
+				return false;
+			}
+		}
+		return result;
+	}
+	
+	private boolean compareLabels(Task other){
+		if (other.getLabels() == null) {
+			if (mLabels != null) {
+				return false;
+			}
+		} else {
+			if (mLabels == null) {
+				return false;
+			}
+			if (other.getLabels().size() != mLabels.size()) {
+				return false;
+			}
+			for (int i = 0; i < mLabels.size(); i++) {
+				if (!mLabels.get(i).equals(other.getLabels().get(i))) {
 					return false;
-				}
-			} else {
-				if (mLabels == null) {
-					return false;
-				}
-				if (other.getLabels().size() != mLabels.size()) {
-					return false;
-				}
-				for (int i = 0; i < mLabels.size(); i++) {
-					if (!mLabels.get(i).equals(other.getLabels().get(i))) {
-						return false;
-					}
 				}
 			}
 		}

@@ -97,9 +97,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	 * {@inheritDoc}
 	 */
 	public FeedbackObject executeCommand(String input) {
-		//mLocalMem.print();
 		Command commandObject = parseInput(input);
-		// String output = removeFirstWord(input);
 
 		if (commandObject == null) {
 			FeedbackObject result = new FeedbackObject("Invalid input", false);
