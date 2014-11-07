@@ -1,9 +1,12 @@
 package mytasks.logic;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
+import mytasks.parser.MyTasksParser;
 
 /**
  * HideCommand extends Command object to follow OOP standards
@@ -70,11 +73,22 @@ public class HideCommand extends Command {
 	
 	private void addHashtags(ArrayList<String> toHide){
 		for (int i = 0; i<toHide.size(); i++) {
-			if (!toHide.get(i).equals("N.A.")){
+			if (!toHide.get(i).equals("N.A.") && !isDates(toHide.get(i))){
 				String temp = "#" + toHide.get(i);
 				toHide.set(i, temp);
 			}
 		}
+	}
+	
+	private boolean isDates(String toCheck) {
+		try {
+			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
+			curDateForm.parse(toCheck);
+		} catch (ParseException e) {
+			System.out.println("should see this");
+			return false;
+		}
+		return true;
 	}
 
 	@Override

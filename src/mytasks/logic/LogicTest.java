@@ -254,29 +254,41 @@ public class LogicTest {
 		allTasks.remove(0);
 		taskLogic.executeCommand("hi N.A.");
 		assertEquals(allTasks, taskLogic.toHide);
+		
 	}
 	
 	@Test
-	public void testShowCommand() {
+	public void testHideCommand2() {
 		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad watch webcast #boring");
-		taskLogic.executeCommand("ad do tutorial");
-		taskLogic.executeCommand("so boring");
-		taskLogic.executeCommand("hi boring");
-		
-		taskLogic.executeCommand("sh boring");
-		assertEquals(true, taskLogic.labelsShown);
-		ArrayList<String> toShow = new ArrayList<String>();
-		toShow.add("boring");
-		assertEquals(toShow, taskLogic.toShow);
-		
-		taskLogic.executeCommand("sh all");
-		assertEquals(true, taskLogic.labelsShown);
-		ArrayList<String> allTasks = new ArrayList<String>();
-		allTasks.add("boring");
-		allTasks.add("N.A.");
-		assertEquals(allTasks, taskLogic.toShow);
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("18.Sep.2014");
+		taskLogic.executeCommand("hi 18.Sep.2014");
+		assertEquals(newTasks, taskLogic.toHide);
 	}
+	
+//	@Test
+//	public void testShowCommand() {
+//		taskLogic.getMemory().clearMemory();
+//		taskLogic.executeCommand("ad watch webcast #boring");
+//		taskLogic.executeCommand("ad do tutorial");
+//		taskLogic.executeCommand("so boring");
+//		taskLogic.executeCommand("hi boring");
+//		
+//		taskLogic.executeCommand("sh boring");
+//		assertEquals(true, taskLogic.labelsShown);
+//		ArrayList<String> toShow = new ArrayList<String>();
+//		toShow.add("boring");
+//		assertEquals(toShow, taskLogic.toShow);
+//		
+//		taskLogic.executeCommand("sh all");
+//		assertEquals(true, taskLogic.labelsShown);
+//		ArrayList<String> allTasks = new ArrayList<String>();
+//		allTasks.add("boring");
+//		allTasks.add("N.A.");
+//		assertEquals(allTasks, taskLogic.toShow);
+//	}
 	
 	@Test
 	public void testHideShowUndoCommand() {

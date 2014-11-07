@@ -30,8 +30,6 @@ public class ShowCommand extends Command {
 
 	@Override
 	FeedbackObject execute() {
-		mController.toggleHide(false);
-		mController.clearShowLabels();
 		
 		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
 		ArrayList<String> availableLabels = new ArrayList<String>();

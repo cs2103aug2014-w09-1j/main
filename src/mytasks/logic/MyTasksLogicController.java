@@ -36,9 +36,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
 	protected ArrayList<String> toHide;
-	protected boolean labelsShown = false;
-	protected ArrayList<String> toShow;
-
 	// Constructor
 	private MyTasksLogicController(boolean isDeveloper) {
 		initLogic(isDeveloper);
@@ -90,7 +87,6 @@ public class MyTasksLogicController implements ILogic, Serializable {
 		}
 		mViewHandler = MemorySnapshotHandler.getInstance();
 		toHide = new ArrayList<String>();
-		toShow = new ArrayList<String>();
 	}
 
 	/**
@@ -184,22 +180,5 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	
 	protected void clearHideLabels() {
 		toHide.clear();
-	}
-	
-	protected void showLabels(ArrayList<String> labels) {
-		toShow = labels;
-	}
-	
-	protected void clearShowLabels() {
-		toShow.clear();
-	}
-	
-	protected List<String> getHideShowList() {
-		if (labelsHidden) {
-			return toHide;
-		}
-		else {
-			return toShow;
-		}
 	}
 }
