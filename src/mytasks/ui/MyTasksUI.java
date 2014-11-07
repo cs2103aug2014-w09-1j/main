@@ -4,6 +4,7 @@ import java.awt.*;
 //waits for user to do something
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,14 +28,13 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+
 import mytasks.file.FeedbackObject;
 import mytasks.logic.ILogic;
 import mytasks.logic.MyTasksLogicController;
 
 //@author A0115034X
-/**
- * MyTasksUI is the GUI for MyTasks.
- */
+
 public class MyTasksUI extends JPanel implements ActionListener,
 		DocumentListener, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -228,8 +229,9 @@ public class MyTasksUI extends JPanel implements ActionListener,
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
-		boolean isRed = false;
+		boolean isRed = false, isHide = false;
 		Border colourLine;
+		List<String> labelsToHide = new ArrayList<String>();
 		
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);		
@@ -240,7 +242,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				textAreaFeedback.setText(feedback.getFeedback());
 				textAreaFeedback.setCaretPosition(0);
 			} else {
-				textAreaFeedback.setForeground(new Color(0, 0, 0));
+				textAreaFeedback.setForeground(new Color(0, 150, 0));
 				textAreaFeedback.setText(feedback.getFeedback());
 				textAreaFeedback.setCaretPosition(0);
 			}
@@ -269,23 +271,48 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			textAreaPanel.add(textArea);
 			textArea.setCaretPosition(0);
 		} else {
+			if(mLogic.checkIfToHide()) {
+				labelsToHide = mLogic.labelsToHide();
+			}
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
 				textArea = new JTextArea();
 				textArea.setEditable(false);				
 				textArea.setFocusable(false);
-
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				isHide = false; 
 				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
 				if(firstWord.equals("#important")) {
 					isRed = true;
-					colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
+				}
+				if(labelsToHide.size() > 0) {
+					for(int k = 0; k < labelsToHide.size(); k++) {
+						if(labelsToHide.get(k).equals(firstWord)) {
+							isHide = true;
+						}
+					}
+				}
+				if(isHide) {
+					if(isRed) {
+						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+					} else {
+						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+					}
+						
 					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					
-					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-					textArea.setText(content);
+					textArea.setText("");
 					textArea.setBorder(titled);
-					textAreaPanel.add(textArea);
-				} else {
+						
+					GridBagConstraints c = new GridBagConstraints();
+					c.gridwidth = GridBagConstraints.REMAINDER;
+					c.fill = GridBagConstraints.VERTICAL;
+					c.gridx = 0;
+					c.weightx = 1.0;
+					c.weighty = 1.0;
+
+					textAreaPanel.add(textArea, c);
+					textArea.setCaretPosition(0);
+				}
+				else {
 					if(isRed) {
 						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 					} else {
@@ -295,7 +322,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
 					textArea.setText(content);
 					textArea.setBorder(titled);
-
+	
 					GridBagConstraints c = new GridBagConstraints();
 					c.gridwidth = GridBagConstraints.REMAINDER;
 					c.fill = GridBagConstraints.VERTICAL;
@@ -307,6 +334,37 @@ public class MyTasksUI extends JPanel implements ActionListener,
 					textArea.setCaretPosition(0);
 				}
 			}
+//				else if(firstWord.equals("#important")) {
+//					isRed = true;
+//					colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
+//					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+//					
+//					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+//					textArea.setText(content);
+//					textArea.setBorder(titled);
+//					textAreaPanel.add(textArea);
+//				} else {
+//					if(isRed) {
+//						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+//					} else {
+//						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+//					}
+//					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+//					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+//					textArea.setText(content);
+//					textArea.setBorder(titled);
+//
+//					GridBagConstraints c = new GridBagConstraints();
+//					c.gridwidth = GridBagConstraints.REMAINDER;
+//					c.fill = GridBagConstraints.VERTICAL;
+//					c.gridx = 0;
+//					c.weightx = 1.0;
+//					c.weighty = 1.0;
+//
+//					textAreaPanel.add(textArea, c);
+//					textArea.setCaretPosition(0);
+//				}
+			
 		}
 		textField.selectAll();
 	}
@@ -326,6 +384,19 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		// Display the window.
 		frame.pack();
 		frame.setVisible(true);
+		
+		// pressing the esc key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
 	}
 
 	@Override
