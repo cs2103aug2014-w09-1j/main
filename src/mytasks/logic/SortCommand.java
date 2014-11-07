@@ -14,11 +14,13 @@ public class SortCommand extends Command {
 	
 	private MemorySnapshotHandler mViewHandler;
 	private LocalMemory mLocalMem;
+	private MyTasksLogicController mController;
 
 	public SortCommand(String comdDes, Date fromDateTime,
 			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mViewHandler = MemorySnapshotHandler.getInstance();
+		mController = MyTasksLogicController.getInstance(false);
 		mLocalMem = LocalMemory.getInstance();
 	}
 
@@ -40,6 +42,7 @@ public class SortCommand extends Command {
 		}
 		String resultString = output + "sorted";
 		FeedbackObject result = new FeedbackObject(resultString,true);
+		mController.toggleHide(false);
 		return result;
 	}
 	
@@ -54,6 +57,7 @@ public class SortCommand extends Command {
 		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
 		mLocalMem.redoPush(commandToUndo);
 		mViewHandler.setView(super.getTask().getLabels());
+		mController.toggleHide(false);
 		return null;
 	}
 }

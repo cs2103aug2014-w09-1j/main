@@ -1,7 +1,9 @@
 package mytasks.logic;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Stack;
 
 import mytasks.file.MyTasksController;
@@ -28,6 +30,7 @@ class LocalMemory implements Serializable {
 	private Stack<Command> redoStack = new Stack<Command>();
 	private IStorage mStore;
 	private static ArrayList<Task> searchList;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 
 	// Constructor
 	private LocalMemory() {
@@ -133,11 +136,8 @@ class LocalMemory implements Serializable {
 		searchList = new ArrayList<Task>();
 		String[] keywords = null;
 		
-		if (userRequest.getDescription() != null){
-			keywords = userRequest.getDescription().split("\\s+");
-		}
-		else{
-			return searchedTasks;
+		if (userRequest.getDescription() != null && !userRequest.getDescription().equals("")){
+			keywords = userRequest.getDescription().split("\\s+");	
 		}
 
 		for (int i = 0; i < mLocalMem.size(); i++) {
@@ -148,17 +148,26 @@ class LocalMemory implements Serializable {
 			else if (haveSameLabels(keywords, currentTask)) {
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
+			else if (isBetweenStartDateAndEndDate(userRequest.getFromDateTime(), userRequest.getToDateTime(), currentTask)){
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			}
+			else if (haveSameDate(userRequest.getFromDateTime(), currentTask)){
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			}
 		}
 
 		return searchedTasks;
 	}
-	
+
 	private boolean haveSameDesc(String[] keywords, Task currentTask) {
+		if (keywords == null || currentTask.getDescription() == null){
+			return false;
+		}
+		
 		for (int i=0; i < keywords.length; i++){
 			String desc = keywords[i];
 
-			if (currentTask.getDescription() != null
-					&& currentTask.getDescription().toLowerCase().contains(desc.toLowerCase())) {
+			if (currentTask.getDescription().toLowerCase().contains(desc.toLowerCase())) {
 				searchList.add(currentTask);
 				return true;
 			}
@@ -167,7 +176,7 @@ class LocalMemory implements Serializable {
 	}
 
 	private boolean haveSameLabels(String[] keywords, Task currentTask) {
-		if (currentTask.getLabels() == null){
+		if (keywords == null || currentTask.getLabels() == null){
 			return false;
 		}
 		
@@ -181,6 +190,49 @@ class LocalMemory implements Serializable {
 				}
 			}
 		}
+		return false;
+	}
+	
+	private boolean isBetweenStartDateAndEndDate(Date fromDateTime, Date toDateTime, Task currentTask) {
+		if (toDateTime == null || currentTask.getFromDateTime() == null){
+			return false;
+		}
+
+		if (currentTask.getToDateTime() == null){
+			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0){
+				searchList.add(currentTask);
+				return true;
+			}
+		}
+		else{
+			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0 || 
+					fromDateTime.compareTo(currentTask.getToDateTime()) <= 0 && toDateTime.compareTo(currentTask.getToDateTime()) >= 0){
+				searchList.add(currentTask);
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	private boolean haveSameDate(Date fromDateTime, Task currentTask) {
+		if (fromDateTime == null || currentTask.getFromDateTime() == null){
+			return false;
+		}
+		
+		if (currentTask.getToDateTime() == null){
+			if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
+				searchList.add(currentTask);
+				return true;
+			}
+		}
+		else{
+			if (currentTask.getFromDateTime().compareTo(fromDateTime) <= 0 && currentTask.getToDateTime().compareTo(fromDateTime) >= 0){ 
+				searchList.add(currentTask);
+				return true;
+			}
+		}
+		
 		return false;
 	}
 

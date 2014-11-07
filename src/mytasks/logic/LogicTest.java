@@ -12,16 +12,8 @@ public class LogicTest {
 
 	@Test
 	public void testAddCommand() {
-		taskLogic.getMemory().clearMemory();	
-		taskLogic.executeCommand("ad meeting 22.09.2014 #important");
-		taskLogic.executeCommand("ad Beyond Earth #CivV");
-		taskLogic.executeCommand("ad OP2 3.11.2014");
-		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #V0.4");
-		taskLogic.executeCommand("ad lab quiz 11.11.2014 #MA1101R");
-		//assertEquals("meeting added",
-		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-		//assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
-		//		taskLogic.obtainPrintableOutput());
+		taskLogic.getMemory().clearMemory();
+		assertEquals("meeting added", taskLogic.executeCommand("ad meeting 22.09.2014 #important").getFeedback());
 	}
 
 
@@ -51,6 +43,16 @@ public class LogicTest {
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "3. important\n"
 				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
+		// test 3 - search for startDate
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "task(s) with keyword 'on 22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
+		// test 4 - search for tasks between startDate and endDate
+		taskLogic.executeCommand("ad do project from 24.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad pay electric bill from 1.10.2014 to 3.10.2014");
+		assertEquals("1. CS2101 meeting on 29.09.2014\n" 
+				+ "2. do project from 24.09.2014 to 30.09.2014\n"
+				+ "3. pay electric bill from 01.10.2014 to 03.10.2014\n"
+				+ "task(s) with keyword 'from 27.09.2014 to 01.10.2014' searched", taskLogic.executeCommand("se from 27.09.2014 to 1.10.2014").getFeedback());
 	}
 
 	@Test
@@ -62,17 +64,14 @@ public class LogicTest {
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
 		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n", output);
 		// sort by date - test 2 - tasks without date & time and task with date & time 
 		taskLogic.executeCommand("ad play badminton #anytime");
 		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n"
@@ -83,9 +82,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
 		taskLogic.executeCommand("ad eat sushi #KentRidge");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -96,9 +93,7 @@ public class LogicTest {
 		// sort by date - test 4 - tasks with start and end DateTime partition
 		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
 		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -112,9 +107,7 @@ public class LogicTest {
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
 		// sort by labels - test 1 - sort 1 labels
 		taskLogic.executeCommand("so important");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();
 		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
 				+ "CS2101 meeting on 29.09.2014\n" 
 				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
@@ -135,37 +128,35 @@ public class LogicTest {
 		taskLogic.executeCommand("ad meeting 3.11.2014 #CS2101 #important");
 		taskLogic.executeCommand("ad video making #CS2101");
 		taskLogic.executeCommand("so CS2103 CS2100 important");
-		output = "";
+		output = obtainOutput();
+		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
+				+ "#CS2100#important\n" + "lab\n"
+				+ "#CS2103\n" + "tutorial\n"
+				+ "#CS2100\n" + "tutorial\n"
+				+ "#important\n" + "meeting on 03.11.2014 #CS2101\n"
+				+ "N.A.\n" + "video making #CS2101\n", output);
+	}
+	
+	private String obtainOutput(){
+		String output = "";
 		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
 			output += taskLogic.obtainPrintableOutput().get(i);		
-		assertEquals("#CS2103#important\n" 
-				+ "demo on 05.11.2014\n"
-				+ "#CS2100#important\n"
-				+ "lab\n"
-				+ "#CS2103\n"
-				+ "tutorial\n"
-				+ "#CS2100\n"
-				+ "tutorial\n"
-				+ "#important\n"
-				+ "meeting on 03.11.2014 #CS2101\n"
-				+ "N.A.\n"
-				+ "video making #CS2101\n", output);
+		return output;
 	}
 	
 	@Test
 	public void testDoneCommand(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
-        taskLogic.executeCommand("do meeting");
+        assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
         taskLogic.executeCommand("so done");
-		String output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+        String output = obtainOutput();	
 		assertEquals("#done\n" + "meeting\n", output);
 	}
 	
 	@Test
 	public void testUndoRedoDone(){
+		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
 		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
 		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
@@ -179,6 +170,9 @@ public class LogicTest {
 		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// test 3 - redo 
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
 	}
 	
 	@Test
@@ -228,19 +222,71 @@ public class LogicTest {
 		taskLogic.executeCommand("hi fun");
 		assertEquals(true, taskLogic.labelsHidden);
 		ArrayList<String> toHide = new ArrayList<String>();
-		toHide.add("fun");
+		toHide.add("#fun");
 		assertEquals(toHide, taskLogic.toHide);
 		
 		taskLogic.executeCommand("hi all");
 		assertEquals(true, taskLogic.labelsHidden);
 		ArrayList<String> allTasks = new ArrayList<String>();
-		allTasks.add("fun");
+		allTasks.add("#fun");
 		allTasks.add("N.A.");
 		assertEquals(allTasks, taskLogic.toHide);
+		
+		taskLogic.executeCommand("hi all fun");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+		allTasks.remove(0);
+		taskLogic.executeCommand("hi N.A.");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+	}
+	
+	//@author A0114302A
+	@Test
+	public void testHideCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework");
+		taskLogic.executeCommand("so date");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("18.Sep.2014");
+		taskLogic.executeCommand("hi 18.Sep.2014");
+		assertEquals(true, taskLogic.labelsHidden);
+		assertEquals(newTasks, taskLogic.toHide);
 	}
 	
 	@Test
-	public void testShowCommand() {
+	public void testHideCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
+		taskLogic.executeCommand("so fun gg");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("#fun");
+		newTasks.add("#fun#gg");
+		newTasks.add("#gg");
+		taskLogic.executeCommand("hi fun gg");
+		assertEquals(true, taskLogic.labelsHidden);
+		assertEquals(newTasks, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testHideCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
+		taskLogic.executeCommand("so fun gg");
+		taskLogic.executeCommand("hi fun gg");
+		taskLogic.executeCommand("so date");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand1() {
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad watch webcast #boring");
 		taskLogic.executeCommand("ad do tutorial");
@@ -248,18 +294,69 @@ public class LogicTest {
 		taskLogic.executeCommand("hi boring");
 		
 		taskLogic.executeCommand("sh boring");
-		assertEquals(true, taskLogic.labelsShown);
-		ArrayList<String> toShow = new ArrayList<String>();
-		toShow.add("boring");
-		assertEquals(toShow, taskLogic.toShow);
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
 		
 		taskLogic.executeCommand("sh all");
-		assertEquals(true, taskLogic.labelsShown);
-		ArrayList<String> allTasks = new ArrayList<String>();
-		allTasks.add("boring");
-		allTasks.add("N.A.");
-		assertEquals(allTasks, taskLogic.toShow);
+		assertEquals(false, taskLogic.labelsHidden);
 	}
-	// TODO: add test cases for the working functions. Ie. search and update.
-	// Follow conventions stated in v0.1
+	
+	@Test
+	public void testShowCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial #fun");
+		taskLogic.executeCommand("ad sleep #boring #fun");
+		taskLogic.executeCommand("ad randomcomd");
+		taskLogic.executeCommand("so boring fun");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring fun");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand5() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial #fun");
+		taskLogic.executeCommand("ad sleep #boring #fun");
+		taskLogic.executeCommand("ad randomcomd");
+		taskLogic.executeCommand("so boring fun");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("#boring#fun");
+		labels.add("#fun");
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
 }

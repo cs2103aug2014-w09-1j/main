@@ -57,6 +57,10 @@ public class Task {
 		}
 	}
 	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
 	private void closeHandler() {
 		fh.flush();
 		fh.close();

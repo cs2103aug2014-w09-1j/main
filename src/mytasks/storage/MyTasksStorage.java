@@ -27,6 +27,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	private static MyTasksStorage INSTANCE = null;
 	private final String MESSAGE_CORPTDATA = "Corrupted data";
 	private final String MESSAGE_FILEERROR = "Error with reading existing file";
+	private final String DELIMS = "//";
 	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
 			.getName());
 	private Handler fh = null;
@@ -45,7 +46,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 	protected Object readResolve() {
 		return INSTANCE;
 	}
-
+	
 	private void runLogger() {
 		try {
 			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
@@ -60,7 +61,11 @@ public class MyTasksStorage implements IStorage, Serializable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
 	private void closeHandler() {
 		fh.flush();
 		fh.close();
@@ -99,8 +104,7 @@ public class MyTasksStorage implements IStorage, Serializable {
 		if (memString.length() == 0) {
 			return result;
 		}
-		String delims = "(//)";
-		String[] memBlock = memString.split(delims);
+		String[] memBlock = memString.split(DELIMS);
 		int noBlocks = memBlock.length;
 		int sizeBlocks = 4;
 		if (noBlocks % sizeBlocks != 0) {
@@ -112,7 +116,14 @@ public class MyTasksStorage implements IStorage, Serializable {
 		handleIndivBlocks(result, memBlock, noBlocks, sizeBlocks);
 		return result;
 	}
-
+	
+	/**
+	 * handleIndivBlocks creates a new task for each block of memory (consecutive 4 blocks)
+	 * @param result
+	 * @param memBlock
+	 * @param noBlocks
+	 * @param sizeBlocks
+	 */
 	public void handleIndivBlocks(ArrayList<Task> result, String[] memBlock,
 			int noBlocks, int sizeBlocks) {
 		for (int i = 0; i < noBlocks / sizeBlocks; i++) {
@@ -165,7 +176,14 @@ public class MyTasksStorage implements IStorage, Serializable {
 		String output = determineOutput(localMemory);
 		printOutput(output, MyTasksController.DEFAULT_FILENAME);
 	}
-
+	
+	/**
+	 * determineOutput checks the arraylist that represents memory and converts it to
+	 * a string format by having DELIMS seperate each field. An empty field is denoted by a
+	 * single empty space
+	 * @param localMem
+	 * @return String to be printed
+	 */
 	protected String determineOutput(ArrayList<Task> localMem) {
 		String result = "";
 		for (int i = 0; i < localMem.size(); i++) {
@@ -205,9 +223,14 @@ public class MyTasksStorage implements IStorage, Serializable {
 	}
 
 	private String addBreak() {
-		return "//";
+		return DELIMS;
 	}
-
+	
+	/**
+	 * printOutput takes a string and prints it to a destinated fileName
+	 * @param output
+	 * @param fileName
+	 */
 	private void printOutput(String output, String fileName) {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));

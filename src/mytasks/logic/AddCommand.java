@@ -1,26 +1,57 @@
 package mytasks.logic;
 
+//@author A0114302A
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
 
 /**
  * AddCommand extends Command object to follow OOP standards
- * 
- * @author Huiwen, Shuan Siang 
- *
  */
 public class AddCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
+	private static final Logger LOGGER = Logger.getLogger(AddCommand.class
+			.getName());
+	private Handler fh = null;
 
 	public AddCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mLocalMem = LocalMemory.getInstance();
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
 	}
 
 	//@author A0108543J
@@ -48,6 +79,12 @@ public class AddCommand extends Command {
 				break;
 			}
 		}
+		if (prevState == null){
+			runLogger();
+			LOGGER.log(Level.SEVERE, Command.MESSAGE_NOTASK);
+			closeHandler();
+			return null;
+		} 
 		Command toRedo = new AddCommand(prevState.getDescription(),
 				prevState.getFromDateTime(), prevState.getToDateTime(),
 				prevState.getLabels(), null);

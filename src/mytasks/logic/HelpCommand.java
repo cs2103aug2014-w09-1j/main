@@ -1,18 +1,18 @@
 package mytasks.logic;
 
-//@author A0108543J
-import java.awt.FlowLayout;
+// @author A0108543J
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.JDialog;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import mytasks.file.FeedbackObject;
+import mytasks.ui.HelpUI;
 
 /**
  * HelpCommand extends Command object to follow OOP standards.
@@ -25,43 +25,43 @@ public class HelpCommand extends Command {
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		// TODO Auto-generated constructor stub
 	}
 
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc,
 					boolean canDo) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	FeedbackObject execute() {
-		// TODO Auto-generated method stub
-		HelpWindow help = new HelpWindow(null);
-		help.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		help.setSize(300,300);
-		help.setLocation(300, 300);
-		help.setVisible(true);
-		FeedbackObject result = new FeedbackObject("Opening help", true);
-		return result;
+		// create and set up the window
+		JFrame frame = new JFrame("MyTasks Help");
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+		// add contents to the window
+		frame.add(new HelpUI());
+
+		// display the window
+		frame.pack();
+		frame.setVisible(true);
+
+		// pressing the esc key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+						.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+		
+		return null;
 	}
 
 	@Override
 	FeedbackObject undo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Help does not have an undo function");
+		throw new UnsupportedOperationException(
+						"Help does not have an undo function");
 	}
-	
-	public class HelpWindow extends JDialog {
-		JLabel label;
-		
-		public HelpWindow(JFrame frame) {
-			super(frame, "Help", true);
-			setLayout(new FlowLayout());
-			
-			label = new JLabel("new window");
-			add(label);
-		}
-	}
+
 }

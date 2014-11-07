@@ -1,86 +1,79 @@
 package mytasks.logic;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import mytasks.file.FeedbackObject;
+import mytasks.parser.MyTasksParser;
 
 /**
  * HideCommand extends Command object to follow OOP standards
- * 
- * @author Shuan Siang
- *
  */
 
 // @author A0108543J
 public class HideCommand extends Command {
 
 	// private variables
-	private LocalMemory mLocalMem;
 	private MyTasksLogicController mController;
-	private MemorySnapshotHandler mViewHandler;
 
 	public HideCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		mLocalMem = LocalMemory.getInstance();
 		mController = MyTasksLogicController.getInstance(false);
-		mViewHandler = MemorySnapshotHandler.getInstance();
 	}
 
 	@Override
 	FeedbackObject execute() {
-		mController.toggleHide(false);
-		mController.clearHideLabels();
 		
-		ArrayList<String> temp = new ArrayList<String>(mViewHandler.getSnapshot(mLocalMem));
+		List<String> temp = mController.obtainPrintableOutput();
+		ArrayList<String> referenceLabels = new ArrayList<String>();
 		ArrayList<String> availableLabels = new ArrayList<String>();
 		ArrayList<String> toHide = super.getTask().getLabels();
+		ArrayList<String> toReturnArray = new ArrayList<String>();
+		ArrayList<Integer> toUse = new ArrayList<Integer>();
+		addHashtags(toHide);
 
-		// if there are no labels to hide
 		if (toHide == null) {
 			FeedbackObject toReturn = new FeedbackObject("No arguments found", false);
 			return toReturn;
 		}
-		
-		ArrayList<String> labels = new ArrayList<String>();
-		labels.add("all");
-		ShowCommand commandToUndo = new ShowCommand(null, null, null, labels, null);
-		mLocalMem.undoPush(commandToUndo);
-		mLocalMem.saveLocalMemory();
-		
-		// to hide all labels
-		// TODO address issue where there will be a label #all (clash)
-		if (toHide.get(0).equals("all")) {
-			toHide.remove(0);
-			for (int i=0; i<temp.size(); i++) {
-				toHide.add(locateLabels(temp.get(i)));
-			}
-			mController.toggleHide(true);
-			mController.hideLabels(toHide);
-			
-			FeedbackObject toReturn = new FeedbackObject("All labels hidden", true);
-			return toReturn;
-		}
-		
-		
+		// TODO known bug: cannot use all as label
 		for (int i = 0; i < temp.size(); i++) {
 			availableLabels.add(locateLabels(temp.get(i)));
+			referenceLabels.add(locateLabels(temp.get(i)));
 		}
-		// if labels to hide not found in current list
+		
 		for (int i = 0; i < toHide.size(); i++) {
-			if (!availableLabels.contains(toHide.get(i))) {
+			boolean haveThisWord = false;
+			String thisWord = toHide.get(i);
+			for (int j = 0; j<availableLabels.size(); j++){
+				String curLabel = availableLabels.get(j);
+				if (curLabel.equals(thisWord)){
+					haveThisWord = true;
+					toUse.add(j);
+				} else if (curLabel.contains(thisWord)){
+					haveThisWord = true;
+					curLabel = curLabel.replace(thisWord, "");
+					availableLabels.set(j, curLabel);
+				}
+			}
+			if (!haveThisWord && !thisWord.equals("#all")) {
 				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
 				return toReturn;
 			}
 		}
-		
+		if(toHide.contains("#all")){
+			toReturnArray = referenceLabels;
+		} else {
+			for (int i = 0; i<toUse.size(); i++){
+				toReturnArray.add(referenceLabels.get(toUse.get(i)));
+			}
+		}
 		mController.toggleHide(true);
-		mController.hideLabels(toHide);
-		// Hw has to check toggleValue to see if she needs to hide anything.
-		// She will checks content of hidelabels for what to hide
-		// Remember to toggle off when view is changed. (think of cases when need to toggle
-		// Do the converse for showlabels
+		mController.hideLabels(toReturnArray);
 		FeedbackObject toReturn = new FeedbackObject("Labels hidden", true);
 		return toReturn;
 	}
@@ -89,16 +82,29 @@ public class HideCommand extends Command {
 		String firstWord = null;
 		if (temp != null) {
 			firstWord = temp.split("\\s+")[0];
-			char firstLetter = firstWord.charAt(0);
-			if (firstLetter == '#') {
-				firstWord = firstWord.substring(1);
-			}
 		}
 		return firstWord;
 	}
-
-	//TODO implement showing of time
 	
+	private void addHashtags(ArrayList<String> toHide){
+		for (int i = 0; i<toHide.size(); i++) {
+			if (!toHide.get(i).equals("N.A.") && !isDates(toHide.get(i))){
+				String temp = "#" + toHide.get(i);
+				toHide.set(i, temp);
+			}
+		}
+	}
+	
+	private boolean isDates(String toCheck) {
+		try {
+			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
+			curDateForm.parse(toCheck);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	FeedbackObject undo() {
 		throw new UnsupportedOperationException();
