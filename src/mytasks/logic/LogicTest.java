@@ -12,17 +12,8 @@ public class LogicTest {
 
 	@Test
 	public void testAddCommand() {
-		taskLogic.getMemory().clearMemory();	
-		taskLogic.executeCommand("ad meeting 22.09.2014 #important");
-		taskLogic.executeCommand("ad Beyond Earth #CivV");
-		taskLogic.executeCommand("ad OP2 3.11.2014");
-		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #V0.4");
-		taskLogic.executeCommand("ad lab quiz 11.11.2014 #MA1101R");
-		taskLogic.executeCommand("ad gaka from 5.11.2014 to 11.11.2014 #gama #gabu");
-		//assertEquals("meeting added",
-		//		taskLogic.executeCommand("add meeting 22.09.2014 #important"));
-		//assertEquals("22.Sep.2014" + "\n" + "meeting #important" + "\n",
-		//		taskLogic.obtainPrintableOutput());
+		taskLogic.getMemory().clearMemory();
+		assertEquals("meeting added", taskLogic.executeCommand("ad meeting 22.09.2014 #important").getFeedback());
 	}
 
 
@@ -73,17 +64,14 @@ public class LogicTest {
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
 		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n", output);
 		// sort by date - test 2 - tasks without date & time and task with date & time 
 		taskLogic.executeCommand("ad play badminton #anytime");
 		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n"
@@ -94,9 +82,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
 		taskLogic.executeCommand("ad eat sushi #KentRidge");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -107,9 +93,7 @@ public class LogicTest {
 		// sort by date - test 4 - tasks with start and end DateTime partition
 		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
 		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -123,9 +107,7 @@ public class LogicTest {
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
 		// sort by labels - test 1 - sort 1 labels
 		taskLogic.executeCommand("so important");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();
 		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
 				+ "CS2101 meeting on 29.09.2014\n" 
 				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
@@ -146,9 +128,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad meeting 3.11.2014 #CS2101 #important");
 		taskLogic.executeCommand("ad video making #CS2101");
 		taskLogic.executeCommand("so CS2103 CS2100 important");
-		output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+		output = obtainOutput();
 		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
 				+ "#CS2100#important\n" + "lab\n"
 				+ "#CS2103\n" + "tutorial\n"
@@ -157,15 +137,20 @@ public class LogicTest {
 				+ "N.A.\n" + "video making #CS2101\n", output);
 	}
 	
+	private String obtainOutput(){
+		String output = "";
+		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
+			output += taskLogic.obtainPrintableOutput().get(i);		
+		return output;
+	}
+	
 	@Test
 	public void testDoneCommand(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
         assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
         taskLogic.executeCommand("so done");
-		String output = "";
-		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
-			output += taskLogic.obtainPrintableOutput().get(i);		
+        String output = obtainOutput();	
 		assertEquals("#done\n" + "meeting\n", output);
 	}
 	
@@ -185,6 +170,7 @@ public class LogicTest {
 		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// test 3 - redo 
 		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
 		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
 	}
