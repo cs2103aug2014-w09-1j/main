@@ -1,4 +1,4 @@
-package mytasks.parser;
+package mytasks.logic.parser;
 
 import static org.junit.Assert.*;
 
@@ -8,13 +8,14 @@ import java.util.Calendar;
 import java.util.Date;
 
 import mytasks.file.Task;
-import mytasks.logic.AddCommand;
-import mytasks.logic.Command;
-import mytasks.logic.DeleteCommand;
-import mytasks.logic.HideCommand;
-import mytasks.logic.ShowCommand;
-import mytasks.logic.SortCommand;
-import mytasks.logic.UpdateCommand;
+import mytasks.logic.command.AddCommand;
+import mytasks.logic.command.Command;
+import mytasks.logic.command.DeleteCommand;
+import mytasks.logic.command.HideCommand;
+import mytasks.logic.command.ShowCommand;
+import mytasks.logic.command.SortCommand;
+import mytasks.logic.command.UpdateCommand;
+import mytasks.logic.parser.MyTasksParser;
 
 import org.junit.Test;
 

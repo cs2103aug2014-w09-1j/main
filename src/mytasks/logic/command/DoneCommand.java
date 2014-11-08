@@ -1,10 +1,11 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
+import mytasks.logic.LocalMemory;
 
 //@author A0112139R
 /**
@@ -25,7 +26,7 @@ public class DoneCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		if (isRedo){
 			int indexOfTaskToDone = 0;
 			Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);		
@@ -137,7 +138,7 @@ public class DoneCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		Task prevState = null;
 		int indexOfTaskToUndone = mLocalMem.getLocalMem().size()-1;
 		prevState = mLocalMem.getLocalMem().get(indexOfTaskToUndone).getClone();

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package mytasks.parser;
+package mytasks.logic.parser;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -9,18 +9,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.*;
 
-import mytasks.logic.AddCommand;
-import mytasks.logic.Command;
-import mytasks.logic.DeleteCommand;
-import mytasks.logic.DoneCommand;
-import mytasks.logic.HelpCommand;
-import mytasks.logic.HideCommand;
-import mytasks.logic.RedoCommand;
-import mytasks.logic.SearchCommand;
-import mytasks.logic.ShowCommand;
-import mytasks.logic.SortCommand;
-import mytasks.logic.UndoCommand;
-import mytasks.logic.UpdateCommand;
+import mytasks.logic.command.AddCommand;
+import mytasks.logic.command.Command;
+import mytasks.logic.command.DeleteCommand;
+import mytasks.logic.command.DoneCommand;
+import mytasks.logic.command.HelpCommand;
+import mytasks.logic.command.HideCommand;
+import mytasks.logic.command.RedoCommand;
+import mytasks.logic.command.SearchCommand;
+import mytasks.logic.command.ShowCommand;
+import mytasks.logic.command.SortCommand;
+import mytasks.logic.command.UndoCommand;
+import mytasks.logic.command.UpdateCommand;
 
 //@author A0114302A
 /**

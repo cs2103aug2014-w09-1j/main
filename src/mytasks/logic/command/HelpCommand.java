@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,14 +30,14 @@ public class HelpCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		UIComponent.run();
 		
 		return null;
 	}
 
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		throw new UnsupportedOperationException(
 						"Help does not have an undo function");
 	}

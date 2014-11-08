@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.logging.SimpleFormatter;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
+import mytasks.logic.LocalMemory;
 
 //@author A0114302A
 /**
@@ -56,7 +57,7 @@ public class AddCommand extends Command {
 
 	//@author A0108543J
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		mLocalMem.add(super.getTask());
 		AddCommand commandToUndo = new AddCommand(null, null, null, null, super
 				.getTask().getDescription());
@@ -70,7 +71,7 @@ public class AddCommand extends Command {
 	
 	//@author A0114302A
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		Task prevState = null;
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {

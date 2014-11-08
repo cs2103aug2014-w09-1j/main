@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +56,7 @@ public abstract class Command {
 		return mToUpdateTaskDesc;
 	}
 
-	abstract FeedbackObject execute();
+	public abstract FeedbackObject execute();
 
-	abstract FeedbackObject undo();
+	public abstract FeedbackObject undo();
 }

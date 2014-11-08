@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 //@author A0115034X 
 public class IntegrationTesting {
