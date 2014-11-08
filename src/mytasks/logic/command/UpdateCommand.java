@@ -71,7 +71,7 @@ public class UpdateCommand extends Command {
 		}
 
 		mLocalMem.saveLocalMemory();
-		haveSearched = false;
+		hasSearched = false;
 		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
 				super.getToUpdateTaskDesc());
 		FeedbackObject result = new FeedbackObject(resultString, true);
@@ -172,7 +172,7 @@ public class UpdateCommand extends Command {
 
 	// @author A0112139R
 	private boolean canUpdateFromSearchResults() {
-		if (haveSearched == true
+		if (hasSearched == true
 				&& isNumeric(super.getToUpdateTaskDesc())
 				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem
 						.getSearchList().size())) {
@@ -194,7 +194,7 @@ public class UpdateCommand extends Command {
 		mLocalMem.getLocalMem().remove(indexOfTaskToUpdated);
 		mLocalMem.getLocalMem().add(updatedTask);
 
-		haveSearched = false;
+		hasSearched = false;
 		mLocalMem.saveLocalMemory();
 		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
 				taskToUpdated.getDescription());

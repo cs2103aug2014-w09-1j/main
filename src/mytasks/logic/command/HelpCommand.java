@@ -32,7 +32,7 @@ public class HelpCommand extends Command {
 	@Override
 	public FeedbackObject execute() {
 		UIComponent.run();
-		
+		hasSearched = false;
 		return null;
 	}
 

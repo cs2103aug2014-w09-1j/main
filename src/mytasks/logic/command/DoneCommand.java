@@ -61,25 +61,25 @@ public class DoneCommand extends Command {
 			FeedbackObject result = new FeedbackObject(resultString, true);
 			return result;
 		}else{
-			boolean isDone = true;
+			boolean hasDone = true;
 			for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
 				if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
 					Task currentTask = mLocalMem.getLocalMem().get(i);
-					Command commandToUndo = createDoneUndo(currentTask);
-					mLocalMem.undoPush(commandToUndo);
 					if (!isDone(currentTask)){
-						isDone = false;
+						hasDone = false;
+						Command commandToUndo = createDoneUndo(currentTask);
+						mLocalMem.undoPush(commandToUndo);
 						doTask(currentTask);
+						mLocalMem.getLocalMem().remove(i);
+						mLocalMem.getLocalMem().add(currentTask);
 					}
-					mLocalMem.getLocalMem().remove(i);
-					mLocalMem.getLocalMem().add(currentTask);
 					break;
 				}
 			}
 
-			haveSearched = false;
+			hasSearched = false;
 			mLocalMem.saveLocalMemory();
-			if (isDone){
+			if (hasDone){
 				String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
 				FeedbackObject result = new FeedbackObject(resultString,false);
 				return result;
@@ -168,7 +168,7 @@ public class DoneCommand extends Command {
 	}
 	
 	private boolean canDoneFromSearchResults(){
-		if (haveSearched == true && isNumeric(super.getTaskDetails()) && 
+		if (hasSearched == true && isNumeric(super.getTaskDetails()) && 
 				Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
 			return true;
 		}
@@ -178,19 +178,19 @@ public class DoneCommand extends Command {
 	private FeedbackObject doneFromSearchResults(){
 		int indexOfTaskToDone = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
 		Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);
-		DoneCommand commandToUndo = createDoneUndo(taskToDone);
-		mLocalMem.undoPush(commandToUndo);
 		
-		boolean isDone = true;
+		boolean hasDone = true;
 		if (!isDone(taskToDone)){
-			isDone = false;
+			hasDone = false;
+			DoneCommand commandToUndo = createDoneUndo(taskToDone);
+			mLocalMem.undoPush(commandToUndo);
 			doTask(taskToDone);
+			mLocalMem.getLocalMem().remove(indexOfTaskToDone);
+			mLocalMem.getLocalMem().add(taskToDone);
+			mLocalMem.saveLocalMemory();
 		}
-		mLocalMem.getLocalMem().remove(indexOfTaskToDone);
-		mLocalMem.getLocalMem().add(taskToDone);
-		haveSearched = false;
-		mLocalMem.saveLocalMemory();
-		if (isDone){
+		hasSearched = false;
+		if (hasDone){
 			String resultString =  String.format(MESSAGE_DONE_ALREADY, taskToDone.getDescription());
 			FeedbackObject result = new FeedbackObject(resultString,false);
 			return result;

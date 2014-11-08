@@ -35,6 +35,7 @@ public class HideCommand extends Command {
 		ArrayList<String> toReturnArray = new ArrayList<String>();
 		ArrayList<Integer> toUse = new ArrayList<Integer>();
 		addHashtags(toHide);
+		hasSearched = false;
 
 		if (toHide == null) {
 			FeedbackObject toReturn = new FeedbackObject("No arguments found", false);
