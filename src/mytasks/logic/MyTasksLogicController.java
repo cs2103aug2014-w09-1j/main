@@ -11,8 +11,9 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import mytasks.file.FeedbackObject;
-import mytasks.parser.IParser;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.command.Command;
+import mytasks.logic.parser.IParser;
+import mytasks.logic.parser.MyTasksParser;
 import mytasks.storage.MyTasksStorage;
 
 //@author A0114302A
@@ -172,19 +173,19 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	}
 	
 	//@author A0108543J
-	protected void toggleHide(boolean hideOrNot) {
+	public void toggleHide(boolean hideOrNot) {
 		labelsHidden = hideOrNot;
 	}
 	
-	protected void hideLabels(ArrayList<String> labels){
+	public void hideLabels(ArrayList<String> labels){
 		toHide = labels;
 	}
 	
-	protected void clearHideLabels() {
+	public void clearHideLabels() {
 		toHide.clear();
 	}
 	
-	protected ArrayList<String> getHideLabels() {
+	public ArrayList<String> getHideLabels() {
 		return toHide;
 	}
 

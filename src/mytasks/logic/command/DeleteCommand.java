@@ -1,10 +1,11 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
+import mytasks.logic.LocalMemory;
 
 //@author A0112139R
 /**
@@ -26,7 +27,7 @@ public class DeleteCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		if (isRedo){
 			int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
 			Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
@@ -101,7 +102,7 @@ public class DeleteCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		Task prevState = super.getTask();
 		Command toRedo = new DeleteCommand(prevState.getDescription(), 
 				null, null, null, null);

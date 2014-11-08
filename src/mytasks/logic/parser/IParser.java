@@ -1,6 +1,6 @@
-package mytasks.parser;
+package mytasks.logic.parser;
 
-import mytasks.logic.Command;
+import mytasks.logic.command.Command;
 
 //@author A0114302A
 public interface IParser {

@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import mytasks.file.MyTasksController;
 import mytasks.file.Task;
+import mytasks.logic.command.Command;
 import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
 
@@ -21,7 +22,7 @@ import mytasks.storage.MyTasksStorage;
  */
 
 @SuppressWarnings("serial")
-class LocalMemory implements Serializable {
+public class LocalMemory implements Serializable {
 
 	// Private variables
 	private static LocalMemory INSTANCE = null;
@@ -37,7 +38,7 @@ class LocalMemory implements Serializable {
 		mStore = MyTasksStorage.getInstance();
 	}
 
-	protected static LocalMemory getInstance() {
+	public static LocalMemory getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new LocalMemory();
 		}
@@ -57,23 +58,23 @@ class LocalMemory implements Serializable {
 		mLocalMem = mStore.readExtMem(MyTasksController.DEFAULT_FILENAME);
 	}
 
-	protected void saveLocalMemory() {
+	public void saveLocalMemory() {
 		mStore.writeExtMem(mLocalMem);
 	}
 
-	protected ArrayList<Task> getLocalMem() {
+	public ArrayList<Task> getLocalMem() {
 		return mLocalMem;
 	}
 	
-	protected ArrayList<Integer> getSearchList(){
+	public ArrayList<Integer> getSearchList(){
 		return searchList;
 	}
 
-	protected void add(Task userRequest) {
+	public void add(Task userRequest) {
 		mLocalMem.add(userRequest);
 	}
 
-	protected void remove(Task userRequest) {
+	public void remove(Task userRequest) {
 		for (int i = 0; i < mLocalMem.size(); i++) {
 			if (userRequest.getDescription().equals(
 							mLocalMem.get(i).getDescription())) {
@@ -82,7 +83,7 @@ class LocalMemory implements Serializable {
 		}
 	}
 	
-	protected void remove(int index) {
+	public void remove(int index) {
 		mLocalMem.remove(index);
 	}
 
@@ -135,7 +136,7 @@ class LocalMemory implements Serializable {
 	}
 
 	//@author A0112139R
-	protected String search(Task userRequest) {
+	public String search(Task userRequest) {
 		String searchedTasks = "";
 		searchList = new ArrayList<Integer>();
 		String[] keywords = null;
@@ -239,24 +240,24 @@ class LocalMemory implements Serializable {
 	}
 
 	//@author A0108543J
-	protected void undoPush(Command commandToUndo) {
+	public void undoPush(Command commandToUndo) {
 		undoStack.push(commandToUndo);
 	}
 
-	protected Stack<Command> getUndoStack() {
+	public Stack<Command> getUndoStack() {
 		return undoStack;
 	}
 	
-	protected void redoPush(Command commandToUndo) {
+	public void redoPush(Command commandToUndo) {
 		redoStack.push(commandToUndo);
 	}
 	
-	protected Stack<Command> getRedoStack() {
+	public Stack<Command> getRedoStack() {
 		return redoStack;
 	}
 
 	//Backdoor function to use for testing
-	protected void clearMemory() {
+	public void clearMemory() {
 		mLocalMem.clear();
 	}
 

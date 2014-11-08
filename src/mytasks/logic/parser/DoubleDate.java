@@ -1,4 +1,4 @@
-package mytasks.parser;
+package mytasks.logic.parser;
 
 import java.util.Date;
 

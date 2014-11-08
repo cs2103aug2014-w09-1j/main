@@ -1,9 +1,10 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
+import mytasks.logic.LocalMemory;
 
 //@author A0114302A
 /**
@@ -21,7 +22,7 @@ public class RedoCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		FeedbackObject feedback = null;
 
 		if (mLocalMem.getRedoStack().isEmpty()) {
@@ -35,7 +36,7 @@ public class RedoCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject undo(){
+	public FeedbackObject undo(){
 		// Unimplemented method
 		throw new UnsupportedOperationException("RedoCommand does not have an undo function");
 	}

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.*;
 
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 //@author A0114302A
 /**

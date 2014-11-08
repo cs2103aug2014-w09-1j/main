@@ -1,9 +1,10 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
+import mytasks.logic.LocalMemory;
 
 //@author A0112139R
 /**
@@ -22,7 +23,7 @@ public class SearchCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		String searchedTasks = mLocalMem.search(super.getTask());
 		FeedbackObject result = null;
 		if (!searchedTasks.isEmpty()) {
@@ -38,7 +39,7 @@ public class SearchCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		throw new UnsupportedOperationException("Search does not have an undo function");
 	}
 }

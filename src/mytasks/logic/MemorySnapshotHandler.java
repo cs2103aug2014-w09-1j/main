@@ -9,14 +9,14 @@ import java.util.HashMap;
 
 import mytasks.file.MyTasksController;
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 //@author A0112139R
 /**
  * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
  * It is required to be able to categorize by labels that is listed in the currentSettings
  */
-class MemorySnapshotHandler {
+public class MemorySnapshotHandler {
 	
 	private static MemorySnapshotHandler INSTANCE = null;
 	private String[] currentSettings;
@@ -33,19 +33,19 @@ class MemorySnapshotHandler {
 		assert currentSettings[0] == "date" : "wrong default setting";
 	}
 	
-	protected static MemorySnapshotHandler getInstance(){
+	public static MemorySnapshotHandler getInstance(){
 		if (INSTANCE == null){
 			INSTANCE = new MemorySnapshotHandler();
 		}
 		return INSTANCE;
 	}
 	
-	protected void setView(ArrayList<String> newSettings) {
+	public void setView(ArrayList<String> newSettings) {
 		currentSettings = newSettings.toArray((new String[newSettings.size()]));
 		assert currentSettings != null : "invalid setting";
 	}
 	
-	protected String[] getView() {
+	public String[] getView() {
 		return currentSettings;
 	}
 	

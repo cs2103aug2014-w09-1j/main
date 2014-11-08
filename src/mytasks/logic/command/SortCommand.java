@@ -1,9 +1,12 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
+import mytasks.logic.LocalMemory;
+import mytasks.logic.MemorySnapshotHandler;
+import mytasks.logic.MyTasksLogicController;
 
 //@author A0112139R
 /**
@@ -24,7 +27,7 @@ public class SortCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		String[] prevSettings = mViewHandler.getView();
 		ArrayList<String> prevLabels = new ArrayList<String>();
 		for (int i = 0; i<prevSettings.length; i++){
@@ -47,7 +50,7 @@ public class SortCommand extends Command {
 	
 	//@author A0114302A
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		String[] prevSettings = mViewHandler.getView();
 		ArrayList<String> prevLabels = new ArrayList<String>();
 		for (int i = 0; i<prevSettings.length; i++){

@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.command;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,7 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 import mytasks.file.FeedbackObject;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.MyTasksLogicController;
+import mytasks.logic.parser.MyTasksParser;
 
 //@author A0108543J
 /**
@@ -25,7 +26,7 @@ public class HideCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject execute() {
+	public FeedbackObject execute() {
 		
 		List<String> temp = mController.obtainPrintableOutput();
 		ArrayList<String> referenceLabels = new ArrayList<String>();
@@ -105,7 +106,7 @@ public class HideCommand extends Command {
 	}
 
 	@Override
-	FeedbackObject undo() {
+	public FeedbackObject undo() {
 		throw new UnsupportedOperationException();
 	}
 

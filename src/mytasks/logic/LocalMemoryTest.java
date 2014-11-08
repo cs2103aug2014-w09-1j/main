@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 public class LocalMemoryTest {
 	

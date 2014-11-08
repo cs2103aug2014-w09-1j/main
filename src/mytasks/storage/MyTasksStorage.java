@@ -14,7 +14,7 @@ import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
 import mytasks.file.MyTasksController;
 import mytasks.file.Task;
-import mytasks.parser.MyTasksParser;
+import mytasks.logic.parser.MyTasksParser;
 
 //@author A0114302A
 /**
