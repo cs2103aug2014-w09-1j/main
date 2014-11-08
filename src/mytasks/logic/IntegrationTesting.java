@@ -13,6 +13,8 @@ import mytasks.file.Task;
 import mytasks.logic.parser.MyTasksParser;
 
 //@author A0115034X 
+//TODO: check boundary cases, check error handling, check FeedbackObject 
+
 public class IntegrationTesting {
 	
 	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
@@ -81,6 +83,7 @@ public class IntegrationTesting {
 		//checking for feedback to user 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "meeting two added");
+		
 		//checking whether task is added correctly into memory 
 		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
@@ -101,6 +104,7 @@ public class IntegrationTesting {
 		//checking for feedback to user 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "'meeting' updated");
+		
 		//checking whether task is added correctly into memory 
 		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
@@ -121,6 +125,7 @@ public class IntegrationTesting {
 		//checking for feedback to user 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "'meeting for 2103' updated");
+		
 		//checking whether task is added correctly into memory 
 		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
@@ -141,6 +146,7 @@ public class IntegrationTesting {
 		//checking for feedback to user 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "'last meeting for CS2103T' updated");
+		
 		//checking whether task is added correctly into memory 
 		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
@@ -161,6 +167,7 @@ public class IntegrationTesting {
 		//checking for feedback to user 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "'end of exams' updated");
+		
 		//checking whether task is added correctly into memory 
 		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
 		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
@@ -187,6 +194,7 @@ public class IntegrationTesting {
 		//checking for feedback to user - searching for labels 
 		assertEquals(feedback.getValidity(), isTrue);
 		assertEquals(feedback.getFeedback(), "1. bio exam from 22.11.2014 13:00 to 22.11.2014 15:00 #exam" + "\n" + "2. CS2010 exam from 24.11.2014 17:00 to 24.11.2014 19:00 #exam" + "\n" + "3. CS2103T exam from 26.11.2014 13:00 to 26.11.2014 15:00 #exam" + "\n" + "4. CS2106 exam on 28.11.2014 #important #exams" + "\n" + "task(s) with keyword 'exam' searched");
+	
 		//checking for feedback to user - searching for words in task descriptions 
 		assertEquals(feedbackTwo.getValidity(), isTrue);
 		assertEquals(feedbackTwo.getFeedback(), "1. christmas celebration on 25.12.2014 #xmas" + "\n" + "2. buy christmas presents on 25.12.2014 #xmas" + "\n" + "3. buy christmas groceries on 25.12.2014 #xmas" + "\n" + "task(s) with keyword 'christmas' searched");
@@ -210,6 +218,7 @@ public class IntegrationTesting {
 		assertEquals(feedback.getFeedback(), "tutorial sorted");
 		assertEquals(feedbackTwo.getValidity(), isTrue);
 		assertEquals(feedbackTwo.getFeedback(), "today tutorial sorted");
+		
 		//checking for output to user 
 		ArrayList<String> toCheck = new ArrayList<String>();
 		toCheck.add("#today#tutorial\n" + "bio lab from 12pm to 2pm #cells\n" + "CS2106 tut from 5pm to 6pm\n" + "CS2103T tut from 9am to 10am #important\n");

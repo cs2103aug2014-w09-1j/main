@@ -31,9 +31,9 @@ public class LogicTest {
 
 	//@author A0112139R
 	@Test
-	public void testSearchCommand() {
+	public void testSearchCommand1() {
 		taskLogic.getMemory().clearMemory();
-		// test 1 - search for 1 keyword
+		// search for 1 keyword
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("se meeting").getFeedback());
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
@@ -41,17 +41,41 @@ public class LogicTest {
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
-		// test 2 - search for multiple keywords
+	}
+	
+	@Test
+	public void testSearchCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad important");
+		// search for multiple keywords
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "3. important\n"
 				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
-		// test 3 - search for startDate
+	}
+	
+	@Test
+	public void testSearchCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad do homework from 21.09.2014 to 23.09.2014");
+		// search for startDate
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "2. do homework from 21.09.2014 to 23.09.2014\n"
 				+ "task(s) with keyword 'on 22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
-		// test 4 - search for tasks between startDate and endDate
+	}
+	
+	@Test
+	public void testSearchCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		taskLogic.executeCommand("ad do project from 24.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("ad pay electric bill from 1.10.2014 to 3.10.2014");
+		// search for tasks between startDate and endDate
 		assertEquals("1. CS2101 meeting on 29.09.2014\n" 
 				+ "2. do project from 24.09.2014 to 30.09.2014\n"
 				+ "3. pay electric bill from 01.10.2014 to 03.10.2014\n"
@@ -59,21 +83,25 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void testDeleteWithSearch(){
+	public void testDeleteWithSearch1(){
 		taskLogic.getMemory().clearMemory();
-		// test 1 - delete by search results
+		// delete by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
 		assertEquals("'CS2103T meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
-		// test 2 - delete task with same description
+	}
+	
+	@Test
+	public void testDeleteWithSearch2(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("so date");
 		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
 		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
 		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// when deleting task with same description
 		assertEquals("There are multiple tasks 'meeting'. Auto search to delete the specific one.\n"
 				+ "1. meeting on 01.11.2014 #CS2101\n"
 				+ "2. meeting on 02.11.2014 #CS2103T\n"
@@ -83,24 +111,47 @@ public class LogicTest {
 		String output = obtainOutput();
 		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
 				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
-		// test 3 - undo
+	}
+	
+	@Test
+	public void testDeleteWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+        taskLogic.executeCommand("de meeting");
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+		// undo
 		assertEquals("meeting added", taskLogic.executeCommand("un").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("01.Nov.2014\n" + "meeting #CS2101\n"
 				+ "02.Nov.2014\n" + "meeting #CS2103T\n"
 				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
-		// test 4 - redo
+	}
+	
+	@Test
+	public void testDeleteWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+        taskLogic.executeCommand("de meeting");
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+		assertEquals("meeting added", taskLogic.executeCommand("un").getFeedback());
+		// redo
 		assertEquals("'meeting' deleted", taskLogic.executeCommand("re").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
 				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
 	}
 	
 	@Test
-	public void testUpdateWithSearch(){
+	public void testUpdateWithSearch1(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("so date");
-		// test 1 - update by search results
+		// update by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
@@ -110,40 +161,65 @@ public class LogicTest {
 		String output = obtainOutput();
 		assertEquals("25.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting\n", output);
-		// test 2 - update task with same description
+	}
+	
+	@Test
+	public void testUpdateWithSearch2(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
 		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
 		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// when updating task with same description
 		assertEquals("There are multiple tasks 'meeting'. Auto search to update the specific one.\n"
 				+ "1. meeting on 01.11.2014 #CS2101\n"
 				+ "2. meeting on 02.11.2014 #CS2103T\n"
 				+ "3. meeting on 03.11.2014 #MA1101R\n"
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("up meeting - 4.11.2014").getFeedback());
 		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
-		output = obtainOutput();
-		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
-				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
-				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
-		// test 3 - undo
-		assertEquals("meeting reverted", taskLogic.executeCommand("un").getFeedback());
-		output = obtainOutput();
-		assertEquals("01.Nov.2014\n" + "meeting #CS2101\n"
-				+ "02.Nov.2014\n" + "meeting #CS2103T\n"
-				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
-		// test 4 - redo
-		assertEquals("'meeting' updated", taskLogic.executeCommand("re").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
 				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
 				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
 	}
 	
 	@Test
-	public void testDoneWithSearch(){
+	public void testUpdateWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("up meeting - 4.11.2014");
+		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
+		// undo
+		assertEquals("meeting reverted", taskLogic.executeCommand("un").getFeedback());
+		String output = obtainOutput();
+		assertEquals("01.Nov.2014\n" + "meeting #CS2101\n"
+				+ "02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testUpdateWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("up meeting - 4.11.2014");
+		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
+		assertEquals("meeting reverted", taskLogic.executeCommand("un").getFeedback());
+		// test 4 - redo
+		assertEquals("'meeting' updated", taskLogic.executeCommand("re").getFeedback());
+		String output = obtainOutput();
+		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
+				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
+	}
+	
+	@Test
+	public void testDoneWithSearch1(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("so done");
-		// test 1 - done by search results
+		// done by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
@@ -153,30 +229,58 @@ public class LogicTest {
 		String output = obtainOutput();
 		assertEquals("#done\n" + "CS2103T meeting on 22.09.2014 #important\n"
 				+ "N.A.\n" + "CS2101 meeting on 29.09.2014\n", output);
-		// test 2 - done task with same description
+	}
+	
+	@Test
+	public void testDoneWithSearch2(){
 		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
 		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
 		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
 		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// done task with same description
 		assertEquals("There are multiple tasks 'meeting'. Auto search to mark the specific one as done.\n"
 				+ "1. meeting on 01.11.2014 #CS2101\n"
 				+ "2. meeting on 02.11.2014 #CS2103T\n"
 				+ "3. meeting on 03.11.2014 #MA1101R\n"
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("do meeting").getFeedback());
 		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
 				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
 				+ "meeting on 03.11.2014 #MA1101R\n", output);
-		// test 3 - undo
+	}
+	
+	@Test
+	public void testDoneWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("do meeting");
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		// undo
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("N.A.\n" + "meeting on 01.11.2014 #CS2101\n"
 				+ "meeting on 02.11.2014 #CS2103T\n" 
 				+ "meeting on 03.11.2014 #MA1101R\n", output);
-		// test 4 - redo
+	}
+	
+	@Test
+	public void testDoneWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("do meeting");
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// redo
 		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
 				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
 				+ "meeting on 03.11.2014 #MA1101R\n", output);
@@ -184,33 +288,52 @@ public class LogicTest {
 
 
 	@Test
-	public void testGetSnapshot(){
+	public void testGetSnapshot1(){
 		taskLogic.getMemory().clearMemory();
-		String output = "";
-		 taskLogic.executeCommand("so date");
-		// sort by date - test 1 - tasks with only start date partition
+		taskLogic.executeCommand("so date");
+		// sort by date - tasks with only start date partition
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
 		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n", output);
-		// sort by date - test 2 - tasks without date & time and task with date & time 
+	}
+
+	@Test
+	public void testGetSnapshot2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		// sort by date - tasks without date & time and task with date & time ;
 		taskLogic.executeCommand("ad play badminton #anytime");
 		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
-		output = obtainOutput();	
+		String output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
 				+ "29.Sep.2014\n" + "CS2101 meeting #important\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
 				+ "N.A.\n" + "play badminton #anytime\n", output);
-		// sort by date - test 3 - tasks with same startDate and tasks with start and end date
+	}
+
+	@Test
+	public void testGetSnapshot3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		// sort by date - tasks with same startDate and tasks with start and end date
 		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
 		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
 		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
 		taskLogic.executeCommand("ad eat sushi #KentRidge");
-		output = obtainOutput();	
+		String output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -218,10 +341,26 @@ public class LogicTest {
 				+ "30.Sep.2014\n" + "do PS4\n"
 				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
-		// sort by date - test 4 - tasks with start and end DateTime partition
+		
+	}
+	
+	@Test
+	public void testGetSnapshot4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
+		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
+		taskLogic.executeCommand("ad eat sushi #KentRidge");
+		// sort by date - tasks with start and end DateTime partition
 		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
 		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
-		output = obtainOutput();	
+		String output = obtainOutput();	
 		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
 				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
 				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
@@ -233,9 +372,25 @@ public class LogicTest {
 				+ "11.Oct.2014\n" + "work\n"
 				+ "12.Oct.2014\n" + "work till 13:00\n"
 				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
-		// sort by labels - test 1 - sort 1 labels
+	}
+	
+	@Test
+	public void testGetSnapshot5(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
+		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
+		taskLogic.executeCommand("ad eat sushi #KentRidge");
+		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
+		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
+		// sort by labels - sort 1 labels
 		taskLogic.executeCommand("so important");
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
 				+ "CS2101 meeting on 29.09.2014\n" 
 				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
@@ -247,7 +402,11 @@ public class LogicTest {
 				+ "eat sushi #KentRidge\n"
 				+ "work from 10.10.2014 10:00 to 12.10.2014 13:00\n"
 				+ "gaming from 03.10.2014 10:00 to 03.10.2014 15:00\n", output);
-		// sort by labels - test 2 - sort multiple labels
+	}
+	
+	@Test
+	public void testGetSnapshot6(){
+		// sort by labels - sort multiple labels
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad tutorial #CS2103");
 		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #important");
@@ -256,7 +415,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad meeting 3.11.2014 #CS2101 #important");
 		taskLogic.executeCommand("ad video making #CS2101");
 		taskLogic.executeCommand("so CS2103 CS2100 important");
-		output = obtainOutput();
+		String output = obtainOutput();
 		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
 				+ "#CS2100#important\n" + "lab\n"
 				+ "#CS2103\n" + "tutorial\n"
@@ -283,14 +442,21 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void testUndoRedoDone(){
+	public void testUndoRedoDone1(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
 		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
 		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
-		// test 1 - undo once
+		// undo once
 		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	public void testUndoRedoDone2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
 		// test 2 - undo multiple times
 		taskLogic.executeCommand("do meeting");
 		taskLogic.executeCommand("do do homework");
@@ -298,7 +464,20 @@ public class LogicTest {
 		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
-		// test 3 - redo 
+	}
+	
+	public void testUndoRedoDone3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		taskLogic.executeCommand("do meeting");
+		taskLogic.executeCommand("do do homework");
+		taskLogic.executeCommand("do written quiz 2");
+		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// redo 
 		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
 		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
 	}
