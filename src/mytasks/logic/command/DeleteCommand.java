@@ -60,7 +60,7 @@ public class DeleteCommand extends Command {
 			return result;
 		} else {
 			deleteSingleTask();
-			haveSearched = false;
+			hasSearched = false;
 			mLocalMem.saveLocalMemory();
 			String resultString = String.format(MESSAGE_DELETE_SUCCESS, 
 					super.getTaskDetails());
@@ -116,7 +116,7 @@ public class DeleteCommand extends Command {
 
 	//@author A0112139R
 	private boolean canDeleteFromSearchResults(){
-		if (haveSearched == true && isNumeric(super.getTaskDetails())
+		if (hasSearched == true && isNumeric(super.getTaskDetails())
 				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem.getSearchList().size())) {
 			return true;
 		}
@@ -130,7 +130,7 @@ public class DeleteCommand extends Command {
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.remove(indexOfTaskToDeleted);
 		mLocalMem.saveLocalMemory();
-		haveSearched = false;
+		hasSearched = false;
 		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
 		FeedbackObject feedback = new FeedbackObject(resultString, true);
 		return feedback;

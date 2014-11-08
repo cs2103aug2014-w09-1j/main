@@ -32,6 +32,7 @@ public class ShowCommand extends Command {
 		ArrayList<String> toShow = super.getTask().getLabels();
 		ArrayList<Integer> toUse = new ArrayList<Integer>(); 
 		addHashtags(toShow);
+		hasSearched = false;
 
 		if (toShow == null) {
 			FeedbackObject toReturn = new FeedbackObject("No arguments found",

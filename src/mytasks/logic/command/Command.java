@@ -15,7 +15,7 @@ public abstract class Command {
 
 	private Task mTask;
 	private String mToUpdateTaskDesc;
-	protected static boolean haveSearched;
+	protected static boolean hasSearched;
 	protected static boolean isRedo;
 	
 	public final static String MESSAGE_NOTASK = "Unexpected Error: No Task Found to undo";

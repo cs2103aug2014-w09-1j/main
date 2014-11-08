@@ -29,11 +29,11 @@ public class SearchCommand extends Command {
 		if (!searchedTasks.isEmpty()) {
 			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
 			result = new FeedbackObject(searchedTasks,true);
-			haveSearched = true;
+			hasSearched = true;
 		} else {
 			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
 			result = new FeedbackObject(searchedTasks,false);
-			haveSearched = false;
+			hasSearched = false;
 		}
 		return result;
 	}

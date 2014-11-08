@@ -33,8 +33,8 @@ public class UndoCommand extends Command {
 			Command commandToRevert = mLocalMem.getUndoStack().pop();
 			result = commandToRevert.undo();
 		}
-		haveSearched = false;
-		return result;
+		hasSearched = false;
+		return result;	
 	}
 
 	@Override

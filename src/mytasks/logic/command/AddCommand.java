@@ -63,7 +63,7 @@ public class AddCommand extends Command {
 				.getTask().getDescription());
 		mLocalMem.undoPush(commandToUndo);
 		mLocalMem.saveLocalMemory();
-		haveSearched = false;
+		hasSearched = false;
 		String resultString = super.getTaskDetails() + " added";
 		FeedbackObject result = new FeedbackObject(resultString, true); 
 		return result;

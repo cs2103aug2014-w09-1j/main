@@ -31,7 +31,7 @@ public class RedoCommand extends Command {
 			Command commandToRevert = mLocalMem.getRedoStack().pop();
 			feedback = commandToRevert.execute();
 		}
-		haveSearched = false;
+		hasSearched = false;
 		return feedback;
 	}
 
