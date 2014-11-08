@@ -105,7 +105,8 @@ public class DoneCommand extends Command {
 		taskToDone.setLabels(labels);
 		return taskToDone;
 	}
-
+	
+	//@author A0112139R - unused
 	private Task undoTask(Task taskToUndone) {
 		if (taskToUndone.getLabels() == null){
 			return taskToUndone;
@@ -119,6 +120,7 @@ public class DoneCommand extends Command {
 		return taskToUndone;
 	}
 
+	//@author A0112139R
 	private DoneCommand createDoneUndo(Task currentTask) {
 		DoneCommand commandToUndo = new DoneCommand(currentTask.getDescription(),
 				currentTask.getFromDateTime(), currentTask.getToDateTime(), 
@@ -169,14 +171,14 @@ public class DoneCommand extends Command {
 	
 	private boolean canDoneFromSearchResults(){
 		if (hasSearched == true && isNumeric(super.getTaskDetails()) && 
-				Integer.parseInt(super.getTaskDetails())-1 < (mLocalMem.getSearchList().size())){
+				Integer.parseInt(super.getTaskDetails())-1 < (searchList.size())){
 			return true;
 		}
 		return false;
 	}
 
 	private FeedbackObject doneFromSearchResults(){
-		int indexOfTaskToDone = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
+		int indexOfTaskToDone = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
 		Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);
 		
 		boolean hasDone = true;

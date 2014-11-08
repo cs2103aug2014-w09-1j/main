@@ -117,14 +117,14 @@ public class DeleteCommand extends Command {
 	//@author A0112139R
 	private boolean canDeleteFromSearchResults(){
 		if (hasSearched == true && isNumeric(super.getTaskDetails())
-				&& Integer.parseInt(super.getTaskDetails()) - 1 < (mLocalMem.getSearchList().size())) {
+				&& Integer.parseInt(super.getTaskDetails()) - 1 < (searchList.size())) {
 			return true;
 		}
 		return false;
 	}
 
 	private FeedbackObject deleteFromSearchResults(){
-		int indexOfTaskToDeleted = mLocalMem.getSearchList().get(Integer.parseInt(super.getTaskDetails())-1);
+		int indexOfTaskToDeleted = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
 		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
 		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
 		mLocalMem.undoPush(commandToUndo);
