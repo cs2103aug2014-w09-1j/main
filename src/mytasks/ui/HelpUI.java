@@ -39,7 +39,7 @@ public class HelpUI extends JPanel {
 		return INSTANCE;
 	}
 
-	public HelpUI() {
+	private HelpUI() {
 		super(new GridBagLayout());
 
 		// for header

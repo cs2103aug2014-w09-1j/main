@@ -34,6 +34,7 @@ public class MyTasksLogicController implements ILogic, Serializable {
 			.getName());
 	private Handler fh = null;
 	protected boolean labelsHidden = false;
+	protected boolean showHelp = false;
 	protected ArrayList<String> toHide;
 	private final String MESSAGE_UNSUP = "Unsupported command function";
 	
@@ -202,4 +203,19 @@ public class MyTasksLogicController implements ILogic, Serializable {
 	public List<String> labelsToHide() {
 		return toHide;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean checkIfToHelpUI() {
+		return showHelp;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void toggleHelpUI(boolean onOff) {
+		showHelp = onOff;
+	}
+
 }

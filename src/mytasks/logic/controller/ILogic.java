@@ -48,4 +48,15 @@ public interface ILogic {
 	 */
 	public List<String> labelsToHide();
 	
+	/**
+	 * checkIfToHelpUI checks if there is a need to display the help pop up
+	 * @return boolean
+	 */
+	public boolean checkIfToHelpUI();
+	
+	/**
+	 * toggleHelpUIOff changes boolean flag for HelpUI
+	 * @param onOff
+	 */
+	public void toggleHelpUI(boolean onOff);
 }
