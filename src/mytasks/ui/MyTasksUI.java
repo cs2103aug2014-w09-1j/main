@@ -75,6 +75,43 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		mLogic = MyTasksLogicController.getInstance(false);
 		
 		// for tasks label and box 
+		initTextAreaLabelPanel();
+		clearTextAreaPanel();
+		
+		if (mLogic.obtainPrintableOutput().size() == 0) {
+			newTextArea();
+			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
+			setTextareaContentBorder("", titled);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				newTextArea();
+				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+				titled = BorderFactory.createTitledBorder(colourLine, firstWord);				
+				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+				setTextareaContentBorder(content, titled);
+			}
+		}
+		
+		initTextAreaScrollpane();       
+        
+		// for feedback label and box 
+		JScrollPane scrollPaneFeedback = initFeedbackBox();
+		
+		// for text field label and box 
+		initTextfield();
+
+		// for auto complete 
+		initAutocomplete();		
+		autocompleteStrings();
+
+		// Add Components to this panel.
+		addComponents(scrollPaneFeedback);
+	}
+	
+	private void initTextAreaLabelPanel() {
 		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
 		textAreaLabel.setFocusable(false);
@@ -83,55 +120,37 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
-		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));		
+		textAreaPanel.setFocusable(false);
+	}
+	
+	private void clearTextAreaPanel() {
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
 		textAreaPanel.repaint();
-		textAreaPanel.setFocusable(false);
+	}
 
-		if (mLogic.obtainPrintableOutput().size() == 0) {
-			textArea = new JTextArea();
-			textArea.setEditable(false);
-			textArea.setFocusable(false);
-
-			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
-			textArea.setBorder(titled);
-			textArea.setFocusable(false);
-			textAreaPanel.add(textArea);
-			textArea.setCaretPosition(0);
-		} else {
-			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-  
-				textArea = new JTextArea();
-				textArea.setEditable(false);
-				textArea.setFocusable(false);
-
-				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-				titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-				
-				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-				textArea.setText(content);
-				textArea.setBorder(titled);
-
-				GridBagConstraints c = new GridBagConstraints();
-				c.gridwidth = GridBagConstraints.REMAINDER;
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.gridx = 0;
-				c.weightx = 1.0;
-				c.weighty = 1.0;
-
-				textAreaPanel.add(textArea, c);
-				textArea.setCaretPosition(0);
-			}
-		}
+	private void newTextArea() {
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFocusable(false);
+	}
+	
+	private void setTextareaContentBorder(String content, Border titled2) {
+		textArea.setText(content);
+		textArea.setBorder(titled);
+		textAreaPanel.add(textArea);
+		textArea.setCaretPosition(0);
+	}
+	
+	private void initTextAreaScrollpane() {
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(500, 400));
-		scrollPane.setFocusable(true);       
-        
-		// for feedback label and box 
+		scrollPane.setFocusable(true);
+	}
+	
+	private JScrollPane initFeedbackBox() {
 		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
 		feedbackLabel.setFocusable(false);
 		textAreaFeedback = new JTextArea(10, 40);
@@ -140,21 +159,26 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
 		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPaneFeedback.setFocusable(true);
-		
-		// for textfield label and box 
+		return scrollPaneFeedback;
+	}
+	
+	private void initTextfield() {
 		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
 		textfieldLabel.setFocusable(false);
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
 		textField.setFocusable(true);
-
-		// for autocomplete 
+	}
+	
+	private void initAutocomplete() {
 		InputMap im = textField.getInputMap();
 		ActionMap am = textField.getActionMap();
 		im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
 		am.put("commit", new CommitAction());
-		
+	}
+
+	private void autocompleteStrings() {
 		commands = new ArrayList<String>();
 		commands.add("ad");
 		commands.add("se");
@@ -164,6 +188,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		commands.add("re");
 		commands.add("up");
 		commands.add("so");
+		commands.add("hi");
 		commands.add("?");
 		commands.add("he");
 		commands.add("help");
@@ -176,41 +201,41 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);
-
-		// Add Components to this panel.
+	}
+	
+	private void addComponents(JScrollPane scrollPaneFeedback) {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
 		c.fill = GridBagConstraints.VERTICAL;
 		c.gridx = 0;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		initGridbagWeight(c);
 		add(textAreaLabel, c);
 
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		initGridbagWeight(c);
 		add(scrollPane, c);
 
 		c.fill = GridBagConstraints.VERTICAL;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		initGridbagWeight(c);
 		add(feedbackLabel, c);
 
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		initGridbagWeight(c);
 		add(scrollPaneFeedback, c);
 
 		c.fill = GridBagConstraints.VERTICAL;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		initGridbagWeight(c);
 		add(textfieldLabel, c);
 
 		c.fill = GridBagConstraints.BOTH;
+		initGridbagWeight(c);
+		add(textField, c);
+	}
+
+	private void initGridbagWeight(GridBagConstraints c) {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		add(textField, c);
 	}
 	
 	/**
@@ -233,9 +258,43 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		Border colourLine;
 		List<String> labelsToHide = new ArrayList<String>();
 		
-		String text = textField.getText();
-		FeedbackObject feedback = mLogic.executeCommand(text);		
+		clearTextAreaPanel();
+		autocompleteStrings();
 		
+		String text = textField.getText();
+		FeedbackObject feedback = mLogic.executeCommand(text);			
+		returnFeedbackToUser(feedback);		
+		
+		if (mLogic.obtainPrintableOutput().size() == 0) {
+			newTextArea();			
+			
+			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
+			setTextareaContentBorder("", titled);
+		} else {			
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				newTextArea();				
+				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				isRed = checkImportant(firstWord);
+				isHide = checkLabelsToHide(isHide, labelsToHide, firstWord);
+				
+				if(isHide) {
+					colourLine = detBorderColour(isRed);						
+					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+					setTextareaContentBorder("", titled);
+				}
+				else {
+					colourLine = detBorderColour(isRed);
+					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
+					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+					setTextareaContentBorder(content, titled);					
+				}
+			}			
+		}
+		textField.selectAll();
+	}
+
+	private void returnFeedbackToUser(FeedbackObject feedback) {
 		if (feedback != null){
 			if (feedback.getValidity() == false) {
 				textAreaFeedback.setForeground(new Color(255, 0, 0));
@@ -247,128 +306,44 @@ public class MyTasksUI extends JPanel implements ActionListener,
 				textAreaFeedback.setCaretPosition(0);
 			}
 		}
-		textAreaPanel.removeAll();
-		textAreaPanel.revalidate();
-		textAreaPanel.repaint();
-		
-		words = new ArrayList<String>(commands);
-		for(int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
-			words.add(mLogic.obtainAllTaskDescription().get(i));
-		}
-		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
-			words.add(mLogic.obtainAllLabels().get(i));
-		}
-		
-		Collections.sort(words);
-		
-		if (mLogic.obtainPrintableOutput().size() == 0) {
-			textArea = new JTextArea();
-			textArea.setEditable(false);
-			textArea.setFocusable(false);
-			
-			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
-			textArea.setBorder(titled);
-			textAreaPanel.add(textArea);
-			textArea.setCaretPosition(0);
-		} else {
-			if(mLogic.checkIfToHide()) {
-				labelsToHide = mLogic.labelsToHide();
-			}
-			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				textArea = new JTextArea();
-				textArea.setEditable(false);				
-				textArea.setFocusable(false);
-				isHide = false; 
-				
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-				if(firstWord.equals("#important")) {
-					isRed = true;
-				}
-				if(labelsToHide.size() > 0) {
-					for(int k = 0; k < labelsToHide.size(); k++) {
-						if(labelsToHide.get(k).equals(firstWord)) {
-							isHide = true;
-						}
-					}
-				}
-				if(isHide) {
-					if(isRed) {
-						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-					} else {
-						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-					}
-						
-					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					textArea.setText("");
-					textArea.setBorder(titled);
-						
-					GridBagConstraints c = new GridBagConstraints();
-					c.gridwidth = GridBagConstraints.REMAINDER;
-					c.fill = GridBagConstraints.VERTICAL;
-					c.gridx = 0;
-					c.weightx = 1.0;
-					c.weighty = 1.0;
-
-					textAreaPanel.add(textArea, c);
-					textArea.setCaretPosition(0);
-				}
-				else {
-					if(isRed) {
-						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-					} else {
-						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-					}
-					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-					textArea.setText(content);
-					textArea.setBorder(titled);
+	}
 	
-					GridBagConstraints c = new GridBagConstraints();
-					c.gridwidth = GridBagConstraints.REMAINDER;
-					c.fill = GridBagConstraints.VERTICAL;
-					c.gridx = 0;
-					c.weightx = 1.0;
-					c.weighty = 1.0;
-
-					textAreaPanel.add(textArea, c);
-					textArea.setCaretPosition(0);
-				}
-			}
-//				else if(firstWord.equals("#important")) {
-//					isRed = true;
-//					colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
-//					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-//					
-//					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-//					textArea.setText(content);
-//					textArea.setBorder(titled);
-//					textAreaPanel.add(textArea);
-//				} else {
-//					if(isRed) {
-//						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-//					} else {
-//						colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-//					}
-//					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-//					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-//					textArea.setText(content);
-//					textArea.setBorder(titled);
-//
-//					GridBagConstraints c = new GridBagConstraints();
-//					c.gridwidth = GridBagConstraints.REMAINDER;
-//					c.fill = GridBagConstraints.VERTICAL;
-//					c.gridx = 0;
-//					c.weightx = 1.0;
-//					c.weighty = 1.0;
-//
-//					textAreaPanel.add(textArea, c);
-//					textArea.setCaretPosition(0);
-//				}
-			
+	private boolean checkImportant(String firstWord) {
+		boolean isRed;
+		if(firstWord.equals("#important")) {
+			isRed = true;
+		} else {
+			isRed = false;
 		}
-		textField.selectAll();
+		return isRed;
 	}
 
+	private boolean checkLabelsToHide(boolean isHide,
+			List<String> labelsToHide, String firstWord) {
+		isHide = false; 
+		if(mLogic.checkIfToHide()) {
+			labelsToHide = mLogic.labelsToHide();
+		}
+		if(labelsToHide.size() > 0) {
+			for(int k = 0; k < labelsToHide.size(); k++) {
+				if(labelsToHide.get(k).equals(firstWord)) {
+					isHide = true;
+				}
+			}
+		}
+		return isHide;
+	}
+
+	private Border detBorderColour(boolean isRed) {
+		Border colourLine;
+		if(isRed) {
+			colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
+		} else {
+			colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+		}
+		return colourLine;
+	}
+	
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be
 	 * invoked from the event dispatch thread.
@@ -385,12 +360,10 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		frame.pack();
 		frame.setVisible(true);
 		
-		// pressing the esc key will close the window
+		// pressing the escape key will close the window
 		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
 		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
-			/**
-			 * 
-			 */
+			
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
