@@ -40,8 +40,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
 	protected JTextArea textArea;
-	protected JTextArea textAreaFeedback;
-	private ILogic mLogic;
+	protected JTextArea textAreaFeedback;	
 	private JLabel textAreaLabel, feedbackLabel, textfieldLabel;
 	private JPanel textAreaPanel;
 	private Border paneEdge;
@@ -49,11 +48,13 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private Border titled;
 	private boolean lookingFor = false;
 	private int w = 0;
+	private ILogic mLogic;
 	private static MyTasksUI INSTANCE = null;
 
 	private Mode mode = Mode.INSERT;
 	private List<String> words;
 	private ArrayList<String> commands;
+	private HelpUI helpUI;
 
 	private static enum Mode {
 		INSERT, COMPLETION
@@ -76,6 +77,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		getContentPane().setLayout(layout);
 		
 		mLogic = MyTasksLogicController.getInstance(false);
+		helpUI = HelpUI.getInstance();
 		
 		// for tasks label and box 
 		initTextAreaLabelPanel();
@@ -294,9 +296,12 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		FeedbackObject feedback = mLogic.executeCommand(text);			
 		returnFeedbackToUser(feedback);		
 		
+		if(mLogic.checkIfToHelpUI()) {
+			helpUI.run();
+			mLogic.toggleHelpUI(false);
+		}
 		if (mLogic.obtainPrintableOutput().size() == 0) {
-			newTextArea();			
-			
+			newTextArea();						
 			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
 			setTextareaContentBorder("", titled);
 		} else {			
