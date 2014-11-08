@@ -35,7 +35,7 @@ import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0115034X
 
-public class MyTasksUI extends JPanel implements ActionListener,
+public class MyTasksUI extends JFrame implements ActionListener,
 		DocumentListener, Serializable {
 	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
@@ -71,7 +71,10 @@ public class MyTasksUI extends JPanel implements ActionListener,
 	}
 	
 	private MyTasksUI() {
-		super(new GridBagLayout());
+		super("My Tasks");
+		GridBagLayout layout = new GridBagLayout();
+		getContentPane().setLayout(layout);
+		
 		mLogic = MyTasksLogicController.getInstance(false);
 		
 		// for tasks label and box 
@@ -189,6 +192,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		commands.add("up");
 		commands.add("so");
 		commands.add("hi");
+		commands.add("sh");
 		commands.add("?");
 		commands.add("he");
 		commands.add("help");
@@ -250,7 +254,32 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			}
 		});
 	}
+	
+	/**
+	 * Create the GUI and show it. For thread safety, this method should be
+	 * invoked from the event dispatch thread.
+	 */
+	private static void createAndShowGUI() {
+		// Create and set up the window.
+		JFrame frame = new MyTasksUI();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		// Display the window.
+		frame.pack();
+		frame.setVisible(true);
+		
+		// pressing the escape key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+	}
+	
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
@@ -307,7 +336,7 @@ public class MyTasksUI extends JPanel implements ActionListener,
 			}
 		}
 	}
-	
+
 	private boolean checkImportant(String firstWord) {
 		boolean isRed;
 		if(firstWord.equals("#important")) {
@@ -339,39 +368,11 @@ public class MyTasksUI extends JPanel implements ActionListener,
 		if(isRed) {
 			colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
 		} else {
-			colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 100), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
 		}
 		return colourLine;
 	}
 	
-	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event dispatch thread.
-	 */
-	private static void createAndShowGUI() {
-		// Create and set up the window.
-		JFrame frame = new JFrame("MyTasks");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		// Add contents to the window.
-		frame.add(new MyTasksUI());
-
-		// Display the window.
-		frame.pack();
-		frame.setVisible(true);
-		
-		// pressing the escape key will close the window
-		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
-		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
-			
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-			}
-		});
-	}
-
 	@Override
 	public void insertUpdate(DocumentEvent ev) {
 		if (ev.getLength() != 1)
