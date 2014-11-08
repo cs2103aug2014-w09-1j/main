@@ -15,6 +15,7 @@ public abstract class Command {
 
 	private Task mTask;
 	private String mToUpdateTaskDesc;
+	protected static ArrayList<Integer> searchList;
 	protected static boolean hasSearched;
 	protected static boolean isRedo;
 	

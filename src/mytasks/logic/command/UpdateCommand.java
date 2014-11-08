@@ -29,8 +29,7 @@ public class UpdateCommand extends Command {
 	public FeedbackObject execute() {
 		if (isRedo) {
 			int indexOfTaskToUpdated = 0;
-			Task taskToUpdated = mLocalMem.getLocalMem().get(
-					indexOfTaskToUpdated);
+			Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
 			Command commandToUndo = createUpdateUndo(taskToUpdated);
 			mLocalMem.undoPush(commandToUndo);
 			Task updatedTask = updateTask(super.getTask(), taskToUpdated);
@@ -174,16 +173,14 @@ public class UpdateCommand extends Command {
 	private boolean canUpdateFromSearchResults() {
 		if (hasSearched == true
 				&& isNumeric(super.getToUpdateTaskDesc())
-				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (mLocalMem
-						.getSearchList().size())) {
+				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (searchList.size())) {
 			return true;
 		}
 		return false;
 	}
 
 	private FeedbackObject updateFromSearchResults() {
-		int indexOfTaskToUpdated = mLocalMem.getSearchList().get(
-				Integer.parseInt(super.getToUpdateTaskDesc()) - 1);
+		int indexOfTaskToUpdated = searchList.get(Integer.parseInt(super.getToUpdateTaskDesc()) - 1);
 		Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
 
 		UpdateCommand commandToUndo = createUpdateUndo(taskToUpdated);
