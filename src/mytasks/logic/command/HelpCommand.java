@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
-import mytasks.ui.HelpUI;
+import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0108543J
 /**
@@ -13,26 +13,25 @@ import mytasks.ui.HelpUI;
 public class HelpCommand extends Command {
 
 	// private variables
-	private HelpUI UIComponent;
+	private MyTasksLogicController mController; 
 	
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		UIComponent = HelpUI.getInstance();
+		mController = MyTasksLogicController.getInstance(false);
 	}
 
 	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
 					ArrayList<String> comdLabels, String updateDesc,
 					boolean canDo) {
 		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
-		UIComponent = HelpUI.getInstance();
-
+		mController = MyTasksLogicController.getInstance(false);
 	}
 
 	@Override
 	public FeedbackObject execute() {
-		UIComponent.run();
 		hasSearched = false;
+		mController.toggleHelpUI(true);
 		return null;
 	}
 
