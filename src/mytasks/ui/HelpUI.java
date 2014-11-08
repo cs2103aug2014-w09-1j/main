@@ -41,57 +41,41 @@ public class HelpUI extends JPanel {
 
 	private HelpUI() {
 		super(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
 
 		// for header
-		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Available Commands</font>");
-		textAreaLabel.setOpaque(true);
-		textAreaLabel.setFocusable(false);
-
-		// a border that puts 10 extra pixels at the sides and bottom of each pane
-		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
-		textAreaPanel = new JPanel();
-		textAreaPanel.setBorder(paneEdge);
-		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
-		textAreaPanel.removeAll();
-		textAreaPanel.revalidate();
-		textAreaPanel.repaint();
-		textAreaPanel.setFocusable(false);
-
+		initTextAreaLabelPanel();
+		clearTextAreaPanel();
+		
 		// new text body
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setFocusable(false);
+		newTextArea();
 
 		// coloured border
-		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
-
+		initBorder();
+		
 		// main context
 		String content = "testing1\ntesting2\ntesting3\n";
-		textArea.setText(content);
-		textArea.setBorder(titled);
-
-		GridBagConstraints c = new GridBagConstraints();
+		String footerNote = "Refer to User Guide for more details.";
+		textArea.setText(content + footerNote);
+		
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-
 		textAreaPanel.add(textArea, c);
-		textArea.setCaretPosition(0);
 
-		scrollPane = new JScrollPane(textAreaPanel);
-		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
-		scrollPane.setPreferredSize(new Dimension(400, 400));
-		scrollPane.setFocusable(true);  
+		// instructions box
+		initInstructionBox();  
 
 		// footer
-		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
-		footerAreaLabel.setOpaque(true);
-		footerAreaLabel.setFocusable(false);
+		initFooterAreaLabel();
 
 		// Add Components to this panel.
+		addComponents(c);
+	}
+
+	private void addComponents(GridBagConstraints c) {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
 		// for header (available commands)
@@ -112,6 +96,51 @@ public class HelpUI extends JPanel {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		add(footerAreaLabel, c);
+	}
+
+	private void initFooterAreaLabel() {
+		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
+		footerAreaLabel.setOpaque(true);
+		footerAreaLabel.setFocusable(false);
+	}
+
+	private void initInstructionBox() {
+		scrollPane = new JScrollPane(textAreaPanel);
+		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPane.setPreferredSize(new Dimension(500, 500));
+		scrollPane.setFocusable(true);
+	}
+
+	private void initBorder() {
+		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
+		textArea.setBorder(titled);
+	}
+
+	private void newTextArea() {
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFocusable(false);
+	}
+
+	private void clearTextAreaPanel() {
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();
+	}
+
+	private void initTextAreaLabelPanel() {
+		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Available Commands</font>");
+		textAreaLabel.setOpaque(true);
+		textAreaLabel.setFocusable(false);
+
+		// a border that puts 10 extra pixels at the sides and bottom of each pane
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
+		textAreaPanel = new JPanel();
+		textAreaPanel.setBorder(paneEdge);
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
+		textAreaPanel.setFocusable(false);
+		
 	}
 
 	/**
