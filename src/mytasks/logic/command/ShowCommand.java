@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
-import mytasks.logic.MyTasksLogicController;
+import mytasks.logic.controller.MyTasksLogicController;
 import mytasks.logic.parser.MyTasksParser;
 
 //@author A0108543J

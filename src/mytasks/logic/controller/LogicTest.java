@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.controller;
 
 import static org.junit.Assert.*;
 

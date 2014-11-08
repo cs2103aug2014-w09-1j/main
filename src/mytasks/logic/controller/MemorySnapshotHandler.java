@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

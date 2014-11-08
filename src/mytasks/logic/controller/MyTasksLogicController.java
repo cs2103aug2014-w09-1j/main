@@ -1,4 +1,4 @@
-package mytasks.logic;
+package mytasks.logic.controller;
 
 import java.io.IOException;
 import java.io.Serializable;

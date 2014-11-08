@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import mytasks.file.FeedbackObject;
-import mytasks.logic.LocalMemory;
-import mytasks.logic.MemorySnapshotHandler;
-import mytasks.logic.MyTasksLogicController;
+import mytasks.logic.controller.LocalMemory;
+import mytasks.logic.controller.MemorySnapshotHandler;
+import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0112139R
 /**

@@ -5,7 +5,7 @@ import java.util.Date;
 
 import mytasks.file.FeedbackObject;
 import mytasks.file.Task;
-import mytasks.logic.LocalMemory;
+import mytasks.logic.controller.LocalMemory;
 
 //@author A0112139R
 /**

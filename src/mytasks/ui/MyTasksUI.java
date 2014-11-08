@@ -30,8 +30,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import mytasks.file.FeedbackObject;
-import mytasks.logic.ILogic;
-import mytasks.logic.MyTasksLogicController;
+import mytasks.logic.controller.ILogic;
+import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0115034X
 
