@@ -28,23 +28,32 @@ public class SortCommand extends Command {
 
 	@Override
 	public FeedbackObject execute() {
-		String[] prevSettings = mViewHandler.getView();
-		ArrayList<String> prevLabels = new ArrayList<String>();
-		for (int i = 0; i<prevSettings.length; i++){
-			prevLabels.add(prevSettings[i]);
-		}
-		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		Command commandToUndo = createSortUndo();
 		mLocalMem.undoPush(commandToUndo);
 		mViewHandler.setView(super.getTask().getLabels());
 		hasSearched = false;
-		
+		mController.toggleHide(false);
+		FeedbackObject result = getFeedback();
+		return result;
+	}
+	
+	private SortCommand createSortUndo(){
+		String[] prevSettings = mViewHandler.getView();
+		ArrayList<String> prevLabels = new ArrayList<String>();
+		for (int i=0; i < prevSettings.length; i++){
+			prevLabels.add(prevSettings[i]);
+		}
+		SortCommand commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		return commandToUndo;
+	}
+	
+	private FeedbackObject getFeedback(){
 		String output = "";
 		for (int i=0; i < super.getTask().getLabels().size(); i++){
 			output +=  super.getTask().getLabels().get(i) + " ";
 		}
 		String resultString = output + "sorted";
 		FeedbackObject result = new FeedbackObject(resultString,true);
-		mController.toggleHide(false);
 		return result;
 	}
 	
