@@ -69,6 +69,7 @@ public class SortCommand extends Command {
 		mLocalMem.redoPush(commandToUndo);
 		mViewHandler.setView(super.getTask().getLabels());
 		mController.toggleHide(false);
-		return null;
+		FeedbackObject result = getFeedback();
+		return result;
 	}
 }
