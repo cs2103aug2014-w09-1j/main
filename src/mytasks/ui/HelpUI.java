@@ -23,6 +23,7 @@ import javax.swing.border.Border;
 /**
  * HelpUI is the GUI for HelpCommand.
  */
+@SuppressWarnings("serial")
 public class HelpUI extends JPanel {
 	private JLabel textAreaLabel, footerAreaLabel;
 	private JPanel textAreaPanel;
@@ -54,6 +55,19 @@ public class HelpUI extends JPanel {
 		initBorder();
 		
 		// main context
+		addInstructions(c);
+
+		// instructions box
+		initInstructionBox();  
+
+		// footer
+		initFooterAreaLabel();
+
+		// Add Components to this panel.
+		addComponents(c);
+	}
+
+	private void addInstructions(GridBagConstraints c) {
 		String add = "\n---------------------------ADD---------------------------\n";
 		String addContent ="Function: To add a task\n"
 						+ "Command: ad\n"
@@ -117,15 +131,6 @@ public class HelpUI extends JPanel {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		textAreaPanel.add(textArea, c);
-
-		// instructions box
-		initInstructionBox();  
-
-		// footer
-		initFooterAreaLabel();
-
-		// Add Components to this panel.
-		addComponents(c);
 	}
 
 	private void addComponents(GridBagConstraints c) {
