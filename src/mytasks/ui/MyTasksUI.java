@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,16 +34,16 @@ import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0115034X
 
+@SuppressWarnings("serial")
 public class MyTasksUI extends JFrame implements ActionListener,
-		DocumentListener, Serializable {
-	private static final long serialVersionUID = 1L;
+		DocumentListener {
 	protected JTextField textField;
 	protected JTextArea textArea;
 	protected JTextArea textAreaFeedback;	
 	private JLabel textAreaLabel, feedbackLabel, textfieldLabel;
 	private JPanel textAreaPanel;
 	private Border paneEdge;
-	private JScrollPane scrollPane;
+	private JScrollPane scrollPane, scrollPaneFeedback;
 	private Border titled;
 	private boolean lookingFor = false;
 	private int w = 0;
@@ -73,6 +72,50 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	
 	private MyTasksUI() {
 		super("My Tasks");
+	}
+	
+	/**
+	 * run starts the process of accepting and executing input
+	 */
+	public void run() {
+		// Schedule a job for the event dispatch thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+	
+	/**
+	 * Create the GUI and show it. For thread safety, this method should be
+	 * invoked from the event dispatch thread.
+	 */
+	private static void createAndShowGUI() {
+		// Create and set up the window.
+		JFrame frame = new MyTasksUI();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		//set up the content pane 
+		((MyTasksUI) frame).addComponentsToPane();
+		
+		// Display the window.
+		frame.pack();
+		frame.setVisible(true);		
+		
+		// pressing the escape key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+	}
+	
+	private void addComponentsToPane() {
 		GridBagLayout layout = new GridBagLayout();
 		getContentPane().setLayout(layout);
 		
@@ -81,29 +124,12 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		
 		// for tasks label and box 
 		initTextAreaLabelPanel();
-		clearTextAreaPanel();
-		
-		if (mLogic.obtainPrintableOutput().size() == 0) {
-			newTextArea();
-			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
-			setTextareaContentBorder("", titled);
-		} else {
-			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				newTextArea();
-				
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-				titled = BorderFactory.createTitledBorder(colourLine, firstWord);				
-				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-				setTextareaContentBorder(content, titled);
-			}
-		}
-		
+		clearTextAreaPanel();		
+		printToUserOnStartUp();		
 		initTextAreaScrollpane();       
         
 		// for feedback label and box 
-		JScrollPane scrollPaneFeedback = initFeedbackBox();
+		initFeedbackBox();
 		
 		// for text field label and box 
 		initTextfield();
@@ -112,8 +138,8 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		initAutocomplete();		
 		autocompleteStrings();
 
-		// Add Components to this panel.
-		addComponents(scrollPaneFeedback);
+		// Add Components 
+		addComponents();
 	}
 	
 	private void initTextAreaLabelPanel() {
@@ -135,6 +161,25 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		textAreaPanel.repaint();
 	}
 
+	private void printToUserOnStartUp() {
+		if (mLogic.obtainPrintableOutput().size() == 0) {
+			newTextArea();
+			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
+			setTextareaContentBorder("", titled);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				newTextArea();
+				
+				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+				titled = BorderFactory.createTitledBorder(colourLine, firstWord);				
+				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+				setTextareaContentBorder(content, titled);
+			}
+		}
+	}
+	
 	private void newTextArea() {
 		textArea = new JTextArea();
 		textArea.setEditable(false);
@@ -161,7 +206,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		textAreaFeedback = new JTextArea(10, 40);
 		textAreaFeedback.setEditable(false);
 		textAreaFeedback.setFocusable(false);
-		JScrollPane scrollPaneFeedback = new JScrollPane(textAreaFeedback);
+		scrollPaneFeedback = new JScrollPane(textAreaFeedback);
 		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPaneFeedback.setFocusable(true);
 		return scrollPaneFeedback;
@@ -209,7 +254,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		Collections.sort(words);
 	}
 	
-	private void addComponents(JScrollPane scrollPaneFeedback) {
+	private void addComponents() {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
@@ -242,64 +287,47 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private void initGridbagWeight(GridBagConstraints c) {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-	}
-	
-	/**
-	 * run starts the process of accepting and executing input
-	 */
-	public void run() {
-		// Schedule a job for the event dispatch thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				createAndShowGUI();
-			}
-		});
-	}
-	
-	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event dispatch thread.
-	 */
-	private static void createAndShowGUI() {
-		// Create and set up the window.
-		JFrame frame = new MyTasksUI();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		// Display the window.
-		frame.pack();
-		frame.setVisible(true);
-		
-		// pressing the escape key will close the window
-		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
-		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
-			
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-			}
-		});
-	}
+	}	
 	
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
-		boolean isRed = false, isHide = false;
-		Border colourLine;
+		boolean isHide = false;		
 		List<String> labelsToHide = new ArrayList<String>();
 		
 		clearTextAreaPanel();
-		autocompleteStrings();
 		
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);			
 		returnFeedbackToUser(feedback);		
 		
+		autocompleteStrings();
+		
 		if(mLogic.checkIfToHelpUI()) {
 			helpUI.run();
 			mLogic.toggleHelpUI(false);
 		}
+		printToUser(isHide, labelsToHide);		
+	}
+	
+	private void returnFeedbackToUser(FeedbackObject feedback) {
+		if (feedback != null){
+			if (feedback.getValidity() == false) {
+				textAreaFeedback.setForeground(new Color(255, 0, 0));
+				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
+			} else {
+				textAreaFeedback.setForeground(new Color(0, 150, 0));
+				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
+			}
+		}
+	}
+
+	private void printToUser(boolean isHide, List<String> labelsToHide) {
+		boolean isRed;
+		Border colourLine;
+		
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			newTextArea();						
 			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
@@ -326,20 +354,6 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			}			
 		}
 		textField.selectAll();
-	}
-
-	private void returnFeedbackToUser(FeedbackObject feedback) {
-		if (feedback != null){
-			if (feedback.getValidity() == false) {
-				textAreaFeedback.setForeground(new Color(255, 0, 0));
-				textAreaFeedback.setText(feedback.getFeedback());
-				textAreaFeedback.setCaretPosition(0);
-			} else {
-				textAreaFeedback.setForeground(new Color(0, 150, 0));
-				textAreaFeedback.setText(feedback.getFeedback());
-				textAreaFeedback.setCaretPosition(0);
-			}
-		}
 	}
 
 	private boolean checkImportant(String firstWord) {
@@ -405,15 +419,14 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		if (pos - w < 1)
 			return;
 
-		String prefix = content.substring(w + 1).toLowerCase();
+		String prefix = content.substring(w + 1);
 		int n = Collections.binarySearch(words, prefix);
 		if (n < 0 && -n <= words.size()) {
 			String match = words.get(-n - 1);
 			if (match.startsWith(prefix)) {
 				// A completion is found
 				String completion = match.substring(pos - w);
-				// We cannot modify Document from within notification,
-				// so we submit a task that does the change later
+				// Submitting a new function to do the completion 
 				SwingUtilities.invokeLater(new CompletionTask(completion,
 						pos + 1));
 			}

@@ -142,7 +142,8 @@ public class UpdateCommand extends Command {
 		FeedbackObject result = new FeedbackObject(resultString, true);
 		return result;
 	}
-
+	
+	//@author A0115034X 
 	private Task updateTask(Task currentTask, Task taskToUpdated) {
 		if (currentTask.getDescription() != null) {
 			taskToUpdated.setDescription(currentTask.getDescription());
