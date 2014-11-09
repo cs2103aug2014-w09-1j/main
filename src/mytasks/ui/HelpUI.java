@@ -41,57 +41,94 @@ public class HelpUI extends JPanel {
 
 	private HelpUI() {
 		super(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
 
 		// for header
-		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Available Commands</font>");
-		textAreaLabel.setOpaque(true);
-		textAreaLabel.setFocusable(false);
-
-		// a border that puts 10 extra pixels at the sides and bottom of each pane
-		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
-		textAreaPanel = new JPanel();
-		textAreaPanel.setBorder(paneEdge);
-		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
-		textAreaPanel.removeAll();
-		textAreaPanel.revalidate();
-		textAreaPanel.repaint();
-		textAreaPanel.setFocusable(false);
-
+		initTextAreaLabelPanel();
+		clearTextAreaPanel();
+		
 		// new text body
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setFocusable(false);
+		newTextArea();
 
 		// coloured border
-		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
-
+		initBorder();
+		
 		// main context
-		String content = "testing1\ntesting2\ntesting3\n";
-		textArea.setText(content);
-		textArea.setBorder(titled);
-
-		GridBagConstraints c = new GridBagConstraints();
+		String add = "\n---------------------------ADD---------------------------\n";
+		String addContent ="Function: To add a task\n"
+						+ "Command: ad\n"
+						+ "Format: ad <task descr.> <date> <time> #<label(s)>\n";
+		
+		String delete = "\n--------------------------DELETE--------------------------\n";
+		String deleteContent = "Function: To delete a task\n"
+						+ "Command: de\n"
+						+ "Format: de <task descr.>\n";
+		
+		String update = "\n--------------------------UPDATE--------------------------\n";
+		String updateContent = "Function: To make changes to an existing task\n"
+						+ "Command: up\n"
+						+ "Format: up <task descr.> - <new task descr.> <new date>  <new labels>\n";
+		
+		String search = "\n--------------------------SEARCH--------------------------\n";
+		String searchContent = "Function: To search for a task or label\n"
+						+ "Command: se\n"
+						+ "Format: se <keyword(s)>\n";
+		
+		String sort = "\n---------------------------SORT---------------------------\n";
+		String sortContent = "Function: To sort by labels or dates\n"
+						+ "Command: so\n"
+						+ "Format: so <label name(s)>\n";
+		
+		String done = "\n---------------------------DONE--------------------------\n";
+		String doneContent = "Function: To mark a task as done\n"
+						+ "Command: do\n"
+						+ "Format: do <task descr.>\n";
+		
+		String undo = "\n---------------------------UNDO--------------------------\n";
+		String undoContent = "Function: To undo an input\n"
+						+ "Command: un\n"
+						+ "Format: un\n";
+		
+		String redo = "\n---------------------------REDO---------------------------\n";
+		String redoContent = "Function: To redo an input\n"
+						+ "Command: re\n"
+						+ "Format: re\n";
+		
+		String show = "\n---------------------------SHOW--------------------------\n";
+		String showContent = "Function: To show certain labels or dates\n"
+						+ "Command: sh\n"
+						+ "Format: sh <label name(s)>\n";
+		
+		String hide = "\n---------------------------HIDE---------------------------\n";
+		String hideContent = "Function: To hide certain labels or dates\n"
+						+ "Command: hi\n"
+						+ "Format: hi <label name(s)>\n";
+		
+		
+		String footerNote = "\n\n\t\t         *Refer to User Guide for more details.";
+		textArea.setText(add + addContent + delete + deleteContent + update + updateContent + search + searchContent + 
+						sort + sortContent + done + doneContent + undo + undoContent + redo + redoContent + show + showContent + 
+						hide + hideContent + footerNote);
+		textArea.setCaretPosition(0);
+		
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-
 		textAreaPanel.add(textArea, c);
-		textArea.setCaretPosition(0);
 
-		scrollPane = new JScrollPane(textAreaPanel);
-		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
-		scrollPane.setPreferredSize(new Dimension(400, 400));
-		scrollPane.setFocusable(true);  
+		// instructions box
+		initInstructionBox();  
 
 		// footer
-		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
-		footerAreaLabel.setOpaque(true);
-		footerAreaLabel.setFocusable(false);
+		initFooterAreaLabel();
 
 		// Add Components to this panel.
+		addComponents(c);
+	}
+
+	private void addComponents(GridBagConstraints c) {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
 		// for header (available commands)
@@ -114,6 +151,50 @@ public class HelpUI extends JPanel {
 		add(footerAreaLabel, c);
 	}
 
+	private void initFooterAreaLabel() {
+		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
+		footerAreaLabel.setOpaque(true);
+		footerAreaLabel.setFocusable(false);
+	}
+
+	private void initInstructionBox() {
+		scrollPane = new JScrollPane(textAreaPanel);
+		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPane.setPreferredSize(new Dimension(520, 400));
+		scrollPane.setFocusable(true);
+	}
+
+	private void initBorder() {
+		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
+		textArea.setBorder(titled);
+	}
+
+	private void newTextArea() {
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFocusable(false);
+	}
+
+	private void clearTextAreaPanel() {
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();
+	}
+
+	private void initTextAreaLabelPanel() {
+		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Available Commands</font>");
+		textAreaLabel.setOpaque(true);
+		textAreaLabel.setFocusable(false);
+
+		// a border that puts 10 extra pixels at the sides and bottom of each pane
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
+		textAreaPanel = new JPanel();
+		textAreaPanel.setBorder(paneEdge);
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
+		textAreaPanel.setFocusable(false);
+	}
+
 	/**
 	 * run opens up the help window
 	 */
@@ -129,7 +210,8 @@ public class HelpUI extends JPanel {
 		// create and set up the window
 		JFrame frame = new JFrame("MyTasks Help");
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
+		frame.setLocation(500, 0);
+		
 		// add contents to the window
 		frame.add(new HelpUI());
 
