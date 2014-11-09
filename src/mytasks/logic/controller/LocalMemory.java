@@ -45,10 +45,6 @@ public class LocalMemory implements Serializable {
 		return INSTANCE;
 	}
 	
-	public ArrayList<Integer> getSearchList(){
-		return searchList;
-	}
-	
 	//@author A0115034X 
 	// for testing purposes 
 	protected static void clearLocalMem() {
