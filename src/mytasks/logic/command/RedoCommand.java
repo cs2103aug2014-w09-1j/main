@@ -17,14 +17,14 @@ public class RedoCommand extends Command {
 	
 	public RedoCommand(String comdDes, Date fromDateTime, Date toDateTime,
 			ArrayList<String> comdLabels, String updateDesc) {
-		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc, true);
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
 		mLocalMem = LocalMemory.getInstance();
 	}
 
 	@Override
 	public FeedbackObject execute() {
+		isRedo = true;
 		FeedbackObject feedback = null;
-
 		if (mLocalMem.getRedoStack().isEmpty()) {
 			feedback = new FeedbackObject("No commands to undo",false);
 		} else {

@@ -41,13 +41,14 @@ public class LocalMemory implements Serializable {
 		return INSTANCE;
 	}
 	
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	//@author A0115034X 
 	// for testing purposes 
 	protected static void clearLocalMem() {
 		mLocalMem = new ArrayList<Task>(); 
-	}
-
-	protected Object readResolve() {
-		return INSTANCE;
 	}
 
 	protected void loadLocalMemory() {

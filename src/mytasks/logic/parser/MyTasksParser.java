@@ -103,7 +103,7 @@ public class MyTasksParser implements IParser {
     public Command parseInput(String input) {
         String[] words = input.split("\\s+");
         if (words.length != 0) {
-            String comdType = words[0];
+            String comdType = words[0].toLowerCase();
             String withoutComdType = removeCommand(input, comdType);
             if (withoutComdType.trim().length() == 0
                     && !comdType.trim().equals("un") && !comdType.equals("re")

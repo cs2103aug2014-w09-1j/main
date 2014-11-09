@@ -16,8 +16,8 @@ public class DeleteCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
+	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to delete the specific one.";
 
 	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
@@ -29,48 +29,75 @@ public class DeleteCommand extends Command {
 	@Override
 	public FeedbackObject execute() {
 		if (isRedo){
-			int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
-			Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
-			DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
-			mLocalMem.undoPush(commandToUndo);
-			mLocalMem.remove(indexOfTaskToDeleted);
-			String resultString = String.format(MESSAGE_DELETE_SUCCESS, super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString, true);
-			return result;
+			return redoTask();
+		} else if (canDeleteFromSearchResults()) {
+			return deleteFromSearchResults();
+		} else {
+			return deleteByTaskDesc();
 		}
-		
-		if (canDeleteFromSearchResults()) {
-			FeedbackObject result = deleteFromSearchResults();
-			return result;
-		}
+	}
 
+	private FeedbackObject redoTask(){
+		int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
+		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
+		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.remove(indexOfTaskToDeleted);
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private boolean canDeleteFromSearchResults(){
+		if (hasSearched == true && isNumeric(super.getTaskDetails())
+				&& (Integer.parseInt(super.getTaskDetails()) - 1 < (searchList.size()))) {
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject deleteFromSearchResults(){
+		int indexOfTaskToDeleted = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
+		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
+		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.remove(indexOfTaskToDeleted);
+		mLocalMem.saveLocalMemory();
+		hasSearched = false;
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
+		FeedbackObject feedback = new FeedbackObject(resultString, true);
+		return feedback;
+	}
+
+	private FeedbackObject deleteByTaskDesc(){
 		int timesAppear = countTimesAppear();
 		if (timesAppear == 0){
-			String resultString = String.format(MESSAGE_DELETE_FAIL,
-					super.getTaskDetails()) + "\n";
-			resultString += autoSearch().getFeedback();
-			FeedbackObject result = new FeedbackObject(resultString, false);
-			return result;
-		}
-		else if (timesAppear > 1) {	
-			String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
-					super.getTaskDetails()) + "\n";
-			resultString += autoSearch().getFeedback();
-			FeedbackObject result = new FeedbackObject(resultString, true);
-			return result;
+			return deleteFail();
+		} else if (timesAppear > 1) {	
+			return directToSearch();
 		} else {
-			deleteSingleTask();
-			hasSearched = false;
-			mLocalMem.saveLocalMemory();
-			String resultString = String.format(MESSAGE_DELETE_SUCCESS, 
-					super.getTaskDetails());
-			FeedbackObject result = new FeedbackObject(resultString,true);
-			return result;
+			return deleteSingleTask();
 		} 
 	}
 
+	private FeedbackObject deleteFail(){
+		String resultString = String.format(MESSAGE_DELETE_FAIL,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, false);
+		return result;
+	}
+
+	private FeedbackObject directToSearch(){
+		String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
 	//@author A0115034X
-	private void deleteSingleTask(){
+	private FeedbackObject deleteSingleTask(){
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()
 					.equals(super.getTask().getDescription())) {
@@ -81,6 +108,13 @@ public class DeleteCommand extends Command {
 				break;
 			}
 		}
+
+		hasSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, 
+				super.getTaskDetails());
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
 	}
 
 	private DeleteCommand createDeleteUndo(Task currentTask){
@@ -115,27 +149,6 @@ public class DeleteCommand extends Command {
 	}
 
 	//@author A0112139R
-	private boolean canDeleteFromSearchResults(){
-		if (hasSearched == true && isNumeric(super.getTaskDetails())
-				&& Integer.parseInt(super.getTaskDetails()) - 1 < (searchList.size())) {
-			return true;
-		}
-		return false;
-	}
-
-	private FeedbackObject deleteFromSearchResults(){
-		int indexOfTaskToDeleted = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
-		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
-		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
-		mLocalMem.undoPush(commandToUndo);
-		mLocalMem.remove(indexOfTaskToDeleted);
-		mLocalMem.saveLocalMemory();
-		hasSearched = false;
-		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
-		FeedbackObject feedback = new FeedbackObject(resultString, true);
-		return feedback;
-	}
-
 	private boolean isNumeric(String str) {
 		try {
 			Integer.parseInt(str);

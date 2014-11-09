@@ -27,15 +27,7 @@ public abstract class Command {
 		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
 		mTask = thisTask;
 		mToUpdateTaskDesc = updateDesc;
-		Command.isRedo = false;
-	}
-	
-	public Command(String comdDes, Date fromDateTime, Date toDateTime,
-			ArrayList<String> comdLabels, String updateDesc, boolean isRedo) {
-		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
-		mTask = thisTask;
-		mToUpdateTaskDesc = updateDesc;
-		Command.isRedo = isRedo;
+		isRedo = false;
 	}
 
 	protected String getTaskDetails() {

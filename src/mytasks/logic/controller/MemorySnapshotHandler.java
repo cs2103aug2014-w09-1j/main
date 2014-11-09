@@ -17,7 +17,7 @@ import mytasks.logic.parser.MyTasksParser;
  * It is required to be able to categorize by labels that is listed in the currentSettings
  */
 public class MemorySnapshotHandler {
-	
+
 	private static MemorySnapshotHandler INSTANCE = null;
 	private String[] currentSettings;
 	private ArrayList<Task> snapshotList;
@@ -30,25 +30,25 @@ public class MemorySnapshotHandler {
 	//Constructor
 	private MemorySnapshotHandler() {
 		currentSettings = MyTasksController.DEFAULT_VIEW;
-		assert currentSettings[0] == "date" : "wrong default setting";
+		assert currentSettings[0].equals("date") : "wrong default setting";
 	}
-	
+
 	public static MemorySnapshotHandler getInstance(){
 		if (INSTANCE == null){
 			INSTANCE = new MemorySnapshotHandler();
 		}
 		return INSTANCE;
 	}
-	
+
 	public void setView(ArrayList<String> newSettings) {
 		currentSettings = newSettings.toArray((new String[newSettings.size()]));
 		assert currentSettings != null : "invalid setting";
 	}
-	
+
 	public String[] getView() {
 		return currentSettings;
 	}
-	
+
 	private void initSnapshotHandler(LocalMemory LocalMem){
 		snapshotList = new ArrayList<Task>();
 		labelsInSortedOrder = new ArrayList<String>();
@@ -66,21 +66,18 @@ public class MemorySnapshotHandler {
 	public ArrayList<String> getSnapshot(LocalMemory LocalMem) {
 		assert currentSettings != null : "invalid setting";
 		initSnapshotHandler(LocalMem);
-		
+
 		for (int i=0; i < currentSettings.length; i++){
 			if (currentSettings[i].toLowerCase().equals("date")){
-				timedTaskToNormalTask();		
+				convertTimedTasksToScheduleTasks();		
 				sortByDate();
-			}
-			else{
-				if (currentSettings[i].equals(""))
-					continue;
+			} else{
 				labelsInSortedOrder.add(currentSettings[i]);
 			}
 		}
-		
+
 		if (!labelsInSortedOrder.isEmpty()){
-			combinationOfLabels();
+			findCombinationOfLabels();
 			computeLabelOrderOfAllTasks();
 			sortByLabels();
 			return convertSnapshotListToStringInLabelsFormat(snapshotList);
@@ -102,7 +99,7 @@ public class MemorySnapshotHandler {
 			}
 		}
 	}
-	
+
 	private void sortByLabels(){
 		for (int i=0; i < snapshotList.size()-1; i++){
 			for (int j=0; j < snapshotList.size()-1-i; j++){
@@ -116,26 +113,26 @@ public class MemorySnapshotHandler {
 	}
 
 	/**
-	 * convert the list of sorted task to an array list of string
+	 * convert the list of sorted task to a list of string
 	 * that follows the date format
 	 * 
 	 * @param snapshotList 
-	 * @return array list of string with date format
+	 * @return a list of string in date format
 	 */
 	private ArrayList<String> convertSnapshotListToStringInDateFormat(ArrayList<Task> snapshotList){	
 		ArrayList<String> output = new ArrayList<String>();
 
 		for (int i=0; i < snapshotList.size(); i++){
-			if (!wantDoneTasks() && isDone(snapshotList.get(i))){
+			if (!isSortedByDoneTasks() && isDone(snapshotList.get(i))){
 				continue;
 			}
-			
+
 			String snapshot = "";
 			Date date = snapshotList.get(i).getFromDateTime();
 			if (date == null){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
-					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 					snapshot += snapshotList.get(j).toString() + "\n";
@@ -148,7 +145,7 @@ public class MemorySnapshotHandler {
 				int j=i;
 				Date currentDate = snapshotList.get(j).getFromDateTime();
 				while (currentDate != null && dateFormat.format(currentDate).equals(dateFormat.format(date))){
-					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 
@@ -167,18 +164,18 @@ public class MemorySnapshotHandler {
 	}
 
 	/**
-	 * convert the list of sorted task to an array list of string
+	 * convert the list of sorted task to a list of string
 	 * that follows the label format
 	 * 
 	 * @param snapshotList 
-	 * @return array list of string with label format
+	 * @return a list of string in label format
 	 */
 	private ArrayList<String> convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){		
 		ArrayList<String> output = new ArrayList<String>();
-		ArrayList<String> labelsNotWanted;
+		ArrayList<String> unwantedLabels;
 
 		for (int i=0; i < snapshotList.size(); i++){
-			if (!wantDoneTasks() && isDone(snapshotList.get(i))){
+			if (!isSortedByDoneTasks() && isDone(snapshotList.get(i))){
 				continue;
 			}
 
@@ -187,7 +184,7 @@ public class MemorySnapshotHandler {
 			if (order == labelCombinations.size()){
 				snapshot += "N.A.\n";
 				for (int j=i; j < snapshotList.size(); j++){
-					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
 					snapshot += snapshotList.get(j).toString() + "\n";
@@ -196,18 +193,18 @@ public class MemorySnapshotHandler {
 				break;
 			}
 			else{
-				labelsNotWanted = new ArrayList<String>();
+				unwantedLabels = new ArrayList<String>();
 				for (int j=0; j < labelCombinations.get(order).size(); j++){
 					snapshot += "#" + labelCombinations.get(order).get(j);
-					labelsNotWanted.add(labelCombinations.get(order).get(j));
+					unwantedLabels.add(labelCombinations.get(order).get(j));
 				}
 				snapshot += "\n";
 				int j=i;
 				while (j < snapshotList.size() && tasksToLabelOrders.get(snapshotList.get(j)) == tasksToLabelOrders.get(snapshotList.get(i))){
-					if (!wantDoneTasks() && isDone(snapshotList.get(j))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
 						continue;
 					}
-					snapshot += taskToStringWithoutSpecifiedLabels(snapshotList.get(j), labelsNotWanted) + "\n";
+					snapshot += taskToStringWithoutSpecifiedLabels(snapshotList.get(j), unwantedLabels) + "\n";
 					j++;
 				}
 				i = j-1;
@@ -220,24 +217,23 @@ public class MemorySnapshotHandler {
 
 	/**
 	 * convert timed tasks to individual schedule task
-	 * in the range of the date and time
+	 * in the range of the start and end date
 	 * 
 	 * @param 
 	 * @return 
 	 */
-	private void timedTaskToNormalTask(){	
+	private void convertTimedTasksToScheduleTasks(){	
 		for (int i=0; i < snapshotList.size(); i++){
 			if (snapshotList.get(i).getFromDateTime() != null && snapshotList.get(i).getToDateTime() != null){
 				Date startDate = snapshotList.get(i).getFromDateTime();
 				Date endDate = snapshotList.get(i).getToDateTime();
-				Date date = startDate;
 				if (dateFormat.format(startDate).equals(dateFormat.format(endDate))){
 					snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, endDate, snapshotList.get(i).getLabels()));
 					continue;
 				}
-				
+				Date date = startDate;
 				while (!dateFormat.format(date).equals(dateFormat.format(endDate))){
-					date = incrementDate(date);
+					date = increaseOneDay(date);
 					if (dateFormat.format(date).equals(dateFormat.format(endDate))){
 						snapshotList.add(new Task(snapshotList.get(i).getDescription(), endDate, endDate, snapshotList.get(i).getLabels()));
 					}
@@ -251,20 +247,35 @@ public class MemorySnapshotHandler {
 	}
 
 	/**
-	 * find all the possible combination of labels
-	 * that is given
+	 * find all the possible combination of the given labels
 	 * 
 	 * @param 
 	 * @return labelCombinations
 	 */
-	private void combinationOfLabels(){
-		ArrayList<String> chosen = new ArrayList<String>();
-		ArrayList<String> remaining = new ArrayList<String>();		
+	private void findCombinationOfLabels(){
+		ArrayList<String> chosenList = new ArrayList<String>();
+		ArrayList<String> remainingList = new ArrayList<String>();		
 		for (int j=0; j < labelsInSortedOrder.size(); j++){
-			remaining.add(labelsInSortedOrder.get(j));
+			remainingList.add(labelsInSortedOrder.get(j));
 		}
-		combinationOfLabelsRec(remaining, chosen);
+		findCombinationOfLabelsRec(remainingList, chosenList);
+		sortLabelCombinationsInDescendingOrder();
+	}
 
+	private void findCombinationOfLabelsRec(ArrayList<String> remainingList, ArrayList<String> chosenList){
+		if (remainingList.isEmpty()){
+			labelCombinations.add(chosenList);
+		} else {
+			ArrayList<String> remaining = (ArrayList<String>) remainingList.clone();
+			String str = remaining.remove(0);
+			ArrayList<String> chosen = (ArrayList<String>) chosenList.clone();
+			chosen.add(str);
+			findCombinationOfLabelsRec(remaining, chosen);
+			findCombinationOfLabelsRec(remaining, chosenList);			
+		}
+	}
+	
+	private void sortLabelCombinationsInDescendingOrder(){
 		for (int i=0; i < labelCombinations.size()-1; i++){
 			for (int j=0; j < labelCombinations.size()-1-i; j++){
 				if (labelCombinations.get(j).size() < labelCombinations.get(j+1).size()){
@@ -273,27 +284,6 @@ public class MemorySnapshotHandler {
 					labelCombinations.set(j+1, temp);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Recursive method to
-	 * find all the possible combination of labels
-	 * 
-	 * @param 
-	 * @return labelCombinations
-	 */
-	private void combinationOfLabelsRec(ArrayList<String> remaining, ArrayList<String> chosen){
-		if (remaining.isEmpty()){
-			labelCombinations.add(chosen);
-		}
-		else{
-			ArrayList<String> r2 = (ArrayList<String>) remaining.clone();
-			String s = r2.remove(0);
-			ArrayList<String> c2 = (ArrayList<String>) chosen.clone();
-			c2.add(s);
-			combinationOfLabelsRec(r2, c2);
-			combinationOfLabelsRec(r2, chosen);			
 		}
 	}
 
@@ -328,11 +318,11 @@ public class MemorySnapshotHandler {
 	 * @param task
 	 * @return string of task
 	 */
-	private String taskToStringWithoutSpecifiedLabels(Task task, ArrayList<String> labelsNotWanted){
+	private String taskToStringWithoutSpecifiedLabels(Task task, ArrayList<String> unwantedLabels){
 		String labelsToString = "";
 		if (task.getLabels() != null) {
 			for (String s : task.getLabels()){
-				if (haveSameLabels(s ,labelsNotWanted)){
+				if (hasSameLabels(s ,unwantedLabels)){
 					continue;
 				}
 				labelsToString += " " + "#" + s;
@@ -361,14 +351,14 @@ public class MemorySnapshotHandler {
 			result = String.format("%s on %s%s", task.getDescription(), dateFromString,labelsToString);
 		} else {
 			result = String.format("%s from %s to %s%s", task.getDescription(),
-							dateFromString, dateToString, labelsToString);
+					dateFromString, dateToString, labelsToString);
 		}
 		return result.trim();
 	}
 
-	private boolean haveSameLabels(String str, ArrayList<String> labels){
+	private boolean hasSameLabels(String str, ArrayList<String> labels){
 		for (int i=0; i < labels.size(); i++){
-			if (str.equals(labels.get(i))){
+			if (str.toLowerCase().equals(labels.get(i).toLowerCase())){
 				return true;
 			}
 		}
@@ -376,7 +366,7 @@ public class MemorySnapshotHandler {
 	}
 
 	/**
-	 * extract the time from the given task
+	 * extract the time of the given task
 	 * and convert it to string
 	 * 
 	 * @param task
@@ -394,7 +384,7 @@ public class MemorySnapshotHandler {
 			String endTime = timeFormat.format(task.getToDateTime());
 			if (startTime.equals(endTime)){
 				timeToString = "till " + endTime;
-			}else{
+			} else {
 				timeToString = "from " + startTime + " to " + endTime;
 			}
 		}
@@ -419,14 +409,7 @@ public class MemorySnapshotHandler {
 		}	
 		return dateWithoutTime;
 	}
-	
-	/**
-	 * compute the label order of all tasks
-	 * and store it inside a hash map
-	 * 
-	 * @param 
-	 * @return 
-	 */
+
 	private void computeLabelOrderOfAllTasks(){
 		for (int i=0; i < snapshotList.size(); i++){
 			Task currentTask = snapshotList.get(i);
@@ -434,55 +417,44 @@ public class MemorySnapshotHandler {
 		}
 	}
 
-	/**
-	 * compute the label order of the given task tasks
-	 * 
-	 * @param task
-	 * @return an integer represent the task label order
-	 */
 	private int computeLabelOrder(Task task){
-		int order = labelCombinations.size();
+		int lastOrder = labelCombinations.size();
 		if (task.getLabels() == null){
-			return order;
+			return lastOrder;
 		}
-		
-		int matchingLabels=0;
+
+		int matchingNumOfLabels=0;
 		for (int i=0; i < task.getLabels().size(); i++){
 			for (int j=0; j < labelsInSortedOrder.size(); j++){
-				if (task.getLabels().get(i).equals(labelsInSortedOrder.get(j))){
-					matchingLabels++;
+				if (task.getLabels().get(i).toLowerCase().equals(labelsInSortedOrder.get(j).toLowerCase())){
+					matchingNumOfLabels++;
 				}
 			}
 		}
-		if (matchingLabels == 0){
-			return order;
+		if (matchingNumOfLabels == 0){
+			return lastOrder;
 		}
-		
+
+		int order = 0;
 		for (int i=0; i < labelCombinations.size(); i++){
-			if (labelCombinations.get(i).size() == matchingLabels){
-				int matchingSet=0;
+			if (labelCombinations.get(i).size() == matchingNumOfLabels){
+				int matchingLabels=0;
 				for (int j=0; j < task.getLabels().size(); j++){
 					for (int k=0; k < labelCombinations.get(i).size(); k++){
 						if (task.getLabels().get(j).equals(labelCombinations.get(i).get(k))){
-							matchingSet++;
+							matchingLabels++;
 						}
 					}
 				}
-				if (matchingSet == matchingLabels){
+				if (matchingLabels == matchingNumOfLabels){
 					order = i;
 				}
 			}
 		}
 		return order;
 	}
-	
-	/**
-	 * check if need to show done tasks
-	 * 
-	 * @param 
-	 * @return boolean
-	 */
-	private boolean wantDoneTasks(){
+
+	private boolean isSortedByDoneTasks(){
 		for (int i=0; i < currentSettings.length; i++){
 			if (currentSettings[i].toLowerCase().equals("done")){
 				return true;
@@ -491,17 +463,11 @@ public class MemorySnapshotHandler {
 		return false;
 	}
 
-	/**
-	 * check if the given task is mark as done
-	 * 
-	 * @param task
-	 * @return boolean
-	 */
 	private boolean isDone(Task task){
 		if (task.getLabels() == null){
 			return false;
 		}
-		
+
 		for (int i=0; i < task.getLabels().size(); i++){
 			if (task.getLabels().get(i).toLowerCase().equals("done")){
 				return true;
@@ -510,46 +476,10 @@ public class MemorySnapshotHandler {
 		return false;
 	}
 
-	/**
-	 * increase the day of the given date by 1
-	 * 
-	 * @param date
-	 * @return date with 1 more day
-	 */
-	private Date incrementDate(Date date){
+	private Date increaseOneDay(Date date){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.DATE, 1);
 		return calendar.getTime();
-	}
-	
-	private boolean haveLabel(int listIndex, int labelIndex){
-		if (snapshotList.get(listIndex).getLabels() == null){
-			return false;
-		}
-
-		for (int i=0; i < snapshotList.get(listIndex).getLabels().size(); i++){
-			if (snapshotList.get(listIndex).getLabels().get(i).equals(labelsInSortedOrder.get(labelIndex))){
-				return true;
-			}
-		}
-
-		return false;
-	}
-	
-	private boolean haveLabels(int index){
-		if (snapshotList.get(index).getLabels() == null){
-			return false;
-		}
-		
-		for (int i=0; i < snapshotList.get(index).getLabels().size(); i++){
-			for (int j=0; j < labelsInSortedOrder.size(); j++){
-				if (snapshotList.get(index).getLabels().get(i).equals(labelsInSortedOrder.get(j))){
-					return true;
-				}
-			}
-		}
-		
-		return false;	
 	}
 }
