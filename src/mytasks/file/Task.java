@@ -21,7 +21,7 @@ public class Task {
 	private Date mFromDateTime = null;
 	private Date mToDateTime = null;
 	private ArrayList<String> mLabels;
-	
+
 	private static final Logger LOGGER = Logger.getLogger(Task.class
 			.getName());
 	private Handler fh = null;
@@ -29,7 +29,7 @@ public class Task {
 
 	// Constructor
 	public Task(String details, Date fromDateTime, Date toDateTime,
-					ArrayList<String> labels) {
+			ArrayList<String> labels) {
 		mDescription = details;
 		mFromDateTime = fromDateTime;
 		mToDateTime = toDateTime;
@@ -42,7 +42,7 @@ public class Task {
 		mToDateTime = newTask.getToDateTime();
 		mLabels = newTask.getLabels();
 	}
-	
+
 	private void runLogger() {
 		try {
 			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
@@ -56,7 +56,7 @@ public class Task {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * closeHandler prevents overflow of information and multiple logger files
 	 * from appearing
@@ -128,7 +128,7 @@ public class Task {
 		}
 		return new Task(mDescription, newDate1, newDate2, newLabels);
 	}
-	
+
 	//@author A0112139R
 	@Override
 	public String toString() {
@@ -136,11 +136,11 @@ public class Task {
 		String dateFromString = "";
 		if (mFromDateTime != null) {
 			dateFromString = MyTasksParser.dateTimeFormats.get(0).format(
-							mFromDateTime);
+					mFromDateTime);
 		}
 		if (dateFromString.contains("00:00")) {
 			dateFromString = MyTasksParser.dateFormats.get(0).format(
-							mFromDateTime);
+					mFromDateTime);
 		}
 		if (mToDateTime != null) {
 			dateToString = MyTasksParser.dateTimeFormats.get(0).format(mToDateTime);
@@ -160,14 +160,14 @@ public class Task {
 			result = String.format("%s%s ", mDescription, labelsToString);
 		} else if (dateToString.equals("")) {
 			result = String.format("%s on %s%s", mDescription, dateFromString,
-							labelsToString);
+					labelsToString);
 		} else {
 			result = String.format("%s from %s to %s%s", mDescription,
-							dateFromString, dateToString, labelsToString);
+					dateFromString, dateToString, labelsToString);
 		}
 		return result.trim();
 	}
-	
+
 	//@author A0114302A
 	@Override
 	public boolean equals(Object otherTask) {
@@ -197,7 +197,7 @@ public class Task {
 		}
 		return true;
 	}
-	
+
 	private boolean compareDescription(Task other){
 		boolean result = true;
 		if (other.getDescription() == null) {
@@ -214,7 +214,7 @@ public class Task {
 		}
 		return result;
 	}
-	
+
 	private boolean compareFromDateTime(Date other){
 		boolean result = true;
 		if (other == null) {
@@ -231,7 +231,7 @@ public class Task {
 		}
 		return result;
 	}
-	
+
 	private boolean compareToDateTime(Date other){
 		boolean result = true;
 		if (other == null) {
@@ -248,7 +248,7 @@ public class Task {
 		}
 		return result;
 	}
-	
+
 	private boolean compareLabels(Task other){
 		if (other.getLabels() == null) {
 			if (mLabels != null) {

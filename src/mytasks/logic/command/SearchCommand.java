@@ -13,10 +13,10 @@ import mytasks.logic.controller.LocalMemory;
  * SearchCommand extends Command object to follow OOP standards
  */
 public class SearchCommand extends Command {
-	
+
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
+	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
 
 	public SearchCommand(String comdDes, Date fromDateTime,
@@ -45,31 +45,28 @@ public class SearchCommand extends Command {
 	public FeedbackObject undo() {
 		throw new UnsupportedOperationException("Search does not have an undo function");
 	}
-	
+
 	private String search(Task userRequest) {
 		String searchedTasks = "";
 		searchList = new ArrayList<Integer>();
 		String[] keywords = null;
-		
+
 		if (userRequest.getDescription() != null && !userRequest.getDescription().equals("")){
 			keywords = userRequest.getDescription().split("\\s+");	
 		}
 
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			Task currentTask = mLocalMem.getLocalMem().get(i);
-			if (haveSameDesc(keywords, currentTask)) {
+			if (hasSameDesc(keywords, currentTask)) {
 				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
-			}
-			else if (haveSameLabels(keywords, currentTask)) {
+			} else if (hasSameLabels(keywords, currentTask)) {
 				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
-			}
-			else if (isBetweenStartDateAndEndDate(userRequest.getFromDateTime(), userRequest.getToDateTime(), currentTask)){
+			} else if (isBetweenStartDateAndEndDate(userRequest.getFromDateTime(), userRequest.getToDateTime(), currentTask)){
 				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
-			}
-			else if (haveSameDate(userRequest.getFromDateTime(), currentTask)){
+			} else if (hasSameDate(userRequest.getFromDateTime(), currentTask)){
 				searchList.add(i);
 				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
 			}
@@ -78,38 +75,38 @@ public class SearchCommand extends Command {
 		return searchedTasks;
 	}
 
-	private boolean haveSameDesc(String[] keywords, Task currentTask) {
+	private boolean hasSameDesc(String[] keywords, Task currentTask) {
 		if (keywords == null || currentTask.getDescription() == null){
 			return false;
 		}
-		
-		for (int i=0; i < keywords.length; i++){
-			String desc = keywords[i];
 
-			if (currentTask.getDescription().toLowerCase().contains(desc.toLowerCase())) {
+		for (int i=0; i < keywords.length; i++){
+			String word = keywords[i];
+
+			if (currentTask.getDescription().toLowerCase().contains(word.toLowerCase())) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean haveSameLabels(String[] keywords, Task currentTask) {
+	private boolean hasSameLabels(String[] keywords, Task currentTask) {
 		if (keywords == null || currentTask.getLabels() == null){
 			return false;
 		}
-		
+
 		for (int i=0; i < keywords.length; i++){
-			String desc = keywords[i];
+			String word = keywords[i];
 
 			for (int j=0; j < currentTask.getLabels().size(); j++){
-				if (currentTask.getLabels().get(j).toLowerCase().contains(desc.toLowerCase())){
+				if (currentTask.getLabels().get(j).toLowerCase().contains(word.toLowerCase())){
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean isBetweenStartDateAndEndDate(Date fromDateTime, Date toDateTime, Task currentTask) {
 		if (toDateTime == null || currentTask.getFromDateTime() == null){
 			return false;
@@ -119,33 +116,29 @@ public class SearchCommand extends Command {
 			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0){
 				return true;
 			}
-		}
-		else{
+		} else {
 			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0 || 
 					fromDateTime.compareTo(currentTask.getToDateTime()) <= 0 && toDateTime.compareTo(currentTask.getToDateTime()) >= 0){
 				return true;
 			}
 		}
-
 		return false;
 	}
-	
-	private boolean haveSameDate(Date fromDateTime, Task currentTask) {
+
+	private boolean hasSameDate(Date fromDateTime, Task currentTask) {
 		if (fromDateTime == null || currentTask.getFromDateTime() == null){
 			return false;
 		}
-		
+
 		if (currentTask.getToDateTime() == null){
 			if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
 				return true;
 			}
-		}
-		else{
+		} else {
 			if (currentTask.getFromDateTime().compareTo(fromDateTime) <= 0 && currentTask.getToDateTime().compareTo(fromDateTime) >= 0){ 
 				return true;
 			}
-		}
-		
+		}	
 		return false;
 	}
 }
