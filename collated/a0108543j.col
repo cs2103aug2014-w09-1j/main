@@ -1,0 +1,683 @@
+//@author: a0108543j
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+	 */
+
+	@Override
+	public FeedbackObject execute() {
+		mLocalMem.add(super.getTask());
+		AddCommand commandToUndo = new AddCommand(null, null, null, null, super
+				.getTask().getDescription());
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.saveLocalMemory();
+		hasSearched = false;
+		String resultString = super.getTaskDetails() + " added";
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\HelpCommand.java
+	 */
+
+/**
+ * HelpCommand extends Command object to follow OOP standards.
+ */
+public class HelpCommand extends Command {
+
+	// private variables
+	private MyTasksLogicController mController; 
+	
+	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
+					ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mController = MyTasksLogicController.getInstance(false);
+	}
+
+	public HelpCommand(String comdDes, Date fromDateTime, Date toDateTime,
+					ArrayList<String> comdLabels, String updateDesc,
+					boolean canDo) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mController = MyTasksLogicController.getInstance(false);
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		hasSearched = false;
+		mController.toggleHelpUI(true);
+		FeedbackObject temp = new FeedbackObject("Help menu opened",true);
+		return temp;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		throw new UnsupportedOperationException(
+						"Help does not have an undo function");
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\HelpCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\HideCommand.java
+	 */
+
+/**
+ * HideCommand extends Command object to follow OOP standards
+ */
+public class HideCommand extends Command {
+
+	// private variables
+	private MyTasksLogicController mController;
+
+	public HideCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mController = MyTasksLogicController.getInstance(false);
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		
+		List<String> temp = mController.obtainPrintableOutput();
+		ArrayList<String> referenceLabels = new ArrayList<String>();
+		ArrayList<String> availableLabels = new ArrayList<String>();
+		ArrayList<String> toHide = super.getTask().getLabels();
+		ArrayList<String> toReturnArray = new ArrayList<String>();
+		ArrayList<Integer> toUse = new ArrayList<Integer>();
+		addHashtags(toHide);
+		hasSearched = false;
+
+		if (toHide == null) {
+			FeedbackObject toReturn = new FeedbackObject("No arguments found", false);
+			return toReturn;
+		}
+		// TODO known bug: cannot use all as label
+		for (int i = 0; i < temp.size(); i++) {
+			availableLabels.add(locateLabels(temp.get(i)));
+			referenceLabels.add(locateLabels(temp.get(i)));
+		}
+		
+		for (int i = 0; i < toHide.size(); i++) {
+			boolean haveThisWord = false;
+			String thisWord = toHide.get(i);
+			for (int j = 0; j<availableLabels.size(); j++){
+				String curLabel = availableLabels.get(j);
+				if (curLabel.equals(thisWord)){
+					haveThisWord = true;
+					toUse.add(j);
+				} else if (curLabel.contains(thisWord)){
+					haveThisWord = true;
+					curLabel = curLabel.replace(thisWord, "");
+					availableLabels.set(j, curLabel);
+				}
+			}
+			if (!haveThisWord && !thisWord.equals("#all")) {
+				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
+				return toReturn;
+			}
+		}
+		if(toHide.contains("#all")){
+			toReturnArray = referenceLabels;
+		} else {
+			for (int i = 0; i<toUse.size(); i++){
+				toReturnArray.add(referenceLabels.get(toUse.get(i)));
+			}
+		}
+		mController.toggleHide(true);
+		mController.hideLabels(toReturnArray);
+		FeedbackObject toReturn = new FeedbackObject("Labels hidden", true);
+		return toReturn;
+	}
+
+	private String locateLabels(String temp) {
+		String firstWord = null;
+		if (temp != null) {
+			firstWord = temp.split("\\s+")[0];
+		}
+		return firstWord;
+	}
+	
+	private void addHashtags(ArrayList<String> toHide){
+		for (int i = 0; i<toHide.size(); i++) {
+			if (!toHide.get(i).equals("N.A.") && !isDates(toHide.get(i))){
+				String temp = "#" + toHide.get(i);
+				toHide.set(i, temp);
+			}
+		}
+	}
+	
+	private boolean isDates(String toCheck) {
+		try {
+			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
+			curDateForm.parse(toCheck);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		throw new UnsupportedOperationException();
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\HideCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\ShowCommand.java
+	 */
+
+/**
+ * HideCommand extends Command object to follow OOP standards
+ */
+public class ShowCommand extends Command {
+
+	// private variables
+	private MyTasksLogicController mController;
+
+	public ShowCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mController = MyTasksLogicController.getInstance(false);
+	}
+
+	@Override
+	public FeedbackObject execute() {
+
+		ArrayList<String> referenceLabelsToShow = cloneList(mController.getHideLabels());
+		ArrayList<String> availableLabelsToShow = cloneList(mController.getHideLabels());
+		ArrayList<String> toShow = super.getTask().getLabels();
+		ArrayList<Integer> toUse = new ArrayList<Integer>(); 
+		addHashtags(toShow);
+		hasSearched = false;
+
+		if (toShow == null) {
+			FeedbackObject toReturn = new FeedbackObject("No arguments found",
+					false);
+			return toReturn;
+		}
+
+		for (int i = 0; i < toShow.size(); i++) {
+			boolean haveThisWord = false;
+			String thisWord = toShow.get(i);
+			for (int j = 0; j<availableLabelsToShow.size(); j++){
+				String curLabel = availableLabelsToShow.get(j);
+				if (curLabel.equals(thisWord)){
+					haveThisWord = true;
+					toUse.add(j);
+				} else if (curLabel.contains(thisWord)){
+					haveThisWord = true;
+					curLabel = curLabel.replace(thisWord, "");
+					availableLabelsToShow.set(j, curLabel);
+				}
+			}
+			if (!haveThisWord && !thisWord.equals("#all")) {
+				FeedbackObject toReturn = new FeedbackObject("Invalid label", false);
+				return toReturn;
+			}
+		}
+
+		if (toShow.contains("#all")) {
+			mController.clearHideLabels();
+			mController.toggleHide(false);
+			FeedbackObject toReturn = new FeedbackObject("All labels shown",
+					true);
+			return toReturn;
+		} 
+
+		ArrayList<String> newToHide = new ArrayList<String>();
+		for (int i = 0; i < referenceLabelsToShow.size(); i++) {
+			if (!toUse.contains(i)) {
+				newToHide.add(referenceLabelsToShow.get(i));
+			}
+		}
+		if (newToHide.size()==0) {
+			mController.clearHideLabels();
+			mController.toggleHide(false);
+			FeedbackObject toReturn = new FeedbackObject("All labels shown",
+					true);
+			return toReturn;
+		}
+		mController.hideLabels(newToHide);
+		FeedbackObject toReturn = new FeedbackObject("Labels shown", true);
+		return toReturn;
+	}
+
+	private void addHashtags(ArrayList<String> toHide) {
+		for (int i = 0; i < toHide.size(); i++) {
+			if (!toHide.get(i).equals("N.A.") && !isDates(toHide.get(i))) {
+				String temp = "#" + toHide.get(i);
+				toHide.set(i, temp);
+			}
+		}
+	}
+	
+	private ArrayList<String> cloneList(ArrayList<String> list) {
+	    ArrayList<String> clone = new ArrayList<String>(list.size());
+	    for(String item: list) clone.add(item);
+	    return clone;
+	}
+
+	private boolean isDates(String toCheck) {
+		try {
+			SimpleDateFormat curDateForm = MyTasksParser.dateFormats.get(1);
+			curDateForm.parse(toCheck);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		throw new UnsupportedOperationException();
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\ShowCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+	 */
+
+	@Override
+	public FeedbackObject undo() {
+		Task prevState = null;
+		int indexOfTaskToUpdate = mLocalMem.getLocalMem().size() - 1;
+		prevState = mLocalMem.getLocalMem().get(indexOfTaskToUpdate).getClone();
+		Command toRedo = new UpdateCommand(prevState.getDescription(),
+				prevState.getFromDateTime(), prevState.getToDateTime(),
+				prevState.getLabels(), this.getTask().getDescription());
+		mLocalMem.getLocalMem().remove(indexOfTaskToUpdate);
+		mLocalMem.getLocalMem().add(0, this.getTask());
+		mLocalMem.redoPush(toRedo);
+		mLocalMem.saveLocalMemory();
+		String resultString = this.getToUpdateTaskDesc() + " reverted";
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+	 */
+
+	public void undoPush(Command commandToUndo) {
+		undoStack.push(commandToUndo);
+	}
+
+	public Stack<Command> getUndoStack() {
+		return undoStack;
+	}
+	
+	public void redoPush(Command commandToUndo) {
+		redoStack.push(commandToUndo);
+	}
+	
+	public Stack<Command> getRedoStack() {
+		return redoStack;
+	}
+
+	//Backdoor function to use for testing
+	public void clearMemory() {
+		mLocalMem.clear();
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+	 */
+
+	@Test
+	public void testHideCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun");
+		taskLogic.executeCommand("ad homework");
+		taskLogic.executeCommand("so fun");
+		taskLogic.executeCommand("hi fun");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> toHide = new ArrayList<String>();
+		toHide.add("#fun");
+		assertEquals(toHide, taskLogic.toHide);
+		
+		taskLogic.executeCommand("hi all");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> allTasks = new ArrayList<String>();
+		allTasks.add("#fun");
+		allTasks.add("N.A.");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+		taskLogic.executeCommand("hi all fun");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+		allTasks.remove(0);
+		taskLogic.executeCommand("hi N.A.");
+		assertEquals(allTasks, taskLogic.toHide);
+		
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+	 */
+
+	public void toggleHide(boolean hideOrNot) {
+		labelsHidden = hideOrNot;
+	}
+	
+	public void hideLabels(ArrayList<String> labels){
+		toHide = labels;
+	}
+	
+	public void clearHideLabels() {
+		toHide.clear();
+	}
+	
+	public ArrayList<String> getHideLabels() {
+		return toHide;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean checkIfToHide() {
+		return labelsHidden;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> labelsToHide() {
+		return toHide;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean checkIfToHelpUI() {
+		return showHelp;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void toggleHelpUI(boolean onOff) {
+		showHelp = onOff;
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\ui\HelpUI.java
+	 */
+
+/**
+ * HelpUI is the GUI for HelpCommand.
+ */
+@SuppressWarnings("serial")
+public class HelpUI extends JPanel {
+	private JLabel textAreaLabel, footerAreaLabel;
+	private JPanel textAreaPanel;
+	private JTextArea textArea;
+	private Border paneEdge;
+	private JScrollPane scrollPane;
+	private Border titled;
+	private static HelpUI INSTANCE = null;
+
+	public static HelpUI getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new HelpUI();
+		}
+		return INSTANCE;
+	}
+
+	private HelpUI() {
+		super(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+
+		// for header
+		initTextAreaLabelPanel();
+		clearTextAreaPanel();
+		
+		// new text body
+		newTextArea();
+
+		// coloured border
+		initBorder();
+		
+		// main context
+		addInstructions(c);
+
+		// instructions box
+		initInstructionBox();  
+
+		// footer
+		initFooterAreaLabel();
+
+		// Add Components to this panel.
+		addComponents(c);
+	}
+
+	private void addInstructions(GridBagConstraints c) {
+		String add = "\n---------------------------ADD---------------------------\n";
+		String addContent ="Function: To add a task\n"
+						+ "Command: ad\n"
+						+ "Format: ad <task descr.> <date> <time> #<label(s)>\n";
+		
+		String delete = "\n--------------------------DELETE--------------------------\n";
+		String deleteContent = "Function: To delete a task\n"
+						+ "Command: de\n"
+						+ "Format: de <task descr.>\n";
+		
+		String update = "\n--------------------------UPDATE--------------------------\n";
+		String updateContent = "Function: To make changes to an existing task\n"
+						+ "Command: up\n"
+						+ "Format: up <task descr.> - <new task descr.> <new date>  <new labels>\n";
+		
+		String search = "\n--------------------------SEARCH--------------------------\n";
+		String searchContent = "Function: To search for a task or label\n"
+						+ "Command: se\n"
+						+ "Format: se <keyword(s)>\n";
+		
+		String sort = "\n---------------------------SORT---------------------------\n";
+		String sortContent = "Function: To sort by labels or dates\n"
+						+ "Command: so\n"
+						+ "Format: so <label name(s)>\n";
+		
+		String done = "\n---------------------------DONE--------------------------\n";
+		String doneContent = "Function: To mark a task as done\n"
+						+ "Command: do\n"
+						+ "Format: do <task descr.>\n";
+		
+		String undo = "\n---------------------------UNDO--------------------------\n";
+		String undoContent = "Function: To undo an input\n"
+						+ "Command: un\n"
+						+ "Format: un\n";
+		
+		String redo = "\n---------------------------REDO---------------------------\n";
+		String redoContent = "Function: To redo an input\n"
+						+ "Command: re\n"
+						+ "Format: re\n";
+		
+		String show = "\n---------------------------SHOW--------------------------\n";
+		String showContent = "Function: To show certain labels or dates\n"
+						+ "Command: sh\n"
+						+ "Format: sh <label name(s)>\n";
+		
+		String hide = "\n---------------------------HIDE---------------------------\n";
+		String hideContent = "Function: To hide certain labels or dates\n"
+						+ "Command: hi\n"
+						+ "Format: hi <label name(s)>\n";
+		
+		
+		String footerNote = "\n\n\t\t         *Refer to User Guide for more details.";
+		textArea.setText(add + addContent + delete + deleteContent + update + updateContent + search + searchContent + 
+						sort + sortContent + done + doneContent + undo + undoContent + redo + redoContent + show + showContent + 
+						hide + hideContent + footerNote);
+		textArea.setCaretPosition(0);
+		
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		textAreaPanel.add(textArea, c);
+	}
+
+	private void addComponents(GridBagConstraints c) {
+		c.gridwidth = GridBagConstraints.REMAINDER;
+
+		// for header (available commands)
+		c.fill = GridBagConstraints.VERTICAL;
+		c.gridx = 0;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		add(textAreaLabel, c);
+
+		// for instructions box
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		add(scrollPane, c);
+
+		// for footer
+		c.fill = GridBagConstraints.VERTICAL;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		add(footerAreaLabel, c);
+	}
+
+	private void initFooterAreaLabel() {
+		footerAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Press 'Esc' key to exit!</font>");
+		footerAreaLabel.setOpaque(true);
+		footerAreaLabel.setFocusable(false);
+	}
+
+	private void initInstructionBox() {
+		scrollPane = new JScrollPane(textAreaPanel);
+		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPane.setPreferredSize(new Dimension(520, 400));
+		scrollPane.setFocusable(true);
+	}
+
+	private void initBorder() {
+		Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+		titled = BorderFactory.createTitledBorder(colourLine, "These are all you will ever need (:");
+		textArea.setBorder(titled);
+	}
+
+	private void newTextArea() {
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFocusable(false);
+	}
+
+	private void clearTextAreaPanel() {
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();
+	}
+
+	private void initTextAreaLabelPanel() {
+		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Available Commands</font>");
+		textAreaLabel.setOpaque(true);
+		textAreaLabel.setFocusable(false);
+
+		// a border that puts 10 extra pixels at the sides and bottom of each pane
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
+		textAreaPanel = new JPanel();
+		textAreaPanel.setBorder(paneEdge);
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
+		textAreaPanel.setFocusable(false);
+	}
+
+	/**
+	 * run opens up the help window
+	 */
+	public void run() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+
+	private static void createAndShowGUI() {
+		// create and set up the window
+		JFrame frame = new JFrame("MyTasks Help");
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setLocation(500, 0);
+		
+		// add contents to the window
+		frame.add(new HelpUI());
+
+		// display the window
+		frame.pack();
+		frame.setVisible(true);
+
+		// pressing the esc key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+		.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\ui\HelpUI.java
+
+
+
+
+

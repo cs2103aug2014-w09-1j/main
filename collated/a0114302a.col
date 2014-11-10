@@ -1,0 +1,2787 @@
+//@author: a0114302a
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\FeedbackObject.java
+	 */
+
+public class FeedbackObject {
+	
+	private boolean mIsValid;
+	private String mFeedback;
+	
+	public FeedbackObject(String feedback, boolean isValid){
+		mFeedback = feedback;
+		mIsValid = isValid;
+	}
+	
+	public boolean getValidity() {
+		return mIsValid;
+	}
+	
+	public String getFeedback() {
+		return mFeedback;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\FeedbackObject.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\MyTasksController.java
+	 */
+
+/**
+ * MyTasksController acts as the controller of MyTasks. However, this is shared with the UI
+ * MyTasksController hides the creation of UI and simply runs it upon program call
+ */
+public class MyTasksController {
+	
+	public final static String DEFAULT_FILENAME = "externalmemoryfile";
+	public final static String[] DEFAULT_VIEW = {"date"};
+	public final static String SYSTEM_SHUTDOWN = "system off";
+	public static String default_log = "log";
+	
+	private MyTasksUI UIComponent = null;
+	
+	//Constructor
+	public MyTasksController(){
+		Date today = new Date();
+		default_log +=today.hashCode();
+		UIComponent = MyTasksUI.getInstance();
+	}
+	
+	public static void main(String[] args){
+		MyTasksController runningProgram = new MyTasksController();
+		runningProgram.UIComponent.run();
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\MyTasksController.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+	 */
+
+/**
+ * Task object represents a single task with all the relevant fields that is
+ * essential to a task
+ */
+public class Task {
+
+	// Private local variables
+	private String mDescription;
+	private Date mFromDateTime = null;
+	private Date mToDateTime = null;
+	private ArrayList<String> mLabels;
+
+	private static final Logger LOGGER = Logger.getLogger(Task.class
+			.getName());
+	private Handler fh = null;
+	private final String MESSAGE_UNEXPERROR = "Unexpected error in dates";
+
+	// Constructor
+	public Task(String details, Date fromDateTime, Date toDateTime,
+			ArrayList<String> labels) {
+		mDescription = details;
+		mFromDateTime = fromDateTime;
+		mToDateTime = toDateTime;
+		mLabels = labels;
+	}
+
+	public Task(Task newTask) {
+		mDescription = newTask.getDescription();
+		mFromDateTime = newTask.getFromDateTime();
+		mToDateTime = newTask.getToDateTime();
+		mLabels = newTask.getLabels();
+	}
+
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0, 1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
+	}
+
+	public String getDescription() {
+		return mDescription;
+	}
+
+	public void setDescription(String updateDesc) {
+		mDescription = updateDesc;
+	}
+
+	public Date getFromDateTime() {
+		return mFromDateTime;
+	}
+
+	public Date getToDateTime() {
+		return mToDateTime;
+	}
+
+	public void setFromDateTime(Date dateTime) {
+		mFromDateTime = dateTime;
+	}
+
+	public void setToDateTime(Date dateTime) {
+		mToDateTime = dateTime;
+	}
+
+	public ArrayList<String> getLabels() {
+		return mLabels;
+	}
+
+	public void setLabels(ArrayList<String> labels) {
+		mLabels = new ArrayList<String>(); // for resetting after every update
+		mLabels = labels;
+	}
+
+	public void setTask(Task newTask) {
+		setDescription(newTask.getDescription());
+		setFromDateTime(newTask.getFromDateTime());
+		setToDateTime(newTask.getToDateTime());
+		setLabels(newTask.getLabels());
+	}
+
+	public Task getClone() {
+		SimpleDateFormat form = MyTasksParser.dateTimeFormats.get(1);
+		Date newDate1 = null;
+		Date newDate2 = null;
+		try {
+			if (mFromDateTime != null) {
+				newDate1 = form.parse(form.format(mFromDateTime));
+			}
+			if (mToDateTime != null) {
+				newDate2 = form.parse(form.format(mToDateTime));
+			}
+		} catch (ParseException e) {
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_UNEXPERROR, e);
+			closeHandler();
+		}
+		ArrayList<String> newLabels = null;
+		if (mLabels!=null){
+			newLabels = new ArrayList<String>(mLabels);
+		}
+		return new Task(mDescription, newDate1, newDate2, newLabels);
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+	 */
+
+	@Override
+	public boolean equals(Object otherTask) {
+		if (otherTask == this) {
+			return true;
+		}
+		if (!(otherTask instanceof Task)) {
+			return false;
+		} else {
+			Task other = (Task) otherTask;
+			boolean sameDescription = compareDescription(other);
+			if (!sameDescription){
+				return sameDescription;
+			}
+			boolean sameDateFrom = compareFromDateTime(other.getFromDateTime());
+			if (!sameDateFrom){
+				return sameDateFrom;
+			}
+			boolean sameDateTo = compareToDateTime(other.getToDateTime());
+			if (!sameDateTo){
+				return sameDateTo;
+			}
+			boolean sameLabels = compareLabels(other);
+			if (!sameLabels){
+				return sameLabels;
+			}
+		}
+		return true;
+	}
+
+	private boolean compareDescription(Task other){
+		boolean result = true;
+		if (other.getDescription() == null) {
+			if (mDescription != null) {
+				result = false;
+			}
+		} else {
+			if (mDescription == null) {
+				result = false;
+			}
+			if (!other.getDescription().equals(mDescription)) {
+				result = false;
+			}
+		}
+		return result;
+	}
+
+	private boolean compareFromDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mFromDateTime != null) {
+				return false;
+			}
+		} else {
+			if (mFromDateTime == null) {
+				return false;
+			}
+			if (!other.equals(mFromDateTime)) {
+				return false;
+			}
+		}
+		return result;
+	}
+
+	private boolean compareToDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mToDateTime != null) {
+				return false;
+			}
+		} else {
+			if (mToDateTime == null) {
+				return false;
+			}
+			if (!other.equals(mToDateTime)) {
+				return false;
+			}
+		}
+		return result;
+	}
+
+	private boolean compareLabels(Task other){
+		if (other.getLabels() == null) {
+			if (mLabels != null) {
+				return false;
+			}
+		} else {
+			if (mLabels == null) {
+				return false;
+			}
+			if (other.getLabels().size() != mLabels.size()) {
+				return false;
+			}
+			for (int i = 0; i < mLabels.size(); i++) {
+				if (!mLabels.get(i).equals(other.getLabels().get(i))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+	 */
+
+/**
+ * AddCommand extends Command object to follow OOP standards
+ */
+public class AddCommand extends Command {
+
+	// private variables
+	private LocalMemory mLocalMem;
+	private static final Logger LOGGER = Logger.getLogger(AddCommand.class
+			.getName());
+	private Handler fh = null;
+
+	public AddCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+	 */
+
+	@Override
+	public FeedbackObject undo() {
+		Task prevState = null;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription().equals(this.getToUpdateTaskDesc())) {
+				prevState = mLocalMem.getLocalMem().get(i).getClone();
+				mLocalMem.getLocalMem().remove(i);
+				break;
+			}
+		}
+		if (prevState == null){
+			runLogger();
+			LOGGER.log(Level.SEVERE, Command.MESSAGE_NOTASK);
+			closeHandler();
+			return null;
+		} 
+		Command toRedo = new AddCommand(prevState.getDescription(),
+				prevState.getFromDateTime(), prevState.getToDateTime(),
+				prevState.getLabels(), null);
+		mLocalMem.saveLocalMemory();
+		mLocalMem.redoPush(toRedo);
+		String resultString =this.getToUpdateTaskDesc() + " deleted";
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\AddCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\Command.java
+	 */
+
+/**
+ * CommandType instance used to access different fields of a command that has
+ * been parsed.
+ */
+public abstract class Command {
+
+	private Task mTask;
+	private String mToUpdateTaskDesc;
+	protected static ArrayList<Integer> searchList;
+	protected static boolean hasSearched;
+	protected static boolean isRedo;
+	
+	public final static String MESSAGE_NOTASK = "Unexpected Error: No Task Found to undo";
+
+	// Constructor
+	public Command(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		Task thisTask = new Task(comdDes, fromDateTime, toDateTime, comdLabels);
+		mTask = thisTask;
+		mToUpdateTaskDesc = updateDesc;
+		isRedo = false;
+	}
+
+	protected String getTaskDetails() {
+		return mTask.getDescription();
+	}
+
+	public Task getTask() {
+		return mTask;
+	}
+
+	/**
+	 * getToUpdateTaskDesc is only used for update commands. Is null for all
+	 * other command types.
+	 * 
+	 * @return String of the task description of the task to be updated || old
+	 *         task
+	 */
+	public String getToUpdateTaskDesc() {
+		return mToUpdateTaskDesc;
+	}
+
+	public abstract FeedbackObject execute();
+
+	public abstract FeedbackObject undo();
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\Command.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\RedoCommand.java
+	 */
+
+/**
+ * RedoCommand extends Command to follow OOP standard. Redo command does not exist within the stack
+ * for undo/redo but is used to manipulate these stacks 
+ */
+public class RedoCommand extends Command {
+	
+	LocalMemory mLocalMem = null;
+	
+	public RedoCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		isRedo = true;
+		FeedbackObject feedback = null;
+		if (mLocalMem.getRedoStack().isEmpty()) {
+			feedback = new FeedbackObject("No commands to undo",false);
+		} else {
+			Command commandToRevert = mLocalMem.getRedoStack().pop();
+			feedback = commandToRevert.execute();
+		}
+		hasSearched = false;
+		return feedback;
+	}
+
+	@Override
+	public FeedbackObject undo(){
+		// Unimplemented method
+		throw new UnsupportedOperationException("RedoCommand does not have an undo function");
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\RedoCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SortCommand.java
+	 */
+
+	@Override
+	public FeedbackObject undo() {
+		String[] prevSettings = mViewHandler.getView();
+		ArrayList<String> prevLabels = new ArrayList<String>();
+		for (int i = 0; i<prevSettings.length; i++){
+			prevLabels.add(prevSettings[i]);
+		}
+		Command commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		mLocalMem.redoPush(commandToUndo);
+		mViewHandler.setView(super.getTask().getLabels());
+		mController.toggleHide(false);
+		FeedbackObject result = getFeedback();
+		return result;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SortCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UndoCommand.java
+	 */
+
+/**
+ * UndoCommand extends Command object to follow OOP standards.Undo command does not exist within the stack
+ * for undo/redo but is used to manipulate these stacks 
+ */
+public class UndoCommand extends Command {
+
+	// private variables
+	private LocalMemory mLocalMem;
+
+	public UndoCommand(String comdDes, Date fromDateTime, Date toDateTime,
+					ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		String feedback;
+		FeedbackObject result = null;
+		if (mLocalMem.getUndoStack().isEmpty()) {
+			feedback = "No changes yet";
+			result = new FeedbackObject(feedback, false);
+		} else {
+			Command commandToRevert = mLocalMem.getUndoStack().pop();
+			result = commandToRevert.undo();
+		}
+		hasSearched = false;
+		return result;	
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		throw new UnsupportedOperationException("UndoCommand does not have an undo function");
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UndoCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\ILogic.java
+	 */
+
+/**
+ * ILogic interface defines abstract methods to be used by logic component
+ */
+public interface ILogic {
+	
+	/**
+	 * executeCommand executes the user's input.
+	 * @param userInput
+	 * @return message/updated UI to be printed
+	 */
+	public FeedbackObject executeCommand(String userInput);
+	
+	/**
+	 * obtainPrintableOutput reads and converts local memory into a form that is directly printable by UI.
+	 * @return printable format that is not neccessarily a string. Will use string temporarily
+	 */
+	public List<String> obtainPrintableOutput();
+	
+	/**
+	 * obtainAllTaskDescription generates a list of all the task descriptions
+	 * @return a list containing all the task descriptions of the current memory
+	 */
+	public List<String> obtainAllTaskDescription();
+	
+	/**
+	 * obtainsAllLabels generates a list of all the labels currently used by memory 
+	 * @return a list of strings
+	 */
+	public List<String> obtainAllLabels();
+	
+	/**
+	 * checkIfToHide checks if there is a need to hide any labels. If so, call labelsToHide
+	 * @return boolean
+	 */
+	public boolean checkIfToHide();
+	
+	/**
+	 * labelsToHide returns the labels that should be hidden. Values are only accurate if
+	 * checkIfToHide is true. 
+	 * @return List of strings to hide
+	 */
+	public List<String> labelsToHide();
+	
+	/**
+	 * checkIfToHelpUI checks if there is a need to display the help pop up
+	 * @return boolean
+	 */
+	public boolean checkIfToHelpUI();
+	
+	/**
+	 * toggleHelpUIOff changes boolean flag for HelpUI
+	 * @param onOff
+	 */
+	public void toggleHelpUI(boolean onOff);
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\ILogic.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+	 */
+
+/**
+ * LocalMemory holds all related task information in the current session and is
+ * only required to read and write
+ * to external memory minimally.
+ */
+
+@SuppressWarnings("serial")
+public class LocalMemory implements Serializable {
+
+	// Private variables
+	private static LocalMemory INSTANCE = null;
+	private static ArrayList<Task> mLocalMem = new ArrayList<Task>();
+	private Stack<Command> undoStack = new Stack<Command>();
+	private Stack<Command> redoStack = new Stack<Command>();
+	private IStorage mStore;
+
+	// Constructor
+	private LocalMemory() {
+		mStore = MyTasksStorage.getInstance();
+	}
+
+	public static LocalMemory getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new LocalMemory();
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+	 */
+
+	@Test
+	public void testHideCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework");
+		taskLogic.executeCommand("so date");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("18.Sep.2014");
+		taskLogic.executeCommand("hi 18.Sep.2014");
+		assertEquals(true, taskLogic.labelsHidden);
+		assertEquals(newTasks, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testHideCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
+		taskLogic.executeCommand("so fun gg");
+		ArrayList<String> newTasks = new ArrayList<String>();
+		newTasks.add("#fun");
+		newTasks.add("#fun#gg");
+		newTasks.add("#gg");
+		taskLogic.executeCommand("hi fun gg");
+		assertEquals(true, taskLogic.labelsHidden);
+		assertEquals(newTasks, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testHideCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play #fun 18.09.2014");
+		taskLogic.executeCommand("ad homework #fun #gg");
+		taskLogic.executeCommand("ad playmore");
+		taskLogic.executeCommand("ad playgg #gg");
+		taskLogic.executeCommand("so fun gg");
+		taskLogic.executeCommand("hi fun gg");
+		taskLogic.executeCommand("so date");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand1() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi boring");
+		
+		taskLogic.executeCommand("sh all");
+		assertEquals(false, taskLogic.labelsHidden);
+	}
+	
+	@Test
+	public void testShowCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial");
+		taskLogic.executeCommand("so boring");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial #fun");
+		taskLogic.executeCommand("ad sleep #boring #fun");
+		taskLogic.executeCommand("ad randomcomd");
+		taskLogic.executeCommand("so boring fun");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring fun");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+	
+	@Test
+	public void testShowCommand5() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad watch webcast #boring");
+		taskLogic.executeCommand("ad do tutorial #fun");
+		taskLogic.executeCommand("ad sleep #boring #fun");
+		taskLogic.executeCommand("ad randomcomd");
+		taskLogic.executeCommand("so boring fun");
+		taskLogic.executeCommand("hi all");
+		
+		taskLogic.executeCommand("sh boring");
+		assertEquals(true, taskLogic.labelsHidden);
+		ArrayList<String> labels = new ArrayList<String>();
+		labels.add("#boring#fun");
+		labels.add("#fun");
+		labels.add("N.A.");
+		assertEquals(labels, taskLogic.toHide);
+	}
+}
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+	 */
+
+/**
+ * MyTasksLogic handles all logic related operations such as program flow and
+ * execution of commands
+ */
+
+@SuppressWarnings("serial")
+public class MyTasksLogicController implements ILogic, Serializable {
+	
+	private IParser mParser;
+	private LocalMemory mLocalMem;
+	private MemorySnapshotHandler mViewHandler;
+	private boolean isDeveloper;
+	private static MyTasksLogicController INSTANCE = null;
+	private static final Logger LOGGER = Logger.getLogger(MyTasksLogicController.class
+			.getName());
+	private Handler fh = null;
+	protected boolean labelsHidden = false;
+	protected boolean showHelp = false;
+	protected ArrayList<String> toHide;
+	private final String MESSAGE_UNSUP = "Unsupported command function";
+	
+	// Constructor
+	private MyTasksLogicController(boolean isDeveloper) {
+		initLogic(isDeveloper);
+	}
+	
+	public static MyTasksLogicController getInstance(boolean isDeveloper){
+		if (INSTANCE == null){
+			INSTANCE= new MyTasksLogicController(isDeveloper);
+		}
+		return INSTANCE;
+	}
+	
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
+	}
+
+
+	/**
+	 * initProgram initializes all local variables to prevent and data overflow
+	 * from previous sessions
+	 */
+	private void initLogic(boolean isDev) {
+		isDeveloper = isDev;
+		mParser = new MyTasksParser();
+		MyTasksStorage.getInstance();
+		mLocalMem = LocalMemory.getInstance();
+		if (!isDeveloper) {
+			mLocalMem.loadLocalMemory();
+		}
+		mViewHandler = MemorySnapshotHandler.getInstance();
+		toHide = new ArrayList<String>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public FeedbackObject executeCommand(String input) {
+		Command commandObject = parseInput(input);
+
+		if (commandObject == null) {
+			FeedbackObject result = new FeedbackObject("Invalid input", false);
+			return result;
+		}
+		FeedbackObject feedback = null;
+		try {
+			feedback = commandObject.execute();
+		} catch (UnsupportedOperationException e) {
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_UNSUP, e);
+			closeHandler();
+		}
+		return feedback;
+	}
+	
+	/**
+	 * parseInput calls the parser to read and understand user input
+	 * 
+	 * @param userInput
+	 * @return CommandType object that contains the relevant fields
+	 */
+	private Command parseInput(String userInput) {
+		Command input = mParser.parseInput(userInput);
+		return input;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> obtainPrintableOutput() {
+		return mViewHandler.getSnapshot(mLocalMem);
+	}
+
+	protected LocalMemory getMemory() {
+		return mLocalMem;
+	}
+	
+	protected MemorySnapshotHandler getView(){
+		return mViewHandler;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> obtainAllTaskDescription() {
+		ArrayList<String> result = new ArrayList<String>();
+		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
+			String curDesc = mLocalMem.getLocalMem().get(i).getDescription();
+			result.add(curDesc);
+		}
+		return result;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\DoubleDate.java
+	 */
+
+/**
+ * DoubleDate is a data structure to hold 2 dates for the parser to use. This is
+ * a protected class that cannot be accessed from outside package
+ */
+class DoubleDate {
+
+	private Date mDate1 = null;
+	private Date mDate2 = null;
+
+	protected DoubleDate(Date date1, Date date2) {
+		mDate1 = date1;
+		mDate2 = date2;
+	}
+
+	public Date getDate1() {
+		return mDate1;
+	}
+
+	public Date getDate2() {
+		return mDate2;
+	}
+
+	@Override
+	public boolean equals(Object otherTask) {
+		if (otherTask == this) {
+			return true;
+		}
+
+		if (!(otherTask instanceof DoubleDate)) {
+			return false;
+		} else {
+			DoubleDate otherDate = (DoubleDate) otherTask;
+			boolean is1Equal = compareFromDateTime(otherDate.getDate1());
+			boolean is2Equal = compareToDateTime(otherDate.getDate2());
+			if (!is1Equal||!is2Equal) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean compareFromDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mDate1 != null) {
+				return false;
+			}
+		} else {
+			if (mDate1 == null) {
+				return false;
+			}
+			if (!other.equals(mDate1)) {
+				return false;
+			}
+		}
+		return result;
+	}
+	
+	private boolean compareToDateTime(Date other){
+		boolean result = true;
+		if (other == null) {
+			if (mDate2 != null) {
+				return false;
+			}
+		} else {
+			if (mDate2 == null) {
+				return false;
+			}
+			if (!other.equals(mDate2)) {
+				return false;
+			}
+		}
+		return result;
+	}
+}
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\DoubleDate.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\IParser.java
+	 */
+
+public interface IParser {
+	
+	/**
+	 * parseInput reads and converts String input into its equivalent CommandType object with the respective
+	 * fields.
+	 * Task object is empty in all fields for "undo","redo"
+	 * mToUpdateTaskDesc is empty for all commands except "update"
+	 * Task object represents new details to be updated to for "update"
+	 * @param input from user
+	 * @return CommandInfo object that is used to execute input
+	 */
+	public Command parseInput (String input);
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\IParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\MyTasksParser.java
+	 */
+
+/**
+ * MyTasksParser interprets userinput to useable data structures to work with in
+ * the Logic component.
+ */
+public class MyTasksParser implements IParser {
+
+    // Date and Time formats that are currently useable.
+    @SuppressWarnings("serial")
+    public static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
+        {
+            add(new SimpleDateFormat("dd.MM.yyyy"));
+            add(new SimpleDateFormat("dd.MMM.yyyy"));
+        }
+    };
+
+    @SuppressWarnings("serial")
+    public static List<SimpleDateFormat> dateTimeFormats = new ArrayList<SimpleDateFormat>() {
+        {
+            add(new SimpleDateFormat("dd.MM.yyyy HH:mm"));
+            add(new SimpleDateFormat("dd.MM.yyyy hha"));
+            add(new SimpleDateFormat("dd.MM.yyyy hh:mma"));
+            add(new SimpleDateFormat("dd.MMM.yyyy HH:mm"));
+            add(new SimpleDateFormat("dd.MMM.yyyy hha"));
+            add(new SimpleDateFormat("dd.MMM.yyyy hh:mma"));
+        }
+    };
+
+    private static final int DAYSINWEEK = 7;
+    private static final Logger LOGGER = Logger.getLogger(MyTasksParser.class
+            .getName());
+    
+    private Handler fh = null;
+    private ArrayList<Integer> usedWords;
+    
+    private final String MESSAGE_INVALIDTOFROM = "No time found after word 'to' or 'next': Taken as task description";
+    private final String MESSAGE_INVALIDINDEX = "Unexpected error: Invalid indexes";
+    private final String MESSAGE_INVALIDDATES = "Input dates do not follow order";
+
+    private String[] keyWords = { "today", "tomorrow", "yesterday", "next",
+            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
+            "sunday" };
+    private String[] dateWords = { "monday", "tuesday", "wednesday",
+            "thursday", "friday", "saturday", "sunday", "month", "year" };
+
+
+    // Constructor
+    public MyTasksParser() {
+        usedWords = new ArrayList<Integer>();
+    }
+
+    private void runLogger() {
+        try {
+            fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+                    1, true);
+            LOGGER.addHandler(fh);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+            LOGGER.setUseParentHandlers(false);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+    private void closeHandler() {
+        fh.flush();
+        fh.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Command parseInput(String input) {
+        String[] words = input.split("\\s+");
+        if (words.length != 0) {
+            String comdType = words[0].toLowerCase();
+            String withoutComdType = removeCommand(input, comdType);
+            if (withoutComdType.trim().length() == 0
+                    && !comdType.trim().equals("un") && !comdType.equals("re")
+                    && !comdType.trim().equals("help") && !comdType.equals("he")
+                    && !comdType.trim().equals("?")) {
+                return null;
+            }
+            switch (comdType) {
+            case "ad":
+            case "se":
+            case "de":
+            case "do":
+                Command temp = convertStandard(withoutComdType, comdType);
+                return temp;
+            case "un":
+                if (words.length != 1) {
+                    return null;
+                }
+                return new UndoCommand(null, null, null, null, null);
+            case "re":
+                if (words.length != 1) {
+                    return null;
+                }
+                return new RedoCommand(null, null, null, null, null);
+            case "up":
+                Command temp2 = convertUpdate(withoutComdType, comdType);
+                return temp2;
+            case "so":
+            case "hi":
+            case "sh":
+                Command temp3 = convertLabels(withoutComdType, comdType);
+                return temp3;
+            case "?":
+            case "he":
+            case "help":
+                Command temp4 = new HelpCommand(null, null, null, null, null);
+                return temp4;
+            default:
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private String removeCommand(String input, String comdType) {
+        String messageAndDateAndLabels = input.substring(comdType.length());
+        return messageAndDateAndLabels;
+    }
+
+    /**
+     * convertStandard parses the parameters and returns the corresponding
+     * CommandInfo object. This is only used for standard command types that are
+     * not update
+     * 
+     * @param message
+     * @param comdType
+     * @return
+     */
+    private Command convertStandard(String message, String comdType) {
+        String[] words = message.trim().split("\\s+");
+        ArrayList<String> labels = locateLabels(words);
+        String[] withoutLabels = removeLabels(words);
+        DoubleDate dates = extractDate(withoutLabels);
+        Date dateFrom = null;
+        Date dateTo = null;
+        if (dates != null) {
+            dateFrom = dates.getDate1();
+            dateTo = dates.getDate2();
+        }
+        String taskDesc = removeDate(withoutLabels);
+        if (taskDesc.equals("") || taskDesc.length() == 0) {
+        	if (!comdType.equals("se")){
+                return null;
+        	}
+        }
+        switch (comdType) {
+        case "ad":
+            if (dateFrom != null && dateTo != null) {
+                if (dateFrom.compareTo(dateTo) >= 0) {
+                    runLogger();
+                    LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+                    closeHandler();
+                    return null;
+                }
+            }
+            return new AddCommand(taskDesc, dateFrom, dateTo, labels, null);
+        case "se":
+            return new SearchCommand(taskDesc, dateFrom, dateTo, labels, null);
+        case "de":
+            return new DeleteCommand(taskDesc, dateFrom, dateTo, labels, null);
+        case "do":
+            return new DoneCommand(taskDesc, dateFrom, dateTo, labels, null);
+        }
+        return null;
+    }
+
+    /**
+     * locateLabels looks at an array and extracts the labels denoted by "#". It
+     * then stores the words that are labels into an arraylist and returns the
+     * arraylist
+     * 
+     * @param words
+     * @return arraylist of strings that represent labels
+     */
+    protected ArrayList<String> locateLabels(String[] words) {
+        ArrayList<String> result = new ArrayList<String>();
+        for (int i = 0; i < words.length; i++) {
+            String curWord = words[i];
+            char firstLetter = curWord.charAt(0);
+            if (firstLetter == '#') {
+                String toAdd = curWord.substring(1);
+                result.add(toAdd);
+            }
+        }
+        if (result.size() != 0) {
+            return result;
+        }
+        return null;
+    }
+
+    protected String[] removeLabels(String[] words) {
+        String result = "";
+        for (int i = 0; i < words.length; i++) {
+            String curWord = words[i];
+            char firstLetter = curWord.charAt(0);
+            if (firstLetter != '#') {
+                result += curWord + " ";
+            }
+        }
+        return result.split("\\s+");
+    }
+
+    /**
+     * extractDate checks if the given array of words contains a date/time that
+     * complies with the current useable formats and returns the date object if
+     * so.
+     * 
+     * @param words
+     *            arrays
+     * @return DoubleDate(object) of the task
+     */
+    protected DoubleDate extractDate(String[] words) {
+        // Reinitialize usedWords because it should be empty for a new function
+        // call.
+        usedWords = new ArrayList<Integer>();
+
+        int[] indexFromTo = checkFromAndTo(words);
+        int indexOfFrom = indexFromTo[0];
+        int indexOfTo = indexFromTo[1];
+
+        int[] indexDatesFormat = updateDateIndexAndFormat(words);
+        DoubleDate result = null;
+        if (isTimedTask(indexOfFrom, indexOfTo)) {
+            int indexOfDate1 = 0;
+            int indexOfDate2 = 0;
+            if (indexOfFrom > indexOfTo) {
+                indexOfDate1 = indexDatesFormat[1];
+                indexOfDate2 = indexDatesFormat[0];
+            } else {
+                indexOfDate1 = indexDatesFormat[0];
+                indexOfDate2 = indexDatesFormat[1];
+            }
+            result = handleTimedTask(words, indexOfDate1, indexOfDate2,
+                    indexOfFrom, indexOfTo);
+        } else {
+            int indexOfDate1 = indexDatesFormat[0];
+            int indexOfDate2 = indexDatesFormat[1];
+            result = handleUntimedTask(words, indexOfDate1, indexOfDate2,
+                    indexOfFrom, indexOfTo);
+        }
+        return result;
+    }
+
+    /**
+     * checkFromAndTo looks at an array of words and checks if words "from" and
+     * "to" exist. If both words exist,their respective indexes are returned in
+     * an array. Else if one or more don't exists, they are represented by a -1
+     * 
+     * @param words
+     * @return int[] where first int represents index of "from" and second int
+     *         represents index of "to"
+     */
+    private int[] checkFromAndTo(String[] words) {
+        int indexFrom = -1;
+        int indexTo = -1;
+        for (int i = 0; i < words.length; i++) {
+            String curWord = words[i];
+            if (curWord.equals("from")) {
+                indexFrom = i;
+            }
+            if (curWord.equals("to")) {
+                indexTo = i;
+            }
+        }
+        if (indexTo == -1 || indexFrom == -1) {
+            int[] result = { -1, -1 };
+            return result;
+        }
+        int[] result = { indexFrom, indexTo };
+        return result;
+    }
+
+    /**
+     * updateDateIndexAndFormat checks if any word fits any of the formats that
+     * are currently accepted. If any of these are absent, they are represented
+     * by a -1. Will be expanded to NLP
+     * 
+     * @param words
+     * @return int[] where index 0 is index of 1st date, 1 is index of 2nd date,
+     *         2 is index of format
+     */
+    private int[] updateDateIndexAndFormat(String[] words) {
+        int indexDate1 = -1;
+        int indexDate2 = -1;
+        int toSkip = -1;
+        for (int i = 0; i < words.length; i++) {
+            if (i != toSkip) {
+                for (int j = 0; j < dateFormats.size(); j++) {
+                    SimpleDateFormat dateForm = dateFormats.get(j);
+                    try {
+                        dateForm.setLenient(false);
+                        dateForm.parse(words[i]);
+                        if (indexDate1 == -1) {
+                            indexDate1 = i;
+                        } else {
+                            indexDate2 = i;
+                        }
+                    } catch (ParseException e) {
+                    }
+                }
+                int[] otherResults = checkForOtherFormats(words, indexDate1,
+                        indexDate2, i);
+                if (otherResults[0] != -1) {
+                    indexDate1 = otherResults[0];
+                    if (otherResults[2] == 1) {
+                        toSkip = i + 1;
+                    }
+                } else if (otherResults[1] != -1) {
+                    indexDate2 = otherResults[1];
+                    if (otherResults[2] == 1) {
+                        toSkip = i + 1;
+                    }
+                }
+            }
+        }
+        int[] result = { indexDate1, indexDate2 };
+        return result;
+    }
+
+    private int[] checkForOtherFormats(String[] words, int indexDate1,
+            int indexDate2, int curIndex) {
+        int[] result = { -1, -1, 0 };
+        int indexKey = checkIfIsKeyWord(words[curIndex]);
+        if (indexKey != -1) {
+            if (indexKey == 3) {
+                if (curIndex != words.length - 1) {
+                    int dateKey = checkIfIsDateWord(words[curIndex + 1]);
+                    if (dateKey != -1) {
+                        if (indexDate1 == -1) {
+                            result[0] = curIndex;
+                            result[2] = 1;
+                        } else {
+                            result[1] = curIndex;
+                            result[2] = 1;
+                        }
+                    }
+                }
+            } else {
+                if (indexDate1 == -1) {
+                    result[0] = curIndex;
+                } else {
+                    result[1] = curIndex;
+                }
+            }
+        }
+        return result;
+    }
+
+    private int checkIfIsKeyWord(String word) {
+        for (int i = 0; i < keyWords.length; i++) {
+            if (word.equals(keyWords[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int checkIfIsDateWord(String word) {
+        for (int i = 0; i < dateWords.length; i++) {
+            if (word.equals(dateWords[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * handleTimedTask uses the variables provided to parse a word array into
+     * the corresponding two date objects. usedWords is also updated here to
+     * that it can be used later for removal of all date related words
+     * individual date objects are null when no date(s) are found
+     * 
+     * @param words
+     * @param indexOfDate1
+     * @param indexOfDate2
+     * @param indexOfFrom
+     * @param indexOfTo
+     * @param indexOfFormat
+     * @return DoubleDate object representing DateFrom and DateTo respectively
+     */
+    private DoubleDate handleTimedTask(String[] words, int indexOfDate1,
+            int indexOfDate2, int indexOfFrom, int indexOfTo) {
+        DoubleDate results = null;
+        if (indexOfDate2 == -1) {
+            try {
+                String toDateFormat = convertToDateFormat(words, indexOfDate1);
+                String time1 = words[indexOfFrom + 1];
+                String time2 = words[indexOfTo + 1];
+                results = getDoubleDateTime(toDateFormat, null, time1, time2);
+                if (results.getDate1() != null && results.getDate2() != null) {
+                    if (isNextDate(words[indexOfDate1])) {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfDate1 + 1, indexOfFrom + 1,
+                                indexOfTo + 1 };
+                        addToUsedWords(toAdd);
+                    } else {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfFrom + 1, indexOfTo + 1 };
+                        addToUsedWords(toAdd);
+                    }
+                }
+            } catch (IndexOutOfBoundsException e) {
+                runLogger();
+                LOGGER.log(Level.WARNING, MESSAGE_INVALIDTOFROM, e);
+                closeHandler();
+            }
+
+        } else {
+            boolean noTime = false;
+            try {
+                boolean isNext1 = isNextDate(words[indexOfDate1]);
+                boolean isNext2 = isNextDate(words[indexOfDate2]);
+                String time1 = words[indexOfDate1 + 1];
+                if (isNext1 && indexOfDate1 < words.length - 2) {
+                    time1 = words[indexOfDate1 + 2];
+                }
+                String time2 = words[indexOfDate2 + 1];
+                if (isNext2 && indexOfDate2 < words.length - 2) {
+                    time2 = words[indexOfDate2 + 2];
+                }
+                String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
+                String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
+                results = getDoubleDateTime(toDateFormat1, toDateFormat2,
+                        time1, time2);
+                if (results.getDate1() != null && results.getDate2() != null) {
+                    if (isNext1 && isNext2) {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfDate2, indexOfDate1 + 1,
+                                indexOfDate1 + 2, indexOfDate2 + 1,
+                                indexOfDate2 + 2 };
+                        addToUsedWords(toAdd);
+                    } else if (isNext1) {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfDate2, indexOfDate1 + 1,
+                                indexOfDate1 + 2, indexOfDate2 + 1 };
+                        addToUsedWords(toAdd);
+                    } else if (isNext2) {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfDate2, indexOfDate1 + 1,
+                                indexOfDate2 + 1, indexOfDate2 + 2 };
+                        addToUsedWords(toAdd);
+                    } else {
+                        int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                                indexOfDate2, indexOfDate1 + 1,
+                                indexOfDate2 + 1 };
+                        addToUsedWords(toAdd);
+                    }
+                } else {
+                    noTime = true;
+                }
+            } catch (IndexOutOfBoundsException e) {
+                noTime = true;
+            }
+            if (noTime) {
+                results = handleTimedDateOnly(words, indexOfDate1,
+                        indexOfDate2, indexOfFrom, indexOfTo);
+            }
+        }
+        return results;
+    }
+
+    public DoubleDate handleTimedDateOnly(String[] words, int indexOfDate1,
+            int indexOfDate2, int indexOfFrom, int indexOfTo) {
+        DoubleDate results;
+        String toDateFormat1 = convertToDateFormat(words, indexOfDate1);
+        String toDateFormat2 = convertToDateFormat(words, indexOfDate2);
+        results = getDoubleDate(toDateFormat1, toDateFormat2);
+        if (results.getDate1() != null && results.getDate2() != null) {
+            if (isNextDate(words[indexOfDate1])
+                    && isNextDate(words[indexOfDate2])) {
+                int[] toAdd = { indexOfDate1 + 1, indexOfFrom, indexOfTo,
+                        indexOfDate1, indexOfDate2, indexOfDate2 + 1 };
+                addToUsedWords(toAdd);
+            } else if (isNextDate(words[indexOfDate1])) {
+                int[] toAdd = { indexOfDate1 + 1, indexOfFrom, indexOfTo,
+                        indexOfDate1, indexOfDate2 };
+                addToUsedWords(toAdd);
+            } else if (isNextDate(words[indexOfDate2])) {
+                int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                        indexOfDate2, indexOfDate2 + 1 };
+                addToUsedWords(toAdd);
+            } else {
+                int[] toAdd = { indexOfFrom, indexOfTo, indexOfDate1,
+                        indexOfDate2 };
+                addToUsedWords(toAdd);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * convertToDateFormat checks the word against an inbuilt set of keywords to
+     * return strings of the dates that they are supposed to represent
+     * 
+     * @param words
+     * @param index
+     * @return strings that represent the dates
+     */
+    private String convertToDateFormat(String[] words, int index) {
+        String curWord = words[index];
+        String result = "";
+        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        String nextWord = "";
+        switch (curWord) {
+        case ("today"):
+            result = dateFormats.get(0).format(today);
+            break;
+        case ("tomorrow"):
+            cal.setTime(today);
+            cal.add(Calendar.DATE, 1);
+            Date tomorrow = cal.getTime();
+            result = dateFormats.get(0).format(tomorrow);
+            break;
+        case ("yesterday"):
+            cal.setTime(today);
+            cal.add(Calendar.DATE, -1);
+            Date ysd = cal.getTime();
+            result = dateFormats.get(0).format(ysd);
+            break;
+        case ("next"):
+            nextWord = words[index + 1];
+            if (nextWord.equals("month")) {
+                cal.setTime(today);
+                cal.add(Calendar.MONTH, 1);
+                Date nextMonth = cal.getTime();
+                result = dateFormats.get(0).format(nextMonth);
+            } else if (nextWord.equals("year")) {
+                cal.setTime(today);
+                cal.add(Calendar.YEAR, 1);
+                Date nextYear = cal.getTime();
+                result = dateFormats.get(0).format(nextYear);
+            } else {
+                result = findNextWeekday(nextWord, DAYSINWEEK);
+            }
+            break;
+        default:
+            // Deals with the days (ie. if type day of today, taken as today
+            result = findNextWeekday(curWord, 0);
+        }
+        return result;
+    }
+
+    private String findNextWeekday(String day, int offset) {
+        String result = day;
+        Calendar cal = Calendar.getInstance();
+        int today = cal.get(Calendar.DAY_OF_WEEK);
+        int toAdd = -1;
+        boolean isInvalidDay = false;
+        switch (day) {
+        case ("monday"):
+            if (today == Calendar.MONDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 2) % DAYSINWEEK;
+            }
+            break;
+        case ("tuesday"):
+            if (today == Calendar.TUESDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 3) % DAYSINWEEK;
+            }
+            break;
+        case ("wednesday"):
+            if (today == Calendar.WEDNESDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 4) % DAYSINWEEK;
+            }
+            break;
+        case ("thursday"):
+            if (today == Calendar.THURSDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 5) % DAYSINWEEK;
+            }
+            break;
+        case ("friday"):
+            if (today == Calendar.FRIDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 6) % DAYSINWEEK;
+            }
+            break;
+        case ("saturday"):
+            if (today == Calendar.SATURDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 7) % DAYSINWEEK;
+            }
+            break;
+        case ("sunday"):
+            if (today == Calendar.SUNDAY) {
+                toAdd = DAYSINWEEK;
+            } else {
+                toAdd = (Calendar.SATURDAY - today + 8) % DAYSINWEEK;
+            }
+            break;
+        default:
+            // Implying that it is not one of the "new" NLP formats
+            isInvalidDay = true;
+        }
+        if (!isInvalidDay) {
+            Date todayDate = new Date();
+            cal.setTime(todayDate);
+            toAdd += offset;
+            cal.add(Calendar.DATE, toAdd);
+            Date nextXDay = cal.getTime();
+            result = dateFormats.get(0).format(nextXDay);
+        }
+        return result;
+    }
+
+    private DoubleDate getDoubleDateTime(String date1, String date2,
+            String time1, String time2) {
+        Date dateTimeObj1 = null;
+        Date dateTimeObj2 = null;
+        String dateTime1 = date1 + " " + time1;
+        String dateTime2 = "";
+        if (date2 == null && time2 != null) {
+            dateTime2 = date1 + " " + time2;
+        } else {
+            dateTime2 = date2 + " " + time2;
+        }
+        for (int i = 0; i < dateTimeFormats.size(); i++) {
+            SimpleDateFormat dateForm = dateTimeFormats.get(i);
+            dateForm.setLenient(false);
+            try {
+                dateTimeObj1 = dateForm.parse(dateTime1);
+                break;
+            } catch (ParseException e) {
+            }
+
+        }
+        for (int i = 0; i < dateTimeFormats.size(); i++) {
+            SimpleDateFormat dateForm = dateTimeFormats.get(i);
+            dateForm.setLenient(false);
+            try {
+                dateTimeObj2 = dateForm.parse(dateTime2);
+                break;
+            } catch (ParseException e) {
+            }
+        }
+        return new DoubleDate(dateTimeObj1, dateTimeObj2);
+    }
+
+    private DoubleDate getDoubleDate(String date1, String date2) {
+        Date dateObj1 = null;
+        Date dateObj2 = null;
+        if (date1 != null) {
+            for (int i = 0; i < dateFormats.size(); i++) {
+                SimpleDateFormat dateForm = dateFormats.get(i);
+                dateForm.setLenient(false);
+                try {
+                    dateObj1 = dateForm.parse(date1);
+                    break;
+                } catch (ParseException e) {
+                }
+            }
+        }
+        if (date2 != null) {
+            for (int i = 0; i < dateFormats.size(); i++) {
+                SimpleDateFormat dateForm = dateFormats.get(i);
+                dateForm.setLenient(false);
+                try {
+                    dateObj2 = dateForm.parse(date2);
+                    break;
+                } catch (ParseException e) {
+                }
+            }
+        }
+        return new DoubleDate(dateObj1, dateObj2);
+    }
+
+    /**
+     * handleUntimedTask uses the variables provided to parse a word array into
+     * the corresponding date object. usedWords is also updated here to that it
+     * can be used later for removal of all date related words individual date
+     * objects are null when no date(s) are found
+     * 
+     * @param words
+     * @param indexOfDate1
+     * @param indexOfDate2
+     * @param indexOfFrom
+     * @param indexOfTo
+     * @param indexOfFormat
+     * @return DoubleDate object representing DateFrom and DateTo respectively
+     */
+    private DoubleDate handleUntimedTask(String[] words, int indexOfDate1,
+            int indexOfDate2, int indexOfFrom, int indexOfTo) {
+        DoubleDate result = null;
+        boolean noTime = false;
+        boolean isNext = false;
+        if (indexOfDate1 != words.length - 1 && indexOfDate1 > -1) {
+            String toDateFormat = convertToDateFormat(words, indexOfDate1);
+            String time1 = "";
+            isNext = isNextDate(words[indexOfDate1]);
+            if (isNext && indexOfDate1 != words.length - 2) {
+                time1 = words[indexOfDate1 + 2];
+            } else {
+                time1 = words[indexOfDate1 + 1];
+            }
+            result = getDoubleDateTime(toDateFormat, null, time1, null);
+            if (result.getDate1() != null) {
+                if (isNext) {
+                    int[] toAdd = { indexOfDate1, indexOfDate1 + 1,
+                            indexOfDate1 + 2 };
+                    addToUsedWords(toAdd);
+                } else {
+                    int[] toAdd = { indexOfDate1, indexOfDate1 + 1 };
+                    addToUsedWords(toAdd);
+                }
+            } else {
+                noTime = true;
+            }
+        } else if (indexOfDate1 < 0) {
+            return new DoubleDate(null, null);
+        } else {
+            noTime = true;
+        }
+        if (noTime) {
+            result = handleUntimedDateOnly(words, indexOfDate1, isNext);
+        }
+        return result;
+    }
+
+    private void addToUsedWords(int[] toAdd) {
+        for (int i = 0; i < toAdd.length; i++) {
+            usedWords.add(toAdd[i]);
+        }
+    }
+
+    public DoubleDate handleUntimedDateOnly(String[] words, int indexOfDate1,
+            boolean isNext) {
+        DoubleDate result;
+        String toDateFormat = convertToDateFormat(words, indexOfDate1);
+        result = getDoubleDate(toDateFormat, null);
+        if (result.getDate1() != null) {
+            if (isNext) {
+                usedWords.add((Integer) indexOfDate1 + 1);
+            }
+            usedWords.add((Integer) indexOfDate1);
+        } else {
+            runLogger();
+            LOGGER.log(Level.SEVERE, MESSAGE_INVALIDINDEX);
+            closeHandler();
+        }
+        return result;
+    }
+
+    private boolean isTimedTask(int indexFrom, int indexTo) {
+        if (indexFrom != -1 && indexTo != -1) {
+            return true;
+        }
+        return false;
+    }
+
+    private String removeDate(String[] words) {
+        String result = "";
+        for (int i = 0; i < words.length; i++) {
+            if (!usedWords.contains((Integer) i)) {
+                result += words[i] + " ";
+            }
+        }
+        return result.trim();
+    }
+
+    private boolean isNextDate(String word) {
+        return word.equals("next");
+    }
+
+    /**
+     * convertUpdate returns a commandInfo object representing the input
+     * strings. This is only used when update is the comdType
+     * 
+     * @param message
+     * @param comdType
+     * @return CommandInfo
+     */
+    private Command convertUpdate(String message, String comdType) {
+
+        String delims = "[-]+";
+        String[] messageSplit = message.split(delims);
+        if (messageSplit.length != 2) { // Wrong format of update command
+            return null;
+        }
+        String toUpdateFrom = messageSplit[0].trim();
+        String remainingMessage = messageSplit[1].trim();
+        String[] words = remainingMessage.split("\\s+");
+        ArrayList<String> labels = locateLabels(words);
+        String[] withoutLabels = removeLabels(words);
+        DoubleDate dates = extractDate(withoutLabels);
+        Date dateFrom = dates.getDate1();
+        Date dateTo = dates.getDate2();
+        String taskDesc = removeDate(withoutLabels);
+        if (taskDesc.equals("") || taskDesc.length() == 0) {
+            taskDesc = null;
+        }
+        if (dateFrom != null && dateTo != null) {
+            if (dateFrom.compareTo(dateTo) >= 0) {
+                runLogger();
+                LOGGER.log(Level.WARNING, MESSAGE_INVALIDDATES);
+                closeHandler();
+                return null;
+            }
+        }
+        return new UpdateCommand(taskDesc, dateFrom, dateTo, labels,
+                toUpdateFrom);
+    }
+
+    /**
+     * convertSort converts a string into a sequence of labels represented in
+     * the task object
+     * 
+     * @param message
+     * @param comdType
+     * @return the command object representing the sortcommand
+     */
+    private Command convertLabels(String message, String comdType) {
+        ArrayList<String> labels = new ArrayList<String>();
+        String[] words = message.trim().split("\\s+");
+        if (words.length > 0) {
+            labels = new ArrayList<String>();
+            for (int i = 0; i < words.length; i++) {
+                labels.add(words[i]);
+            }
+        }
+        Command toReturn = null;
+        if (comdType.equals("sh")) {
+        	toReturn = new ShowCommand(null, null, null, labels, null);
+        } else if (comdType.equals("hi")) {
+        	toReturn = new HideCommand(null, null, null, labels, null);
+        } else if (comdType.equals("so")) {
+        	toReturn = new SortCommand(null, null, null, labels, null);
+        	
+        }
+        return toReturn;
+    }
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\MyTasksParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\ParserTest.java
+	 */
+
+/**
+ * ParserTest holds all unit test cases for the parser component. (Component testing only)
+ */
+public class ParserTest {
+	MyTasksParser tester = new MyTasksParser();
+
+	@Test
+	public void addTest1() {
+		Command test1 = new AddCommand("dinner", null, null, null, null);
+		assertObjFields(test1, tester.parseInput("ad dinner"));
+	}
+
+	@Test
+	public void addDateTest1() {
+		try {
+			Date date2 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
+			Command test2 = new AddCommand("dinner", date2, null, null, null);
+			assertObjFields(test2, tester.parseInput("ad dinner 18.09.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addDateTest2() {
+		try {
+			Date date3 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"20.09.2014 12:00");
+			Command test3 = new AddCommand("submit assignment", date3, null,
+					null, null);
+			assertObjFields(test3,
+					tester.parseInput("ad submit assignment 20.09.2014 12:00"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addDateTest3() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			Command test20 = new AddCommand("sleep", nextXDay, null, null, null);
+			assertObjFields(test20, tester.parseInput("ad sleep next monday"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void addDateTest4() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.TUESDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 3) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String dayFormat = MyTasksParser.dateFormats.get(0)
+					.format(nextXDay);
+			Date includeTime = MyTasksParser.dateTimeFormats.get(0).parse(
+					dayFormat + " 17:00");
+			Command test20 = new AddCommand("sleep", includeTime, null, null,
+					null);
+			assertObjFields(test20,
+					tester.parseInput("ad sleep next tuesday 5pm"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addDateLabelsTest1() {
+		try {
+			ArrayList<String> list5 = new ArrayList<String>();
+			list5.add("cs2103");
+			list5.add("urgent");
+			list5.add("gg");
+			Date date5 = MyTasksParser.dateFormats.get(0).parse("19.09.2014");
+			Command test5 = new AddCommand("do homework", date5, null, list5,
+					null);
+			assertObjFields(
+					test5,
+					tester.parseInput("ad do homework 19.09.2014 #cs2103 #urgent #gg"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addDateLabelsTest2() {
+		try {
+			ArrayList<String> list6 = new ArrayList<String>();
+			list6.add("notpossible");
+			Date date6 = MyTasksParser.dateFormats.get(0).parse("18.09.2014");
+			Command test6 = new AddCommand("have fun!", date6, null, list6,
+					null);
+			assertObjFields(test6,
+					tester.parseInput("ad have fun! #notpossible 18.09.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addTimedTest1() {
+		try {
+			Date date121 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"06.10.2014 12:00");
+			Date date122 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"06.10.2014 14:00");
+			Command test12 = new AddCommand("code for project", date121,
+					date122, null, null);
+			assertObjFields(
+					test12,
+					tester.parseInput("ad code for project 06.10.2014 from 12:00 to 14:00"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addTimedTest2() {
+		try {
+			Date temp = new Date();
+			String dateOnly = MyTasksParser.dateFormats.get(0).format(temp);
+			Date date171 = MyTasksParser.dateTimeFormats.get(1).parse(
+					dateOnly + " 2am");
+			Date date172 = MyTasksParser.dateTimeFormats.get(1).parse(
+					dateOnly + " 3am");
+			Command test17 = new AddCommand("do homework", date171, date172,
+					null, null);
+			assertObjFields(test17,
+					tester.parseInput("ad do homework today from 2am to 3am"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void addTimedTest3() {
+		try {
+			Date temp = new Date();
+			String dateOnly = MyTasksParser.dateFormats.get(0).format(temp);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			cal.add(Calendar.DATE, 1);
+			String date2Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date181 = MyTasksParser.dateTimeFormats.get(1).parse(
+					dateOnly + " 2am");
+			Date date182 = MyTasksParser.dateTimeFormats.get(1).parse(
+					date2Only + " 3am");
+			Command test18 = new AddCommand("coding", date181, date182, null,
+					null);
+			assertObjFields(
+					test18,
+					tester.parseInput("ad coding from today 2am to tomorrow 3am"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void addTimedTest4() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+
+			cal.add(Calendar.DATE, -7);
+			Date date212 = cal.getTime();
+			Command test21 = new AddCommand("sleep more", date212, nextXDay,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("ad sleep more from monday to next monday"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void addTimedTest5() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String nextXDayOnly = MyTasksParser.dateFormats.get(0).format(nextXDay);
+			nextXDay = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 10:00");
+
+			cal.add(Calendar.DATE, -7);
+			Date date212 = cal.getTime();
+			String date212Only = MyTasksParser.dateFormats.get(0).format(date212);
+			date212 = MyTasksParser.dateTimeFormats.get(0).parse(date212Only + " 17:00");
+			Command test21 = new AddCommand("sleep more", date212, nextXDay,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("ad sleep more from monday 5pm to next monday 10am"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void addTimedTest6() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			String date3Only = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date20 = MyTasksParser.dateFormats.get(0).parse(date3Only);
+			cal.setTime(date20);
+			int today = cal.get(Calendar.DAY_OF_WEEK);
+			int toAdd = -1;
+			if (today == Calendar.MONDAY) {
+				toAdd = 7;
+			} else {
+				toAdd = (Calendar.SATURDAY - today + 2) % 7;
+			}
+			toAdd += 7;
+			cal.add(Calendar.DATE, toAdd);
+			Date nextXDay = cal.getTime();
+			String nextXDayOnly = MyTasksParser.dateFormats.get(0).format(nextXDay);
+			Date nextXDay1 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 16:00");
+			Date nextXDay2 = MyTasksParser.dateTimeFormats.get(0).parse(nextXDayOnly + " 17:00");
+			Command test21 = new AddCommand("play more", nextXDay1, nextXDay2,
+					null, null);
+			assertObjFields(
+					test21,
+					tester.parseInput("ad play more next monday from 4pm to 5pm"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void deleteTest1() {
+		Command test7 = new DeleteCommand("CS2103 meeting", null, null, null,
+				null);
+		assertObjFields(test7, tester.parseInput("de CS2103 meeting"));
+	}
+
+	@Test
+	public void updateDescTest1() {
+		Command test8 = new UpdateCommand("CS2103 meeting", null, null, null,
+				"meeting");
+		assertObjFields(test8,
+				tester.parseInput("up meeting - CS2103 meeting"));
+	}
+
+	@Test
+	public void updateDateTest1() {
+		try {
+			Date date9 = MyTasksParser.dateFormats.get(0).parse("20.09.2014");
+			Command test9 = new UpdateCommand(null, date9, null, null,
+					"meeting cs2103");
+			assertObjFields(test9,
+					tester.parseInput("up meeting cs2103 - 20.09.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void updateDateTest2() {
+		try {
+			Date date141 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
+			Date date142 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			Command test14 = new UpdateCommand("wake up", date141, date142, null,
+					"sleep");
+			assertObjFields(
+					test14,
+					tester.parseInput("up sleep - wake up from 05.Oct.2014 to 06.Oct.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void updateDateTest3() {
+		try {
+			Date temp = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(temp);
+			cal.add(Calendar.DATE, 1);
+			String datetmr = MyTasksParser.dateFormats.get(0).format(
+					cal.getTime());
+			Date date191 = MyTasksParser.dateTimeFormats.get(1).parse(
+					datetmr + " 3pm");
+			Date date192 = MyTasksParser.dateTimeFormats.get(1).parse(
+					datetmr + " 4pm");
+			ArrayList<String> labels19 = new ArrayList<String>();
+			labels19.add("yolo");
+			Command test19 = new UpdateCommand(null, date191, date192,
+					labels19, "play");
+			assertObjFields(
+					test19,
+					tester.parseInput("up play - tomorrow from 3pm to 4pm #yolo"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void updateLabelTest1() {
+		ArrayList<String> list10 = new ArrayList<String>();
+		list10.add("CS2103");
+		Command test10 = new UpdateCommand(null, null, null, list10, "meeting");
+		assertObjFields(test10, tester.parseInput("up meeting - #CS2103"));
+	}
+
+	@Test
+	public void updateAllTest1() {
+		try {
+			ArrayList<String> list13 = new ArrayList<String>();
+			list13.add("gg");
+			Date date131 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"09.10.2014 14:00");
+			Date date132 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"10.10.2014 14:00");
+			Command test13 = new UpdateCommand("write report", date131,
+					date132, list13, "read book");
+			assertObjFields(
+					test13,
+					tester.parseInput("up read book - write report from 09.Oct.2014 14:00 to 10.Oct.2014 14:00  #gg"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void sortTest1() {
+		ArrayList<String> list16 = new ArrayList<String>();
+		list16.add("CS2103");
+		list16.add("CS2106");
+		list16.add("CS2101");
+		Command test16 = new SortCommand(null, null, null, list16, null);
+		assertObjFields(test16, tester.parseInput("so CS2103 CS2106 CS2101"));
+	}
+
+	@Test
+	public void locateLabelsTest1() {
+		String[] words = { "#hashtag", "#can", "not", "#be", "#anywhere" };
+		ArrayList<String> test = new ArrayList<String>();
+		test.add("hashtag");
+		test.add("can");
+		test.add("be");
+		test.add("anywhere");
+		assertEquals(test, tester.locateLabels(words));
+	}
+
+	@Test
+	public void removeLabelTest1() {
+		String[] words = { "#hashtag", "#can", "not", "#be", "#anywhere" };
+		assertEquals("not", tester.removeLabels(words)[0]);
+	}
+
+	@Test
+	public void extractDateTest1() {
+		String[] words = { "#hashtag", "#can", "not", "#be", "#anywhere" };
+		assertEquals(null, tester.extractDate(words).getDate1());
+	}
+
+	@Test
+	public void extractDateTest2() {
+		try {
+			Date date1 = MyTasksParser.dateFormats.get(0).parse("23.09.2014");
+			String[] words1 = { "#hashtag", "#can", "not", "#be", "23.09.2014" };
+			assertEquals(date1, tester.extractDate(words1).getDate1());
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void extractDateTest3() {
+		try {
+			Date date2 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"30.10.2014 14:00");
+			String[] words3 = { "30.10.2014", "14:00", "#nothing" };
+			assertEquals(date2, tester.extractDate(words3).getDate1());
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void extractDateTest4() {
+		try {
+			Date date4 = MyTasksParser.dateTimeFormats.get(3).parse(
+					"29.Oct.2014 14:00");
+			Date date5 = MyTasksParser.dateTimeFormats.get(3).parse(
+					"29.Oct.2014 15:00");
+			DoubleDate temp = new DoubleDate(date4, date5);
+			String[] words5 = { "random", "29.Oct.2014", "from", "14:00", "to",
+					"15:00" };
+			assertEquals(temp, tester.extractDate(words5));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void extractDateTest5() {
+		try {
+			Date date6 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"05.10.2014 11:00");
+			Date date7 = MyTasksParser.dateTimeFormats.get(0).parse(
+					"06.10.2014 01:00");
+			DoubleDate temp = new DoubleDate(date6, date7);
+			String[] words6 = { "desc", "from", "05.10.2014", "11:00", "to",
+					"06.10.2014", "01:00" };
+			assertEquals(temp, tester.extractDate(words6));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void flexibilityTest1() {
+		try {
+			Date date1 = MyTasksParser.dateFormats.get(0).parse("05.10.2014");
+			Date date2 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			Command test1 = new UpdateCommand(null, date1, date2, null, "play");
+			assertObjFields(test1, tester.parseInput("up play - to 06.10.2014 from 05.10.2014"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void hideTest1() {
+		ArrayList<String> list1 = new ArrayList<String>();
+		list1.add("18.09.2014");
+		list1.add("important");
+		list1.add("all");
+		Command test1 = new HideCommand(null, null, null, list1, null);
+		assertObjFields(test1, tester.parseInput("hi 18.09.2014 important all"));
+	}
+	
+	@Test
+	public void showTest1() {
+		ArrayList<String> list1 = new ArrayList<String>();
+		list1.add("18.09.2014");
+		list1.add("important");
+		list1.add("all");
+		Command test1 = new ShowCommand(null, null, null, list1, null);
+		assertObjFields(test1, tester.parseInput("sh 18.09.2014 important all"));
+	}
+	
+	@Test
+	public void flexibilityTest2() {
+		assertEquals(null, tester.parseInput("ad play 04.11.2014 from 5pm to 3pm"));
+	}
+	
+	@Test
+	public void flexibilityTest3() {
+		assertEquals(null, tester.parseInput("ad play from tuesday to monday"));
+	}
+
+	private void assertObjFields(Command testCase, Command result) {
+		Task testCaseTask = testCase.getTask();
+		Task resultTask = result.getTask();
+		assertEquals(testCase.getToUpdateTaskDesc(),
+				result.getToUpdateTaskDesc());
+		assertEquals(testCaseTask, resultTask);
+	}
+
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\parser\ParserTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\IStorage.java
+	 */
+
+/**
+ * Istorage interface defines abstract methods to be used by storage component
+ */
+public interface IStorage {
+	
+	/**
+	 * readExtMem converts external memory into local memory for logic usage
+	 * @param fileName
+	 * @return Data Structure that is to be used to local memory. May be changed at later date
+	 */
+	public ArrayList<Task> readExtMem(String fileName);
+	
+	/**
+	 * writeExtMem converts local memory to external memory by writing it to a file that is stored in root
+	 * @param localMem whose data structure may be changed at a later date
+	 */
+	public void writeExtMem(ArrayList<Task> localMem);
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\IStorage.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\MyTasksStorage.java
+	 */
+
+/**
+ * MyTasksStorage handles the storage of tasks into external memory as well as
+ * converting it to readable local memory for logical processes
+ */
+@SuppressWarnings("serial")
+public class MyTasksStorage implements IStorage, Serializable {
+
+	private static MyTasksStorage INSTANCE = null;
+	private final String MESSAGE_CORPTDATA = "Corrupted data";
+	private final String MESSAGE_FILEERROR = "Error with reading existing file";
+	private final String TEXT_DELIMS = "//";
+	private final String TEXT_EMPTYFIELD = " ";
+	private static final Logger LOGGER = Logger.getLogger(MyTasksStorage.class
+			.getName());
+	private Handler fh = null;
+
+	// Constructor
+	private MyTasksStorage() {
+	}
+
+	public static MyTasksStorage getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new MyTasksStorage();
+		}
+		return INSTANCE;
+	}
+
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+	
+	private void runLogger() {
+		try {
+			fh = new FileHandler(mytasks.file.MyTasksController.default_log, 0,
+					1, true);
+			LOGGER.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			LOGGER.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * closeHandler prevents overflow of information and multiple logger files
+	 * from appearing
+	 */
+	private void closeHandler() {
+		fh.flush();
+		fh.close();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	public ArrayList<Task> readExtMem(String fileName) {
+		String pastMem = null;
+		try {
+			pastMem = readString(fileName);
+		} catch (IOException e) {
+		}
+		ArrayList<Task> result = convertToTasks(pastMem);
+		return result;
+	}
+
+	private String readString(String fileName) throws IOException {
+		File tempFile = new File(fileName);
+		String result = null;
+		if (!tempFile.exists()) {
+			return result;
+		} else {
+			result = new String(readAllBytes(get(fileName)));
+		}
+		return result;
+	}
+
+	protected ArrayList<Task> convertToTasks(String memString) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		if (memString == null) {
+			return result;
+		}
+		if (memString.length() == 0) {
+			return result;
+		}
+		String[] memBlock = memString.split(TEXT_DELIMS);
+		int noBlocks = memBlock.length;
+		int sizeBlocks = 4;
+		if (noBlocks % sizeBlocks != 0) {
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_CORPTDATA + " " + noBlocks);
+			closeHandler();
+			return result;
+		}
+		handleIndivBlocks(result, memBlock, noBlocks, sizeBlocks);
+		assert result != null;
+		return result;
+	}
+	
+	/**
+	 * handleIndivBlocks creates a new task for each block of memory (consecutive 4 blocks)
+	 * @param result
+	 * @param memBlock
+	 * @param noBlocks
+	 * @param sizeBlocks
+	 */
+	public void handleIndivBlocks(ArrayList<Task> result, String[] memBlock,
+			int noBlocks, int sizeBlocks) {
+		for (int i = 0; i < noBlocks / sizeBlocks; i++) {
+			String taskDesc = null;
+			Date dateFrom = null;
+			Date dateTo = null;
+			ArrayList<String> labels = null;
+			for (int j = 0; j < sizeBlocks; j++) {
+				int temp = (i * sizeBlocks) + j;
+				String curBlock = memBlock[temp];
+				if (j == 0) {
+					taskDesc = curBlock;
+				} else if (j == 1) {
+					dateFrom = getDate(dateFrom, curBlock);
+				} else if (j == 2) {
+					dateTo = getDate(dateTo, curBlock);
+				} else {
+					labels = getLabels(labels, curBlock);
+				}
+			}
+			result.add(new Task(taskDesc, dateFrom, dateTo, labels));
+		}
+	}
+
+	public ArrayList<String> getLabels(ArrayList<String> labels, String curBlock) {
+		if (!curBlock.equals(TEXT_EMPTYFIELD)) {
+			String delims2 = "[,]+";
+			String[] indivLabels = curBlock.split(delims2);
+			ArrayList<String> tempLabels = new ArrayList<String>();
+			for (int k = 0; k < indivLabels.length; k++) {
+				tempLabels.add(indivLabels[k]);
+			}
+			labels = tempLabels;
+		}
+		return labels;
+	}
+
+	public Date getDate(Date prevDate, String curBlock) {
+		try {
+			prevDate = MyTasksParser.dateTimeFormats.get(0).parse(curBlock);
+		} catch (ParseException e) {
+		}
+		return prevDate;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void writeExtMem(ArrayList<Task> localMemory) {
+		String output = determineOutput(localMemory);
+		printOutput(output, MyTasksController.DEFAULT_FILENAME);
+	}
+	
+	/**
+	 * determineOutput checks the arraylist that represents memory and converts it to
+	 * a string format by having DELIMS seperate each field. An empty field is denoted by a
+	 * single empty space
+	 * @param localMem
+	 * @return String to be printed
+	 */
+	protected String determineOutput(ArrayList<Task> localMem) {
+		String result = "";
+		for (int i = 0; i < localMem.size(); i++) {
+			Task currentTask = localMem.get(i);
+			result += currentTask.getDescription();
+			result += addBreak();
+			result = addDate(currentTask.getFromDateTime(), result);
+			result += addBreak();
+			result = addDate(currentTask.getToDateTime(), result);
+			result += addBreak();
+			result = addLabels(result, currentTask);
+			result += addBreak();
+		}
+		return result;
+	}
+
+	public String addLabels(String result, Task currentTask) {
+		ArrayList<String> labels = currentTask.getLabels();
+		if (labels == null) {
+			result += TEXT_EMPTYFIELD;
+		} else if (labels.size()==0){
+			result += TEXT_EMPTYFIELD;
+		} else {
+			for (int j = 0; j < labels.size(); j++) {
+				result += labels.get(j);
+				result += ",";
+			}
+		}
+		return result;
+	}
+
+	private String addDate(Date currentDate, String result) {
+		if (currentDate == null) {
+			result += TEXT_EMPTYFIELD;
+		} else {
+			result += MyTasksParser.dateTimeFormats.get(0).format(currentDate);
+		}
+		return result;
+	}
+
+	private String addBreak() {
+		return TEXT_DELIMS;
+	}
+	
+	/**
+	 * printOutput takes a string and prints it to a destinated fileName
+	 * @param output
+	 * @param fileName
+	 */
+	private void printOutput(String output, String fileName) {
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+			writer.print(output);
+			writer.close();
+		} catch (IOException e) {
+			runLogger();
+			LOGGER.log(Level.SEVERE, MESSAGE_FILEERROR, e);
+			closeHandler();
+		}
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\MyTasksStorage.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\StorageTest.java
+	 */
+
+public class StorageTest {
+	
+	ArrayList<Task> mem1;
+	String test1;
+	MyTasksStorage tester = MyTasksStorage.getInstance();
+
+	@Test
+	public void convertToTasksTest() {
+		initOutputArrays();
+		assertEquals(mem1, tester.convertToTasks(test1));
+	}
+	
+	@Test
+	public void determineOutputTest() {
+		initOutputArrays();
+		assertEquals(test1,tester.determineOutput(mem1));
+	}
+	
+	private void initOutputArrays() {
+		try {
+			mem1 = new ArrayList<Task>();
+			Date d1 = MyTasksParser.dateFormats.get(0).parse("06.10.2014");
+			Date d2 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 14:00");
+			Date d3 = MyTasksParser.dateTimeFormats.get(0).parse("06.10.2014 15:00");
+			Date d4 = MyTasksParser.dateTimeFormats.get(0).parse("07.10.2014 15:00");
+			ArrayList<String> l1 = new ArrayList<String>();
+			l1.add("yolo");
+			l1.add("gg");
+			Task t1 = new Task("do homework", d1, null, null);
+			Task t2 = new Task("read book", d2, d3, null);
+			Task t3 = new Task("relax", d3, d4, l1);
+			mem1.add(t1);
+			mem1.add(t2);
+			mem1.add(t3);
+			test1 = "do homework//06.10.2014 00:00// // //read book//06.10.2014 14:00//"
+					+ "06.10.2014 15:00// //relax//06.10.2014 15:00//07.10.2014 15:00//"
+					+ "yolo,gg,//";
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\storage\StorageTest.java
+
+
+
+
+

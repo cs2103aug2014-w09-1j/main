@@ -1,0 +1,1746 @@
+//@author: a0112139r
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+	 */
+
+	@Override
+	public String toString() {
+		String dateToString = "";
+		String dateFromString = "";
+		if (mFromDateTime != null) {
+			dateFromString = MyTasksParser.dateTimeFormats.get(0).format(
+					mFromDateTime);
+		}
+		if (dateFromString.contains("00:00")) {
+			dateFromString = MyTasksParser.dateFormats.get(0).format(
+					mFromDateTime);
+		}
+		if (mToDateTime != null) {
+			dateToString = MyTasksParser.dateTimeFormats.get(0).format(mToDateTime);
+		}
+		if (dateToString.contains("00:00")) {
+			dateToString = MyTasksParser.dateFormats.get(0).format(mToDateTime);
+		}
+
+		String labelsToString = "";
+		if (mLabels != null) {
+			for (String s : mLabels) {
+				labelsToString += " " + "#" + s;
+			}
+		}
+		String result = "";
+		if (dateFromString.equals("")) {
+			result = String.format("%s%s ", mDescription, labelsToString);
+		} else if (dateToString.equals("")) {
+			result = String.format("%s on %s%s", mDescription, dateFromString,
+					labelsToString);
+		} else {
+			result = String.format("%s from %s to %s%s", mDescription,
+					dateFromString, dateToString, labelsToString);
+		}
+		return result.trim();
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\file\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DeleteCommand.java
+	 */
+
+/**
+ * DeleteCommand extends Command to follow OOP standards
+ */
+
+public class DeleteCommand extends Command {
+
+	// private variables
+	private LocalMemory mLocalMem;
+	private static String MESSAGE_DELETE_SUCCESS = "'%1$s' deleted";
+	private static String MESSAGE_DELETE_FAIL = "Task '%1$s' does not exist. Unable to delete. Auto search for similar tasks.";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to delete the specific one.";
+
+	public DeleteCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		if (isRedo){
+			return redoTask();
+		} else if (canDeleteFromSearchResults()) {
+			return deleteFromSearchResults();
+		} else {
+			return deleteByTaskDesc();
+		}
+	}
+
+	private FeedbackObject redoTask(){
+		int indexOfTaskToDeleted = mLocalMem.getLocalMem().size()-1;
+		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
+		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.remove(indexOfTaskToDeleted);
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private boolean canDeleteFromSearchResults(){
+		if (hasSearched == true && isNumeric(super.getTaskDetails())
+				&& (Integer.parseInt(super.getTaskDetails()) - 1 < (searchList.size()))) {
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject deleteFromSearchResults(){
+		int indexOfTaskToDeleted = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
+		Task taskToDeleted = mLocalMem.getLocalMem().get(indexOfTaskToDeleted);
+		DeleteCommand commandToUndo = createDeleteUndo(taskToDeleted);
+		mLocalMem.undoPush(commandToUndo);
+		mLocalMem.remove(indexOfTaskToDeleted);
+		mLocalMem.saveLocalMemory();
+		hasSearched = false;
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, taskToDeleted.getDescription());
+		FeedbackObject feedback = new FeedbackObject(resultString, true);
+		return feedback;
+	}
+
+	private FeedbackObject deleteByTaskDesc(){
+		int timesAppear = countTimesAppear();
+		if (timesAppear == 0){
+			return deleteFail();
+		} else if (timesAppear > 1) {	
+			return directToSearch();
+		} else {
+			return deleteSingleTask();
+		} 
+	}
+
+	private FeedbackObject deleteFail(){
+		String resultString = String.format(MESSAGE_DELETE_FAIL,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, false);
+		return result;
+	}
+
+	private FeedbackObject directToSearch(){
+		String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private FeedbackObject deleteSingleTask(){
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(super.getTask().getDescription())) {
+				Task currentTask = mLocalMem.getLocalMem().get(i);
+				DeleteCommand commandToUndo = createDeleteUndo(currentTask);
+				mLocalMem.undoPush(commandToUndo);
+				mLocalMem.remove(super.getTask());
+				break;
+			}
+		}
+
+		hasSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_DELETE_SUCCESS, 
+				super.getTaskDetails());
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
+	}
+
+	private DeleteCommand createDeleteUndo(Task currentTask){
+		DeleteCommand commandToUndo = new DeleteCommand(currentTask.getDescription(),
+				currentTask.getFromDateTime(), currentTask.getToDateTime(), 
+				currentTask.getLabels(), null);
+		return commandToUndo;
+	}
+
+	private int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getTaskDetails().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		Task prevState = super.getTask();
+		Command toRedo = new DeleteCommand(prevState.getDescription(), 
+				null, null, null, null);
+		mLocalMem.add(prevState);
+		mLocalMem.redoPush(toRedo);
+		mLocalMem.saveLocalMemory();
+		String resultString = this.getTask().getDescription() + " added"; 
+		FeedbackObject result = new FeedbackObject(resultString, true); 
+		return result;
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DeleteCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DeleteCommand.java
+	 */
+
+	private boolean isNumeric(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), 
+				task.getToDateTime(), task.getLabels(), null).execute();
+		return result;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DeleteCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DoneCommand.java
+	 */
+
+/**
+ * DoneCommand extends Command object to follow OOP standards
+ */
+public class DoneCommand extends Command {
+
+	private LocalMemory mLocalMem;
+	private static String MESSAGE_DONE_SUCCESS = "'%1$s' mark as done";
+	private static String MESSAGE_DONE_FAIL = "Task '%1$s' does not exist. Unable to mark as done. Auto search for similar tasks.";
+	private static String MESSAGE_DONE_ALREADY = "Task '%1$s' had already been marked as done.";
+	private static String MESSAGE_DONE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to mark the specific one as done.";
+
+	public DoneCommand(String comdDes, Date fromDateTime,
+			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		if (isRedo){
+			return redoTask();
+		} else if (canDoneFromSearchResults()){
+			return doneFromSearchResults();
+		} else {
+			return doneByTaskDesc();
+		}
+	}
+
+	private FeedbackObject redoTask() {
+		int indexOfTaskToDone = 0;
+		Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);		
+		Command commandToUndo = createDoneUndo(taskToDone);
+		mLocalMem.undoPush(commandToUndo);	
+		Task doneTask = markTaskAsDone(taskToDone);
+		mLocalMem.getLocalMem().remove(indexOfTaskToDone);
+		mLocalMem.getLocalMem().add(doneTask);
+		mLocalMem.saveLocalMemory();			
+		String resultString = String.format(MESSAGE_DONE_SUCCESS, taskToDone.getDescription());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private boolean canDoneFromSearchResults(){
+		if (hasSearched == true && isNumeric(super.getTaskDetails()) && 
+				Integer.parseInt(super.getTaskDetails())-1 < (searchList.size())){
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject doneFromSearchResults(){
+		int indexOfTaskToDone = searchList.get(Integer.parseInt(super.getTaskDetails())-1);
+		Task taskToDone = mLocalMem.getLocalMem().get(indexOfTaskToDone);
+
+		boolean hasDone = true;
+		if (!isDone(taskToDone)){
+			hasDone = false;
+			DoneCommand commandToUndo = createDoneUndo(taskToDone);
+			mLocalMem.undoPush(commandToUndo);
+			markTaskAsDone(taskToDone);
+			mLocalMem.getLocalMem().remove(indexOfTaskToDone);
+			mLocalMem.getLocalMem().add(taskToDone);
+			mLocalMem.saveLocalMemory();
+		}
+		hasSearched = false;
+		if (hasDone){
+			String resultString =  String.format(MESSAGE_DONE_ALREADY, taskToDone.getDescription());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
+		} else {
+			String resultString = String.format(MESSAGE_DONE_SUCCESS, taskToDone.getDescription());
+			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
+		}
+	}
+
+	private FeedbackObject doneByTaskDesc(){
+		int timesAppear = countTimesAppear();
+		if (timesAppear == 0){
+			return doneFail();
+		} else if (timesAppear > 1) {	
+			return directToSearch();
+		} else {
+			return doSingleTask();
+		}
+	}
+
+	private FeedbackObject doneFail(){
+		String resultString = String.format(MESSAGE_DONE_FAIL,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, false);
+		return result;
+	}
+
+	private FeedbackObject directToSearch(){
+		String resultString = String.format(MESSAGE_DONE_DUPLICATE,
+				super.getTaskDetails()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private FeedbackObject doSingleTask(){
+		boolean hasDone = true;
+		for (int i=0; i < mLocalMem.getLocalMem().size(); i++){
+			if (mLocalMem.getLocalMem().get(i).getDescription().equals(super.getTaskDetails())){
+				Task currentTask = mLocalMem.getLocalMem().get(i);
+				if (!isDone(currentTask)){
+					hasDone = false;
+					Command commandToUndo = createDoneUndo(currentTask);
+					mLocalMem.undoPush(commandToUndo);
+					markTaskAsDone(currentTask);
+					mLocalMem.getLocalMem().remove(i);
+					mLocalMem.getLocalMem().add(currentTask);
+				}
+				break;
+			}
+		}
+		hasSearched = false;
+		mLocalMem.saveLocalMemory();
+		if (hasDone){
+			String resultString =  String.format(MESSAGE_DONE_ALREADY, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,false);
+			return result;
+		} else {
+			String resultString = String.format(MESSAGE_DONE_SUCCESS, super.getTaskDetails());
+			FeedbackObject result = new FeedbackObject(resultString,true);
+			return result;
+		}
+	}
+
+	private Task markTaskAsDone(Task taskToDone) {
+		ArrayList<String> labels = new ArrayList<String>();
+		if (taskToDone.getLabels() != null){
+			for (int i=0; i < taskToDone.getLabels().size(); i++){
+				labels.add(taskToDone.getLabels().get(i));
+			}
+		}
+		if (!isDone(taskToDone)){
+			labels.add("done");
+		}
+		taskToDone.setLabels(labels);
+		return taskToDone;
+	}
+
+	private boolean isDone(Task task){
+		if (task.getLabels() == null){
+			return false;
+		}
+
+		for (int i=0; i < task.getLabels().size(); i++){
+			if (task.getLabels().get(i).toLowerCase().equals("done")){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private DoneCommand createDoneUndo(Task currentTask) {
+		DoneCommand commandToUndo = new DoneCommand(currentTask.getDescription(),
+				currentTask.getFromDateTime(), currentTask.getToDateTime(), 
+				currentTask.getLabels(), null);
+		return commandToUndo;
+	}
+
+	public int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getTaskDetails().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		Task prevState = null;
+		int indexOfTaskToUndone = mLocalMem.getLocalMem().size()-1;
+		prevState = mLocalMem.getLocalMem().get(indexOfTaskToUndone).getClone();
+		Command toRedo = new DoneCommand(prevState.getDescription(),
+				prevState.getFromDateTime(), prevState.getToDateTime(),
+				prevState.getLabels(), null);
+		mLocalMem.getLocalMem().remove(indexOfTaskToUndone);
+		mLocalMem.getLocalMem().add(0, super.getTask());
+		mLocalMem.redoPush(toRedo);
+		mLocalMem.saveLocalMemory();
+		String resultString = this.getTaskDetails() + " undone";
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private boolean isNumeric(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private FeedbackObject autoSearch(){
+		Task task = super.getTask();
+		FeedbackObject result = new SearchCommand(task.getDescription(), task.getFromDateTime(), task.getToDateTime(), 
+				task.getLabels(), null).execute();
+		return result;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\DoneCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SearchCommand.java
+	 */
+
+/**
+ * SearchCommand extends Command object to follow OOP standards
+ */
+public class SearchCommand extends Command {
+
+	private LocalMemory mLocalMem;
+	private static String MESSAGE_SEARCH_SUCCESS = "task(s) with keyword '%1$s' searched";
+	private static String MESSAGE_SEARCH_FAIL = "unable to find task with keyword '%1$s'";
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
+
+	public SearchCommand(String comdDes, Date fromDateTime,
+			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		String searchedTasks = search(super.getTask());
+		FeedbackObject result = null;
+		if (!searchedTasks.isEmpty()) {
+			searchedTasks += String.format(MESSAGE_SEARCH_SUCCESS, super.getTask());
+			result = new FeedbackObject(searchedTasks,true);
+			hasSearched = true;
+		} else {
+			searchedTasks += String.format(MESSAGE_SEARCH_FAIL, super.getTask());
+			result = new FeedbackObject(searchedTasks,false);
+			hasSearched = false;
+		}
+		return result;
+	}
+
+	@Override
+	public FeedbackObject undo() {
+		throw new UnsupportedOperationException("Search does not have an undo function");
+	}
+
+	private String search(Task userRequest) {
+		String searchedTasks = "";
+		searchList = new ArrayList<Integer>();
+		String[] keywords = null;
+
+		if (userRequest.getDescription() != null && !userRequest.getDescription().equals("")){
+			keywords = userRequest.getDescription().split("\\s+");	
+		}
+
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			Task currentTask = mLocalMem.getLocalMem().get(i);
+			if (hasSameDesc(keywords, currentTask)) {
+				searchList.add(i);
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			} else if (hasSameLabels(keywords, currentTask)) {
+				searchList.add(i);
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			} else if (isBetweenStartDateAndEndDate(userRequest.getFromDateTime(), userRequest.getToDateTime(), currentTask)){
+				searchList.add(i);
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			} else if (hasSameDate(userRequest.getFromDateTime(), currentTask)){
+				searchList.add(i);
+				searchedTasks += searchList.size() + ". " + currentTask.toString() + "\n";
+			}
+		}
+
+		return searchedTasks;
+	}
+
+	private boolean hasSameDesc(String[] keywords, Task currentTask) {
+		if (keywords == null || currentTask.getDescription() == null){
+			return false;
+		}
+
+		for (int i=0; i < keywords.length; i++){
+			String word = keywords[i];
+
+			if (currentTask.getDescription().toLowerCase().contains(word.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasSameLabels(String[] keywords, Task currentTask) {
+		if (keywords == null || currentTask.getLabels() == null){
+			return false;
+		}
+
+		for (int i=0; i < keywords.length; i++){
+			String word = keywords[i];
+
+			for (int j=0; j < currentTask.getLabels().size(); j++){
+				if (currentTask.getLabels().get(j).toLowerCase().contains(word.toLowerCase())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isBetweenStartDateAndEndDate(Date fromDateTime, Date toDateTime, Task currentTask) {
+		if (toDateTime == null || currentTask.getFromDateTime() == null){
+			return false;
+		}
+
+		if (currentTask.getToDateTime() == null){
+			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0){
+				return true;
+			}
+		} else {
+			if (fromDateTime.compareTo(currentTask.getFromDateTime()) <= 0 && toDateTime.compareTo(currentTask.getFromDateTime()) >= 0 || 
+					fromDateTime.compareTo(currentTask.getToDateTime()) <= 0 && toDateTime.compareTo(currentTask.getToDateTime()) >= 0){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasSameDate(Date fromDateTime, Task currentTask) {
+		if (fromDateTime == null || currentTask.getFromDateTime() == null){
+			return false;
+		}
+
+		if (currentTask.getToDateTime() == null){
+			if (dateFormat.format(fromDateTime).equals(dateFormat.format(currentTask.getFromDateTime()))){
+				return true;
+			}
+		} else {
+			if (currentTask.getFromDateTime().compareTo(fromDateTime) <= 0 && currentTask.getToDateTime().compareTo(fromDateTime) >= 0){ 
+				return true;
+			}
+		}	
+		return false;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SearchCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SortCommand.java
+	 */
+
+/**
+ * SortCommand extends Command object to follow OOP standards
+ */
+public class SortCommand extends Command {
+	
+	private MemorySnapshotHandler mViewHandler;
+	private LocalMemory mLocalMem;
+	private MyTasksLogicController mController;
+
+	public SortCommand(String comdDes, Date fromDateTime,
+			Date toDateTime, ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mViewHandler = MemorySnapshotHandler.getInstance();
+		mController = MyTasksLogicController.getInstance(false);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		Command commandToUndo = createSortUndo();
+		mLocalMem.undoPush(commandToUndo);
+		mViewHandler.setView(super.getTask().getLabels());
+		hasSearched = false;
+		mController.toggleHide(false);
+		FeedbackObject result = getFeedback();
+		return result;
+	}
+	
+	private SortCommand createSortUndo(){
+		String[] prevSettings = mViewHandler.getView();
+		ArrayList<String> prevLabels = new ArrayList<String>();
+		for (int i=0; i < prevSettings.length; i++){
+			prevLabels.add(prevSettings[i]);
+		}
+		SortCommand commandToUndo = new SortCommand(null, null, null, prevLabels, null);
+		return commandToUndo;
+	}
+	
+	private FeedbackObject getFeedback(){
+		String output = "";
+		for (int i=0; i < super.getTask().getLabels().size(); i++){
+			output +=  super.getTask().getLabels().get(i) + " ";
+		}
+		String resultString = output + "sorted";
+		FeedbackObject result = new FeedbackObject(resultString,true);
+		return result;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\SortCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+	 */
+
+/**
+ * UpdateCommand extends Command to follow OOP standards
+ */
+public class UpdateCommand extends Command {
+
+	// private variables
+	private LocalMemory mLocalMem;
+	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
+	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
+	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to update the specific one.";
+
+	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
+			ArrayList<String> comdLabels, String updateDesc) {
+		super(comdDes, fromDateTime, toDateTime, comdLabels, updateDesc);
+		mLocalMem = LocalMemory.getInstance();
+	}
+
+	@Override
+	public FeedbackObject execute() {
+		if (isRedo) {
+			return redoTask();
+		} else if (canUpdateFromSearchResults()) {
+			return updateFromSearchResults();
+		} else {
+			return updateByTaskDesc();
+		}
+	}
+
+	private FeedbackObject redoTask(){
+		int indexOfTaskToUpdated = 0;
+		Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
+		Command commandToUndo = createUpdateUndo(taskToUpdated);
+		mLocalMem.undoPush(commandToUndo);
+		Task updatedTask = updateTask(super.getTask(), taskToUpdated);
+		mLocalMem.getLocalMem().remove(indexOfTaskToUpdated);
+		mLocalMem.getLocalMem().add(updatedTask);
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
+				super.getToUpdateTaskDesc());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	private boolean canUpdateFromSearchResults() {
+		if (hasSearched == true && isNumeric(super.getToUpdateTaskDesc())
+				&& Integer.parseInt(super.getToUpdateTaskDesc()) - 1 < (searchList.size())) {
+			return true;
+		}
+		return false;
+	}
+
+	private FeedbackObject updateFromSearchResults() {
+		int indexOfTaskToUpdated = searchList.get(Integer.parseInt(super.getToUpdateTaskDesc()) - 1);
+		Task taskToUpdated = mLocalMem.getLocalMem().get(indexOfTaskToUpdated);
+
+		UpdateCommand commandToUndo = createUpdateUndo(taskToUpdated);
+		mLocalMem.undoPush(commandToUndo);
+
+		Task currentTask = super.getTask();
+		Task updatedTask = updateTask(currentTask, taskToUpdated);
+		mLocalMem.getLocalMem().remove(indexOfTaskToUpdated);
+		mLocalMem.getLocalMem().add(updatedTask);
+
+		hasSearched = false;
+		mLocalMem.saveLocalMemory();
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
+				taskToUpdated.getDescription());
+		FeedbackObject feedback = new FeedbackObject(resultString, true);
+		return feedback;
+	}
+
+	private FeedbackObject updateByTaskDesc(){
+		int timesAppear = countTimesAppear();
+		if (timesAppear == 0) {
+			return updateFail();
+		} else if (timesAppear > 1) {
+			return directToSearch();
+		} else {
+			return updateSingleTask();
+		}
+	}
+
+	private FeedbackObject updateFail(){
+		String resultString = String.format(MESSAGE_UPDATE_FAIL,
+				super.getToUpdateTaskDesc()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, false);
+		return result;
+	}
+
+	private FeedbackObject directToSearch(){
+		String resultString = String.format(MESSAGE_UPDATE_DUPLICATE,
+				super.getToUpdateTaskDesc()) + "\n";
+		resultString += autoSearch().getFeedback();
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+	 */
+
+	private boolean isNumeric(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private FeedbackObject autoSearch() {
+		FeedbackObject result = new SearchCommand(super.getToUpdateTaskDesc(),
+				null, null, null, null).execute();
+		return result;
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+	 */
+
+	@Test
+	public void testSearchCommand1() {
+		taskLogic.getMemory().clearMemory();
+		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("se meeting").getFeedback());
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad important");
+		// search for 1 keyword
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
+	}
+	
+	@Test
+	public void testSearchCommand2() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad important");
+		// search for multiple keywords
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "3. important\n"
+				+ "task(s) with keyword 'meeting important' searched", taskLogic.executeCommand("se meeting important").getFeedback());
+	}
+	
+	@Test
+	public void testSearchCommand3() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad do homework from 21.09.2014 to 23.09.2014");
+		// search for startDate
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n" 
+				+ "2. do homework from 21.09.2014 to 23.09.2014\n"
+				+ "task(s) with keyword 'on 22.09.2014' searched", taskLogic.executeCommand("se 22.09.2014").getFeedback());
+	}
+	
+	@Test
+	public void testSearchCommand4() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		taskLogic.executeCommand("ad do project from 24.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad pay electric bill from 1.10.2014 to 3.10.2014");
+		// search for tasks between startDate and endDate
+		assertEquals("1. CS2101 meeting on 29.09.2014\n" 
+				+ "2. do project from 24.09.2014 to 30.09.2014\n"
+				+ "3. pay electric bill from 01.10.2014 to 03.10.2014\n"
+				+ "task(s) with keyword 'from 27.09.2014 to 01.10.2014' searched", taskLogic.executeCommand("se from 27.09.2014 to 1.10.2014").getFeedback());
+	}
+	
+	@Test
+	public void testDeleteWithSearch1(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// delete by search results
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
+		assertEquals("'CS2103T meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+	}
+	
+	@Test
+	public void testDeleteWithSearch2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// when deleting task with same description
+		assertEquals("There are multiple tasks 'meeting'. Auto search to delete the specific one.\n"
+				+ "1. meeting on 01.11.2014 #CS2101\n"
+				+ "2. meeting on 02.11.2014 #CS2103T\n"
+				+ "3. meeting on 03.11.2014 #MA1101R\n"
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("de meeting").getFeedback());
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+		String output = obtainOutput();
+		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testDeleteWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+        taskLogic.executeCommand("de meeting");
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+		// undo
+		assertEquals("meeting added", taskLogic.executeCommand("un").getFeedback());
+		String output = obtainOutput();
+		assertEquals("01.Nov.2014\n" + "meeting #CS2101\n"
+				+ "02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testDeleteWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+        taskLogic.executeCommand("de meeting");
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("de 1").getFeedback());
+		assertEquals("meeting added", taskLogic.executeCommand("un").getFeedback());
+		// redo
+		assertEquals("'meeting' deleted", taskLogic.executeCommand("re").getFeedback());
+		String output = obtainOutput();
+		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testUpdateWithSearch1(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// update by search results
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
+		assertEquals("'CS2103T meeting' updated", taskLogic.executeCommand("up 1 - 25.09.2014").getFeedback());
+		String output = obtainOutput();
+		assertEquals("25.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting\n", output);
+	}
+	
+	@Test
+	public void testUpdateWithSearch2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// when updating task with same description
+		assertEquals("There are multiple tasks 'meeting'. Auto search to update the specific one.\n"
+				+ "1. meeting on 01.11.2014 #CS2101\n"
+				+ "2. meeting on 02.11.2014 #CS2103T\n"
+				+ "3. meeting on 03.11.2014 #MA1101R\n"
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("up meeting - 4.11.2014").getFeedback());
+		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
+		String output = obtainOutput();
+		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
+				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
+	}
+	
+	@Test
+	public void testUpdateWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("up meeting - 4.11.2014");
+		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
+		// undo
+		assertEquals("meeting reverted", taskLogic.executeCommand("un").getFeedback());
+		String output = obtainOutput();
+		assertEquals("01.Nov.2014\n" + "meeting #CS2101\n"
+				+ "02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testUpdateWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("up meeting - 4.11.2014");
+		assertEquals("'meeting' updated", taskLogic.executeCommand("up 1 - 4.11.2014").getFeedback());
+		assertEquals("meeting reverted", taskLogic.executeCommand("un").getFeedback());
+		// test 4 - redo
+		assertEquals("'meeting' updated", taskLogic.executeCommand("re").getFeedback());
+		String output = obtainOutput();
+		assertEquals("02.Nov.2014\n" + "meeting #CS2103T\n"
+				+ "03.Nov.2014\n" + "meeting #MA1101R\n"
+				+ "04.Nov.2014\n" + "meeting #CS2101\n", output);
+	}
+	
+	@Test
+	public void testDoneWithSearch1(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// done by search results
+		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
+				+ "2. CS2101 meeting on 29.09.2014\n" 
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
+		assertEquals("'CS2103T meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		String output = obtainOutput();
+		assertEquals("#done\n" + "CS2103T meeting on 22.09.2014 #important\n"
+				+ "N.A.\n" + "CS2101 meeting on 29.09.2014\n", output);
+	}
+	
+	@Test
+	public void testDoneWithSearch2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		// done task with same description
+		assertEquals("There are multiple tasks 'meeting'. Auto search to mark the specific one as done.\n"
+				+ "1. meeting on 01.11.2014 #CS2101\n"
+				+ "2. meeting on 02.11.2014 #CS2103T\n"
+				+ "3. meeting on 03.11.2014 #MA1101R\n"
+				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("do meeting").getFeedback());
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		String output = obtainOutput();
+		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testDoneWithSearch3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("do meeting");
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		// undo
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		String output = obtainOutput();
+		assertEquals("N.A.\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+	}
+	
+	@Test
+	public void testDoneWithSearch4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so done");
+		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
+		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
+		taskLogic.executeCommand("do meeting");
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do 1").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// redo
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
+		String output = obtainOutput();
+		assertEquals("#done\n" + "meeting on 01.11.2014 #CS2101\n"
+				+ "N.A.\n" + "meeting on 02.11.2014 #CS2103T\n" 
+				+ "meeting on 03.11.2014 #MA1101R\n", output);
+	}
+
+
+	@Test
+	public void testGetSnapshot1(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		// sort by date - tasks with only start date partition
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		String output = obtainOutput();
+		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting #important\n", output);
+	}
+
+	@Test
+	public void testGetSnapshot2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		// sort by date - tasks without date & time and task with date & time ;
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		String output = obtainOutput();	
+		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting #important\n"
+				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
+				+ "N.A.\n" + "play badminton #anytime\n", output);
+	}
+
+	@Test
+	public void testGetSnapshot3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		// sort by date - tasks with same startDate and tasks with start and end date
+		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
+		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
+		taskLogic.executeCommand("ad eat sushi #KentRidge");
+		String output = obtainOutput();	
+		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
+				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting #important\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "30.Sep.2014\n" + "do PS4\n"
+				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
+				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
+		
+	}
+	
+	@Test
+	public void testGetSnapshot4(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("so date");
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
+		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
+		taskLogic.executeCommand("ad eat sushi #KentRidge");
+		// sort by date - tasks with start and end DateTime partition
+		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
+		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
+		String output = obtainOutput();	
+		assertEquals("22.Sep.2014\n" + "CS2103T meeting #important\n"
+				+ "25.Sep.2014\n" + "CS2100 Midterm #important #urgent\n" + "MA1101R Midterm\n"
+				+ "28.Sep.2014\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "29.Sep.2014\n" + "CS2101 meeting #important\n" + "pay acceptance fee #$200\n" + "do PS4\n"
+				+ "30.Sep.2014\n" + "do PS4\n"
+				+ "01.Oct.2014\n" + "medical check up 13:00 #$100\n"
+				+ "03.Oct.2014\n" + "gaming from 10:00 to 15:00\n"
+				+ "10.Oct.2014\n" + "work 10:00\n"
+				+ "11.Oct.2014\n" + "work\n"
+				+ "12.Oct.2014\n" + "work till 13:00\n"
+				+ "N.A.\n" + "play badminton #anytime\n" + "eat sushi #KentRidge\n", output);
+	}
+	
+	@Test
+	public void testGetSnapshot5(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
+		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014 #important");
+		taskLogic.executeCommand("ad CS2100 Midterm 25.09.2014 #important #urgent");
+		taskLogic.executeCommand("ad play badminton #anytime");
+		taskLogic.executeCommand("ad medical check up 1.10.2014 13:00 #$100");
+		taskLogic.executeCommand("ad pay acceptance fee from 28.09.2014 to 29.09.2014 #$200");
+		taskLogic.executeCommand("ad do PS4 from 28.09.2014 to 30.09.2014");
+		taskLogic.executeCommand("ad MA1101R Midterm 25.09.2014");
+		taskLogic.executeCommand("ad eat sushi #KentRidge");
+		taskLogic.executeCommand("ad work from 10.10.2014 10:00 to 12.10.2014 13:00");
+		taskLogic.executeCommand("ad gaming 3.10.2014 from 10:00 to 15:00");
+		// sort by labels - sort 1 labels
+		taskLogic.executeCommand("so important");
+		String output = obtainOutput();
+		assertEquals("#important\n" + "CS2103T meeting on 22.09.2014\n" 
+				+ "CS2101 meeting on 29.09.2014\n" 
+				+ "CS2100 Midterm on 25.09.2014 #urgent\n" 
+				+ "N.A.\n" + "play badminton #anytime\n" 
+				+ "medical check up on 01.10.2014 13:00 #$100\n" 
+				+ "pay acceptance fee from 28.09.2014 to 29.09.2014 #$200\n" 
+				+ "do PS4 from 28.09.2014 to 30.09.2014\n" 
+				+ "MA1101R Midterm on 25.09.2014\n" 
+				+ "eat sushi #KentRidge\n"
+				+ "work from 10.10.2014 10:00 to 12.10.2014 13:00\n"
+				+ "gaming from 03.10.2014 10:00 to 03.10.2014 15:00\n", output);
+	}
+	
+	@Test
+	public void testGetSnapshot6(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad tutorial #CS2103");
+		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #important");
+		taskLogic.executeCommand("ad tutorial #CS2100");
+		taskLogic.executeCommand("ad lab #CS2100 #important");
+		taskLogic.executeCommand("ad meeting 3.11.2014 #CS2101 #important");
+		taskLogic.executeCommand("ad video making #CS2101");
+		// sort by labels - sort multiple labels
+		taskLogic.executeCommand("so CS2103 CS2100 important");
+		String output = obtainOutput();
+		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
+				+ "#CS2100#important\n" + "lab\n"
+				+ "#CS2103\n" + "tutorial\n"
+				+ "#CS2100\n" + "tutorial\n"
+				+ "#important\n" + "meeting on 03.11.2014 #CS2101\n"
+				+ "N.A.\n" + "video making #CS2101\n", output);
+	}
+	
+	private String obtainOutput(){
+		String output = "";
+		for (int i=0; i < taskLogic.obtainPrintableOutput().size(); i++)
+			output += taskLogic.obtainPrintableOutput().get(i);		
+		return output;
+	}
+	
+	@Test
+	public void testDoneCommand(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+        assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
+        taskLogic.executeCommand("so done");
+        String output = obtainOutput();	
+		assertEquals("#done\n" + "meeting\n", output);
+	}
+	
+	@Test
+	public void testUndoRedoDone1(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		// undo once
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("do meeting").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	@Test
+	public void testUndoRedoDone2(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		// undo multiple times
+		taskLogic.executeCommand("do meeting");
+		taskLogic.executeCommand("do do homework");
+		taskLogic.executeCommand("do written quiz 2");
+		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	@Test
+	public void testUndoRedoDone3(){
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
+		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
+		taskLogic.executeCommand("do meeting");
+		taskLogic.executeCommand("do do homework");
+		taskLogic.executeCommand("do written quiz 2");
+		assertEquals("written quiz 2 undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("do homework undone", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
+		// redo 
+		assertEquals("'meeting' mark as done", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MemorySnapshotHandler.java
+	 */
+
+/**
+ * MemorySnapshotHandler organizes the memory into a format that is readable by UI to display to user.
+ * It is required to be able to categorize by labels that is listed in the currentSettings
+ */
+public class MemorySnapshotHandler {
+
+	private static MemorySnapshotHandler INSTANCE = null;
+	private String[] currentSettings;
+	private ArrayList<Task> snapshotList;
+	private ArrayList<String> labelsInSortedOrder;
+	private ArrayList<ArrayList<String>> labelCombinations;
+	private HashMap<Task, Integer> tasksToLabelOrders;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy");
+	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+	//Constructor
+	private MemorySnapshotHandler() {
+		currentSettings = MyTasksController.DEFAULT_VIEW;
+		assert currentSettings[0].equals("date") : "wrong default setting";
+	}
+
+	public static MemorySnapshotHandler getInstance(){
+		if (INSTANCE == null){
+			INSTANCE = new MemorySnapshotHandler();
+		}
+		return INSTANCE;
+	}
+
+	public void setView(ArrayList<String> newSettings) {
+		currentSettings = newSettings.toArray((new String[newSettings.size()]));
+		assert currentSettings != null : "invalid setting";
+	}
+
+	public String[] getView() {
+		return currentSettings;
+	}
+
+	private void initSnapshotHandler(LocalMemory LocalMem){
+		snapshotList = new ArrayList<Task>();
+		labelsInSortedOrder = new ArrayList<String>();
+		labelCombinations = new ArrayList<ArrayList<String>>();
+		tasksToLabelOrders = new HashMap<Task, Integer>();
+		for (int i=0; i < LocalMem.getLocalMem().size(); i++){
+			snapshotList.add(LocalMem.getLocalMem().get(i));
+		}
+	}
+
+	/**
+	 * getSnapshot takes looks at local memory and organizes it according to currentSettings. 
+	 * @return data structure that is read and printed by UI
+	 */
+	public ArrayList<String> getSnapshot(LocalMemory LocalMem) {
+		assert currentSettings != null : "invalid setting";
+		initSnapshotHandler(LocalMem);
+
+		for (int i=0; i < currentSettings.length; i++){
+			if (currentSettings[i].toLowerCase().equals("date")){
+				convertTimedTasksToScheduleTasks();		
+				sortByDate();
+			} else {
+				labelsInSortedOrder.add(currentSettings[i]);
+			}
+		}
+
+		if (!labelsInSortedOrder.isEmpty()){
+			findCombinationOfLabels();
+			computeLabelOrderOfAllTasks();
+			sortByLabels();
+			return convertSnapshotListToStringInLabelsFormat(snapshotList);
+		}
+
+		return convertSnapshotListToStringInDateFormat(snapshotList);
+	}
+
+	private void sortByDate(){
+		for (int i=0; i < snapshotList.size()-1; i++){
+			for (int j=0; j < snapshotList.size()-1-i; j++){
+				Date currentDate = snapshotList.get(j).getFromDateTime();
+				Date nextDate = snapshotList.get(j+1).getFromDateTime();
+				if (currentDate == null && nextDate != null || nextDate != null && currentDate.after(nextDate)){
+					Task temp = snapshotList.get(j);
+					snapshotList.set(j, snapshotList.get(j+1));
+					snapshotList.set(j+1, temp);
+				}
+			}
+		}
+	}
+
+	private void sortByLabels(){
+		for (int i=0; i < snapshotList.size()-1; i++){
+			for (int j=0; j < snapshotList.size()-1-i; j++){
+				if (tasksToLabelOrders.get(snapshotList.get(j)) > tasksToLabelOrders.get(snapshotList.get(j+1))){
+					Task temp = snapshotList.get(j);
+					snapshotList.set(j, snapshotList.get(j+1));
+					snapshotList.set(j+1, temp);
+				}
+			}
+		}
+	}
+
+	/**
+	 * convert the list of sorted task to a list of string
+	 * that follows the date format
+	 * 
+	 * @param snapshotList 
+	 * @return a list of string in date format
+	 */
+	private ArrayList<String> convertSnapshotListToStringInDateFormat(ArrayList<Task> snapshotList){	
+		ArrayList<String> output = new ArrayList<String>();
+
+		for (int i=0; i < snapshotList.size(); i++){
+			if (!isSortedByDoneTasks() && isDone(snapshotList.get(i))){
+				continue;
+			}
+
+			String snapshot = "";
+			Date date = snapshotList.get(i).getFromDateTime();
+			if (date == null){
+				snapshot += "N.A.\n";
+				for (int j=i; j < snapshotList.size(); j++){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
+						continue;
+					}
+					snapshot += snapshotList.get(j).toString() + "\n";
+				}
+				output.add(snapshot);
+				break;
+			} else {
+				snapshot += dateFormat.format(date) + "\n";
+				int j=i;
+				Date currentDate = snapshotList.get(j).getFromDateTime();
+				while (currentDate != null && dateFormat.format(currentDate).equals(dateFormat.format(date))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
+						continue;
+					}
+
+					snapshot += taskToStringWithoutDate(snapshotList.get(j)) + "\n";
+					j++;
+					if (j > snapshotList.size()-1)
+						break;
+					currentDate = snapshotList.get(j).getFromDateTime();
+				}
+				i = j-1;
+			}
+			output.add(snapshot);
+		}
+
+		return output;
+	}
+
+	/**
+	 * convert the list of sorted task to a list of string
+	 * that follows the label format
+	 * 
+	 * @param snapshotList 
+	 * @return a list of string in label format
+	 */
+	private ArrayList<String> convertSnapshotListToStringInLabelsFormat(ArrayList<Task> snapshotList){		
+		ArrayList<String> output = new ArrayList<String>();
+		ArrayList<String> unwantedLabels;
+
+		for (int i=0; i < snapshotList.size(); i++){
+			if (!isSortedByDoneTasks() && isDone(snapshotList.get(i))){
+				continue;
+			}
+
+			String snapshot = "";
+			int order = tasksToLabelOrders.get(snapshotList.get(i));
+			if (order == labelCombinations.size()){
+				snapshot += "N.A.\n";
+				for (int j=i; j < snapshotList.size(); j++){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
+						continue;
+					}
+					snapshot += snapshotList.get(j).toString() + "\n";
+				}
+				output.add(snapshot);
+				break;
+			} else {
+				unwantedLabels = new ArrayList<String>();
+				for (int j=0; j < labelCombinations.get(order).size(); j++){
+					snapshot += "#" + labelCombinations.get(order).get(j);
+					unwantedLabels.add(labelCombinations.get(order).get(j));
+				}
+				snapshot += "\n";
+				int j=i;
+				while (j < snapshotList.size() && tasksToLabelOrders.get(snapshotList.get(j)) == tasksToLabelOrders.get(snapshotList.get(i))){
+					if (!isSortedByDoneTasks() && isDone(snapshotList.get(j))){
+						continue;
+					}
+					snapshot += taskToStringWithoutSpecifiedLabels(snapshotList.get(j), unwantedLabels) + "\n";
+					j++;
+				}
+				i = j-1;
+			}
+			output.add(snapshot);
+		}
+
+		return output;
+	}
+
+	/**
+	 * convert timed tasks to individual schedule task
+	 * in the range of the start and end date
+	 * 
+	 * @param 
+	 * @return 
+	 */
+	private void convertTimedTasksToScheduleTasks(){	
+		for (int i=0; i < snapshotList.size(); i++){
+			if (snapshotList.get(i).getFromDateTime() != null && snapshotList.get(i).getToDateTime() != null){
+				Date startDate = snapshotList.get(i).getFromDateTime();
+				Date endDate = snapshotList.get(i).getToDateTime();
+				if (dateFormat.format(startDate).equals(dateFormat.format(endDate))){
+					snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, endDate, snapshotList.get(i).getLabels()));
+					continue;
+				}
+				Date date = startDate;
+				while (!dateFormat.format(date).equals(dateFormat.format(endDate))){
+					date = increaseOneDay(date);
+					if (dateFormat.format(date).equals(dateFormat.format(endDate))){
+						snapshotList.add(new Task(snapshotList.get(i).getDescription(), endDate, endDate, snapshotList.get(i).getLabels()));
+					} else {
+						snapshotList.add(new Task(snapshotList.get(i).getDescription(), getDate(date), null, snapshotList.get(i).getLabels()));
+					}
+				}
+				snapshotList.set(i, new Task(snapshotList.get(i).getDescription(), startDate, null, snapshotList.get(i).getLabels()));
+			}
+		}
+	}
+
+	/**
+	 * find all the possible combination of the given labels
+	 * 
+	 * @param 
+	 * @return labelCombinations
+	 */
+	private void findCombinationOfLabels(){
+		ArrayList<String> chosenList = new ArrayList<String>();
+		ArrayList<String> remainingList = new ArrayList<String>();		
+		for (int j=0; j < labelsInSortedOrder.size(); j++){
+			remainingList.add(labelsInSortedOrder.get(j));
+		}
+		findCombinationOfLabelsRec(remainingList, chosenList);
+		sortLabelCombinationsInDescendingOrder();
+	}
+
+	private void findCombinationOfLabelsRec(ArrayList<String> remainingList, ArrayList<String> chosenList){
+		if (remainingList.isEmpty()){
+			labelCombinations.add(chosenList);
+		} else {
+			ArrayList<String> remaining = clone(remainingList);
+			String str = remaining.remove(0);
+			ArrayList<String> chosen = clone(chosenList);
+			chosen.add(str);
+			findCombinationOfLabelsRec(remaining, chosen);
+			findCombinationOfLabelsRec(remaining, chosenList);			
+		}
+	}
+
+	private ArrayList<String> clone(ArrayList<String> list){
+		ArrayList<String> copy = new ArrayList<String>();
+		for (int i=0; i < list.size(); i++){
+			copy.add(list.get(i));
+		}
+		return copy;
+	}
+
+	private void sortLabelCombinationsInDescendingOrder(){
+		for (int i=0; i < labelCombinations.size()-1; i++){
+			for (int j=0; j < labelCombinations.size()-1-i; j++){
+				if (labelCombinations.get(j).size() < labelCombinations.get(j+1).size()){
+					ArrayList<String> temp = labelCombinations.get(j);
+					labelCombinations.set(j, labelCombinations.get(j+1));
+					labelCombinations.set(j+1, temp);
+				}
+			}
+		}
+	}
+
+	/**
+	 * convert the given task to string
+	 * without including its date but preserving its time
+	 * 
+	 * @param task
+	 * @return string of task
+	 */
+	private String taskToStringWithoutDate(Task task){
+		String labelsToString = "";
+		if (task.getLabels() != null) {
+			for (String s : task.getLabels()){
+				labelsToString += " " + "#" + s;
+			}
+		}
+
+		String timeToString = getTime(task);
+
+		if (timeToString.equals("")){
+			return String.format("%s%s", task.getDescription(), labelsToString);
+		}
+
+		return String.format("%s %s%s", task.getDescription(), timeToString, labelsToString);
+	}
+
+	/**
+	 * convert the given task to string
+	 * without including the given labels
+	 * 
+	 * @param task
+	 * @return string of task
+	 */
+	private String taskToStringWithoutSpecifiedLabels(Task task, ArrayList<String> unwantedLabels){
+		String labelsToString = "";
+		if (task.getLabels() != null) {
+			for (String s : task.getLabels()){
+				if (hasSameLabels(s ,unwantedLabels)){
+					continue;
+				}
+				labelsToString += " " + "#" + s;
+			}
+		}
+
+		String dateFromString = "";
+		String dateToString = "";
+		if (task.getFromDateTime() != null) {
+			dateFromString = MyTasksParser.dateTimeFormats.get(0).format(task.getFromDateTime());
+		}
+		if (dateFromString.contains("00:00")) {
+			dateFromString = MyTasksParser.dateFormats.get(0).format(task.getFromDateTime());
+		}
+		if (task.getToDateTime() != null) {
+			dateToString = MyTasksParser.dateTimeFormats.get(0).format(task.getToDateTime());
+		}
+		if (dateToString.contains("00:00")) {
+			dateToString = MyTasksParser.dateFormats.get(0).format(task.getToDateTime());
+		}
+
+		String result = "";
+		if (dateFromString.equals("")) {
+			result = String.format("%s%s ", task.getDescription(), labelsToString);
+		} else if (dateToString.equals("")) {
+			result = String.format("%s on %s%s", task.getDescription(), dateFromString,labelsToString);
+		} else {
+			result = String.format("%s from %s to %s%s", task.getDescription(),
+					dateFromString, dateToString, labelsToString);
+		}
+		return result.trim();
+	}
+
+	private boolean hasSameLabels(String str, ArrayList<String> labels){
+		for (int i=0; i < labels.size(); i++){
+			if (str.toLowerCase().equals(labels.get(i).toLowerCase())){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * extract the time of the given task
+	 * and convert it to string
+	 * 
+	 * @param task
+	 * @return string of time
+	 */
+	private String getTime(Task task){		
+		String timeToString = "";
+		assert task.getFromDateTime() != null;
+
+		if (!timeFormat.format(task.getFromDateTime()).equals("00:00")){
+			timeToString += timeFormat.format(task.getFromDateTime());
+		}
+		if (task.getToDateTime() != null && !timeFormat.format(task.getToDateTime()).equals("00:00")){
+			String startTime = timeToString;
+			String endTime = timeFormat.format(task.getToDateTime());
+			if (startTime.equals(endTime)){
+				timeToString = "till " + endTime;
+			} else {
+				timeToString = "from " + startTime + " to " + endTime;
+			}
+		}
+
+		return timeToString;
+	}
+
+	/**
+	 * extract the date from the given Date object
+	 * without including its time
+	 * 
+	 * @param date
+	 * @return string of date
+	 */
+	private Date getDate(Date date){
+		String dateToString = dateFormat.format(date);
+		Date dateWithoutTime = null;
+		try {
+			dateWithoutTime = dateFormat.parse(dateToString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}	
+		return dateWithoutTime;
+	}
+
+	private void computeLabelOrderOfAllTasks(){
+		for (int i=0; i < snapshotList.size(); i++){
+			Task currentTask = snapshotList.get(i);
+			tasksToLabelOrders.put(currentTask, computeLabelOrder(currentTask));		
+		}
+	}
+
+	private int computeLabelOrder(Task task){
+		int lastOrder = labelCombinations.size();
+		if (task.getLabels() == null){
+			return lastOrder;
+		}
+
+		int matchingNumOfLabels = getMatchingNumOfLabels(task);
+		if (matchingNumOfLabels == 0){
+			return lastOrder;
+		}
+
+		int order = getMatchingLabels(task, matchingNumOfLabels);
+		return order;
+	}
+
+	private int getMatchingNumOfLabels(Task task){
+		int matchingNumOfLabels = 0;
+		for (int i=0; i < task.getLabels().size(); i++){
+			for (int j=0; j < labelsInSortedOrder.size(); j++){
+				if (task.getLabels().get(i).toLowerCase().equals(labelsInSortedOrder.get(j).toLowerCase())){
+					matchingNumOfLabels++;
+				}
+			}
+		}
+		return matchingNumOfLabels;
+	}
+
+	private int getMatchingLabels(Task task, int matchingNumOfLabels){
+		int order = 0;
+		for (int i=0; i < labelCombinations.size(); i++){
+			if (labelCombinations.get(i).size() == matchingNumOfLabels){
+				int matchingLabels=0;
+				for (int j=0; j < task.getLabels().size(); j++){
+					for (int k=0; k < labelCombinations.get(i).size(); k++){
+						if (task.getLabels().get(j).toLowerCase().equals(labelCombinations.get(i).get(k).toLowerCase())){
+							matchingLabels++;
+						}
+					}
+				}
+				if (matchingLabels == matchingNumOfLabels){
+					order = i;
+				}
+			}
+		}
+		return order;
+	}
+
+	private boolean isSortedByDoneTasks(){
+		for (int i=0; i < currentSettings.length; i++){
+			if (currentSettings[i].toLowerCase().equals("done")){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isDone(Task task){
+		if (task.getLabels() == null){
+			return false;
+		}
+
+		for (int i=0; i < task.getLabels().size(); i++){
+			if (task.getLabels().get(i).toLowerCase().equals("done")){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private Date increaseOneDay(Date date){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DATE, 1);
+		return calendar.getTime();
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MemorySnapshotHandler.java
+
+
+
+
+

@@ -1,0 +1,1622 @@
+//@author: a0115034x
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+	 */
+
+	private Task savePrevState() {
+		Task prevState = null;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (mLocalMem.getLocalMem().get(i).getDescription()
+					.equals(super.getToUpdateTaskDesc())) {
+				prevState = mLocalMem.getLocalMem().get(i).getClone();
+				break;
+			}
+		}
+		return prevState;
+	}
+
+	private FeedbackObject updateSingleTask() {
+		Task prevState = savePrevState();
+		UpdateCommand commandToUndo = createUpdateUndo(prevState);
+		mLocalMem.undoPush(commandToUndo);
+
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getToUpdateTaskDesc().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				Task currentTask = super.getTask();
+				Task updatedTask = updateTask(currentTask, mLocalMem
+						.getLocalMem().get(i));
+				mLocalMem.getLocalMem().remove(i);
+				mLocalMem.getLocalMem().add(updatedTask);
+			}
+		}		
+
+		mLocalMem.saveLocalMemory();
+		hasSearched = false;
+		String resultString = String.format(MESSAGE_UPDATE_SUCCESS,
+				super.getToUpdateTaskDesc());
+		FeedbackObject result = new FeedbackObject(resultString, true);
+		return result;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+	 */
+
+	private Task updateTask(Task currentTask, Task taskToUpdated) {
+		if (currentTask.getDescription() != null) {
+			taskToUpdated.setDescription(currentTask.getDescription());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() != null) {
+			taskToUpdated.setFromDateTime(currentTask.getFromDateTime());
+			taskToUpdated.setToDateTime(currentTask.getToDateTime());
+		}
+		if (currentTask.getFromDateTime() != null
+				&& currentTask.getToDateTime() == null) {
+			taskToUpdated.setFromDateTime(currentTask.getFromDateTime());
+			taskToUpdated.setToDateTime(null);
+		}
+		if (currentTask.getLabels() != null) {
+			if (!super.getTask().getLabels().isEmpty()) {
+				taskToUpdated.setLabels(currentTask.getLabels());
+			}
+		}
+		Task updatedTask = taskToUpdated;
+		return updatedTask;
+	}
+
+	private UpdateCommand createUpdateUndo(Task prevState) {
+		UpdateCommand commandToUndo = null;
+		if (this.getTaskDetails() == null) {
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), prevState.getDescription());
+		} else {
+			commandToUndo = new UpdateCommand(prevState.getDescription(),
+					prevState.getFromDateTime(), prevState.getToDateTime(),
+					prevState.getLabels(), super.getTaskDetails());
+		}
+		return commandToUndo;
+	}
+
+	private int countTimesAppear() {
+		int count = 0;
+		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
+			if (super.getToUpdateTaskDesc().equals(
+					mLocalMem.getLocalMem().get(i).getDescription())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\command\UpdateCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\IntegrationTesting.java
+	 */
+
+public class IntegrationTesting {
+	
+	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
+	private LocalMemory mLocalMem = LocalMemory.getInstance(); 
+	private ArrayList<String> labels = new ArrayList<String>();
+	private Task newTask;
+	
+	private void init() {
+		mLocalMem.clearMemory();
+		labels = new ArrayList<String>();
+	}
+	
+	private Task createDateTimeTask(String taskDesc, String string, String string2) {
+		Date date1 = null, date2 = null;
+		try {
+			date1 = MyTasksParser.dateTimeFormats.get(0).parse(string);
+			date2 = MyTasksParser.dateTimeFormats.get(0).parse(string2);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}		
+		return new Task(taskDesc, date1, date2, labels);		 
+	}
+	
+	private Task createDateTask(String taskDesc, String string, String string2) {
+		Date date1 = null, date2 = null;
+		try {
+			date1 = MyTasksParser.dateFormats.get(0).parse(string);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return new Task(taskDesc, date1, date2, labels);		 
+	}
+	
+	@Test
+	public void testAddAll() {		
+		init();
+		
+		FeedbackObject feedback = taskLogic.executeCommand("ad meeting 01.10.2014 from 12:23 to 20:30 #important");		
+		newTask = createDateTimeTask("meeting", "01.10.2014 12:23", "01.10.2014 20:30"); 
+		labels.add("important"); 
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "meeting added");
+		
+		//checking whether task is added correctly into memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("01.Oct.2014\n" + "meeting from 12:23 to 20:30 #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testAddFail() {		
+		init();
+		
+		FeedbackObject feedback = taskLogic.executeCommand("ad #important 24.11.2014");	
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), false);
+		assertEquals(feedback.getFeedback(), "Invalid input");
+	}
+	
+	@Test
+	public void testUndoAdd() {
+		init();
+
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete coding for project from 05.11.2014 12pm to 07.11.2014 4pm #finalrush");
+		taskLogic.executeCommand("ad complete assignment #important");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+		
+		newTask = createDateTimeTask("complete coding for project", "05.11.2014 12:00", "07.11.2014 16:00"); 
+		labels.add("finalrush");
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "complete assignment deleted");
+		
+		//checking whether task is deleted from local memory 
+		assertEquals(2, mLocalMem.getLocalMem().size());	
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(1).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(1).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(1).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(1).getLabels().get(0));
+				
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("05.Nov.2014\n" + "complete coding for project 12:00 #finalrush\n");
+		toCheck.add("06.Nov.2014\n" + "complete coding for project #finalrush\n");
+		toCheck.add("07.Nov.2014\n" + "complete coding for project till 16:00 #finalrush\n");
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testRedoAdd() {
+		init();
+
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete coding for project from 05.11.2014 12pm to 07.11.2014 4pm #finalrush");
+		taskLogic.executeCommand("ad complete assignment #important");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		labels.add("important");
+		newTask = new Task("complete assignment", null, null, labels);		
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "complete assignment added");
+		
+		//checking whether redone task is added into local memory 
+		assertEquals(3, mLocalMem.getLocalMem().size());	
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(2).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(2).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(2).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(2).getLabels().get(0));
+				
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("05.Nov.2014\n" + "complete coding for project 12:00 #finalrush\n");
+		toCheck.add("06.Nov.2014\n" + "complete coding for project #finalrush\n");
+		toCheck.add("07.Nov.2014\n" + "complete coding for project till 16:00 #finalrush\n");
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n" + "complete assignment #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+
+	@Test
+	public void testDelete() {
+		init();
+		
+		FeedbackObject feedback = taskLogic.executeCommand("ad meeting two 03.10.2014 #wecandoit");
+		taskLogic.executeCommand("ad meeting 02.10.2014 12:23 #important");
+		taskLogic.executeCommand("de meeting");
+		
+		newTask = createDateTask("meeting two", "03.10.2014", null); 
+		labels.add("wecandoit"); 
+
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "meeting two added");
+		
+		//checking whether the correct task is deleted from memory 
+		assertEquals(1, mLocalMem.getLocalMem().size());
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), taskLogic.getMemory().getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), taskLogic.getMemory().getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("03.Oct.2014\n" + "meeting two #wecandoit\n");;
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	@Test
+	public void testUndoDelete() {
+		init();
+		
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete homework 15.11.2014 #finals");
+		taskLogic.executeCommand("de complete homework");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+		
+		newTask = createDateTask("complete homework", "15.11.2014", null); 
+		labels.add("finals");
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "complete homework added");
+		
+		//checking whether deleted task is added properly into local memory
+		assertEquals(2, mLocalMem.getLocalMem().size());
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(1).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(1).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(1).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(1).getLabels().get(0));
+
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("15.Nov.2014\n" + "complete homework #finals\n");
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testRedoDelete() {
+		init();
+		
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete homework 15.11.2014 #finals");
+		taskLogic.executeCommand("de complete homework");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		labels.add("tomorrow");
+		labels.add("test");
+		newTask = new Task("do homework", null, null, labels);
+
+		//checking for feedback to user
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'complete homework' deleted");
+		
+		//checking whether task is deleted correctly 
+		assertEquals(1, mLocalMem.getLocalMem().size());
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testUpdateAll() {
+		init();
+		
+		taskLogic.executeCommand("ad meeting 04.10.2014 #important");
+		FeedbackObject feedback = taskLogic.executeCommand("up meeting - meeting for CS2103T 05.10.2014 #letsdothis");	
+		
+		newTask = createDateTask("meeting for CS2103T", "05.10.2014", null); 
+		labels.add("letsdothis"); 
+
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'meeting' updated");
+		
+		//checking whether task is updated correctly into memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("05.Oct.2014\n" + "meeting for CS2103T #letsdothis\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	@Test
+	public void testUndoUpdateAll() {
+		init();
+		
+		taskLogic.executeCommand("ad meeting 04.10.2014 #important");
+		taskLogic.executeCommand("up meeting - meeting for CS2103T 05.10.2014 #letsdothis");
+		FeedbackObject feedback = taskLogic.executeCommand("un");	
+		
+		newTask = createDateTask("meeting", "04.10.2014", null); 
+		labels.add("important"); 
+
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "meeting for CS2103T reverted");
+		
+		//checking whether task is reverted correctly in local memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("04.Oct.2014\n" + "meeting #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testRedoUpdateAll() {
+		init();
+		
+		taskLogic.executeCommand("ad meeting 04.10.2014 #important");
+		taskLogic.executeCommand("up meeting - meeting for CS2103T 05.10.2014 #letsdothis");	
+		taskLogic.executeCommand("un");	
+		FeedbackObject feedback = taskLogic.executeCommand("re");	
+		
+		newTask = createDateTask("meeting for CS2103T", "05.10.2014", null); 
+		labels.add("letsdothis"); 
+
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'meeting' updated");
+		
+		//checking whether task is updated correctly in local memory 
+		assertEquals(1, mLocalMem.getLocalMem().size());
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("05.Oct.2014\n" + "meeting for CS2103T #letsdothis\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testUpdateTaskDesc() {
+		init();
+		
+		taskLogic.executeCommand("ad meeting for 2103 04.11.2014 #important");
+		FeedbackObject feedback = taskLogic.executeCommand("up meeting for 2103 - documentation meeting");
+				
+		newTask = createDateTask("documentation meeting", "04.11.2014", null); 
+		labels.add("important"); 
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'meeting for 2103' updated");
+		
+		//checking whether task is updated correctly in local memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("04.Nov.2014\n" + "documentation meeting #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	@Test
+	public void testUndoUpdateTaskDesc() {
+		init();
+
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete assignment homework 08.11.2014 #important");
+		taskLogic.executeCommand("up complete assignment homework - finish assignment");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+		
+		newTask = createDateTask("complete assignment homework", "08.11.2014", null); 
+		labels.add("important");
+
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "finish assignment reverted");
+		
+		//checking whether task is undone properly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+				
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("08.Nov.2014\n" + "complete assignment homework #important\n");
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testRedoUpdateTaskDesc() {
+		init();
+
+		taskLogic.executeCommand("ad do homework #tomorrow #test");
+		taskLogic.executeCommand("ad complete assignment homework 08.11.2014 #important");
+		taskLogic.executeCommand("up complete assignment homework - finish assignment");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		newTask = createDateTask("finish assignment", "08.11.2014", null); 
+		labels.add("important");
+
+		//checking for feedback to user
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'complete assignment homework' updated");
+		
+		//checking whether task is updated correctly in memory 
+		assertEquals(2, mLocalMem.getLocalMem().size());
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(1).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(1).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(1).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(1).getLabels().get(0));
+				
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("08.Nov.2014\n" + "finish assignment #important\n");
+		toCheck.add("N.A.\n" + "do homework #tomorrow #test\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testUpdateDatetime() {
+		init();
+		
+		taskLogic.executeCommand("ad last meeting for CS2103T 04.11.2014 from 2pm to 5pm #important");
+		FeedbackObject feedback = taskLogic.executeCommand("up last meeting for CS2103T - 08.11.2014 from 4pm to 6pm");
+		
+		newTask = createDateTimeTask("last meeting for CS2103T", "08.11.2014 16:00", "08.11.2014 18:00"); 
+		labels.add("important"); 
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'last meeting for CS2103T' updated");
+		
+		//checking whether task is updated correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("08.Nov.2014\n" + "last meeting for CS2103T from 16:00 to 18:00 #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	@Test
+	public void testUndoUpdateDateTime() {
+		init();
+		
+		taskLogic.executeCommand("ad last meeting for CS2103T 04.11.2014 from 2pm to 5pm #important");
+		taskLogic.executeCommand("up last meeting for CS2103T - 08.11.2014 from 4pm to 6pm");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+		
+		newTask = createDateTimeTask("last meeting for CS2103T", "04.11.2014 14:00", "04.11.2014 17:00"); 
+		labels.add("important"); 
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "last meeting for CS2103T reverted");
+		
+		//checking whether task is reverted correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("04.Nov.2014\n" + "last meeting for CS2103T from 14:00 to 17:00 #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testRedoUpdateDateTime() {
+		init();
+		
+		taskLogic.executeCommand("ad last meeting for CS2103T 04.11.2014 from 2pm to 5pm #important");
+		taskLogic.executeCommand("up last meeting for CS2103T - 08.11.2014 from 4pm to 6pm");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		newTask = createDateTimeTask("last meeting for CS2103T", "08.11.2014 16:00", "08.11.2014 18:00"); 
+		labels.add("important"); 
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'last meeting for CS2103T' updated");
+		
+		//checking whether task is updated correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("08.Nov.2014\n" + "last meeting for CS2103T from 16:00 to 18:00 #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testUpdateLabel() {
+		init();
+		
+		taskLogic.executeCommand("ad end of exams 28.11.2014 #important");
+		FeedbackObject feedback = taskLogic.executeCommand("up end of exams - #hiphiphooray");
+		
+		newTask = createDateTask("end of exams", "28.11.2014", null); 
+		labels.add("hiphiphooray"); 	
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'end of exams' updated");
+		
+		//checking whether task is updated correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("28.Nov.2014\n" + "end of exams #hiphiphooray\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	@Test
+	public void testUndoUpdateLabel() {
+		init();
+		
+		taskLogic.executeCommand("ad end of exams 28.11.2014 #important");
+		taskLogic.executeCommand("up end of exams - #hiphiphooray");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+		
+		newTask = createDateTask("end of exams", "28.11.2014", null); 
+		labels.add("important"); 	
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "end of exams reverted");
+		
+		//checking whether task is reverted correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("28.Nov.2014\n" + "end of exams #important\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}	
+	
+	@Test
+	public void testRedoUpdateLabel() {
+		init();
+		
+		taskLogic.executeCommand("ad end of exams 28.11.2014 #important");
+		taskLogic.executeCommand("up end of exams - #hiphiphooray");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		newTask = createDateTask("end of exams", "28.11.2014", null); 
+		labels.add("hiphiphooray"); 	
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'end of exams' updated");
+		
+		//checking whether task is updated correctly in memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(0).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(0).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(0).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(0).getLabels().get(0));
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("28.Nov.2014\n" + "end of exams #hiphiphooray\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	} 
+	
+	
+	@Test
+	public void testSort() {
+		init();
+		
+		taskLogic.executeCommand("ad bio lab from 12pm to 2pm #cells #tutorial #today");
+		taskLogic.executeCommand("ad CS2010 tut from 4pm to 5pm #tutorial");
+		taskLogic.executeCommand("ad CS2106 tut from 5pm to 6pm #tutorial #today");
+		taskLogic.executeCommand("ad CS2103T tut from 9am to 10am #important #tutorial #today");
+		taskLogic.executeCommand("ad collect welfare pack from 12pm to 2pm #today");
+		
+		FeedbackObject feedback = taskLogic.executeCommand("so tutorial");
+		FeedbackObject feedbackTwo = taskLogic.executeCommand("so today tutorial");
+				
+		//checking for feedback to user - sorting by labels
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "tutorial sorted");
+		assertEquals(feedbackTwo.getValidity(), true);
+		assertEquals(feedbackTwo.getFeedback(), "today tutorial sorted");
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("#today#tutorial\n" + "bio lab from 12pm to 2pm #cells\n" + "CS2106 tut from 5pm to 6pm\n" + "CS2103T tut from 9am to 10am #important\n");
+		toCheck.add("#today\n" + "collect welfare pack from 12pm to 2pm\n");
+		toCheck.add("#tutorial\n" + "CS2010 tut from 4pm to 5pm\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+		taskLogic.executeCommand("so date");
+	}
+	
+	@Test
+	public void testUndoSort() {
+		init();
+		
+		taskLogic.executeCommand("ad bio lab from 12pm to 2pm #cells #tutorial #today");
+		taskLogic.executeCommand("ad CS2010 tut from 4pm to 5pm #tutorial");
+		taskLogic.executeCommand("ad CS2106 tut from 5pm to 6pm #tutorial #today");
+		taskLogic.executeCommand("ad CS2103T tut from 9am to 10am #important #tutorial #today");
+		taskLogic.executeCommand("ad collect welfare pack from 12pm to 2pm #today");
+		taskLogic.executeCommand("so tutorial");
+		FeedbackObject feedback = taskLogic.executeCommand("un");
+				
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "date sorted");
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("N.A.\n" + "bio lab from 12pm to 2pm #cells #tutorial #today\n" + "CS2010 tut from 4pm to 5pm #tutorial\n" + "CS2106 tut from 5pm to 6pm #tutorial #today\n" + "CS2103T tut from 9am to 10am #important #tutorial #today\n" + "collect welfare pack from 12pm to 2pm #today\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+		taskLogic.executeCommand("so date");
+	}
+	
+	@Test
+	public void testRedoSort() {
+		init();
+		
+		taskLogic.executeCommand("ad bio lab from 12pm to 2pm #cells #tutorial #today");
+		taskLogic.executeCommand("ad CS2010 tut from 4pm to 5pm #tutorial");
+		taskLogic.executeCommand("ad CS2106 tut from 5pm to 6pm #tutorial #today");
+		taskLogic.executeCommand("ad CS2103T tut from 9am to 10am #important #tutorial #today");
+		taskLogic.executeCommand("ad collect welfare pack from 12pm to 2pm #today");
+		taskLogic.executeCommand("so today tutorial");
+		taskLogic.executeCommand("un");
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+				
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "today tutorial sorted");
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("#today#tutorial\n" + "bio lab from 12pm to 2pm #cells\n" + "CS2106 tut from 5pm to 6pm\n" + "CS2103T tut from 9am to 10am #important\n");
+		toCheck.add("#today\n" + "collect welfare pack from 12pm to 2pm\n");
+		toCheck.add("#tutorial\n" + "CS2010 tut from 4pm to 5pm\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+		taskLogic.executeCommand("so date");
+	}
+	
+	
+	@Test
+	public void testSearch() {
+		mLocalMem.clearMemory();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad CS2103T exam 26.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2106 exam 28.11.2014 #important #exams");
+		taskLogic.executeCommand("ad christmas celebration 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas presents 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas groceries 25.12.2014 #xmas");
+		
+		FeedbackObject feedback = taskLogic.executeCommand("se exam");
+		FeedbackObject feedbackTwo = taskLogic.executeCommand("se christmas");
+				
+		//checking for feedback to user - searching for labels 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "1. bio exam from 22.11.2014 13:00 to 22.11.2014 15:00 #exam" + "\n" + "2. CS2010 exam from 24.11.2014 17:00 to 24.11.2014 19:00 #exam" + "\n" + "3. CS2103T exam from 26.11.2014 13:00 to 26.11.2014 15:00 #exam" + "\n" + "4. CS2106 exam on 28.11.2014 #important #exams" + "\n" + "task(s) with keyword 'exam' searched");
+	
+		//checking for feedback to user - searching for words in task descriptions 
+		assertEquals(feedbackTwo.getValidity(), true);
+		assertEquals(feedbackTwo.getFeedback(), "1. christmas celebration on 25.12.2014 #xmas" + "\n" + "2. buy christmas presents on 25.12.2014 #xmas" + "\n" + "3. buy christmas groceries on 25.12.2014 #xmas" + "\n" + "task(s) with keyword 'christmas' searched");
+		
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		toCheck.add("26.Nov.2014\n" + "CS2103T exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("28.Nov.2014\n" + "CS2106 exam #important #exams\n");
+		toCheck.add("25.Dec.2014\n" + "christmas celebration #xmas\n" + "buy christmas presents #xmas\n" + "buy christmas groceries #xmas\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testSearchDelete() {
+		mLocalMem.clearMemory();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad CS2103T exam 26.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2106 exam 28.11.2014 #important #exams");
+		taskLogic.executeCommand("ad christmas celebration 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas presents 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas groceries 25.12.2014 #xmas");
+		taskLogic.executeCommand("se exam");
+		FeedbackObject feedback = taskLogic.executeCommand("de 3");
+		
+		//checking for feedback to user - searching for words in task descriptions 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'CS2103T exam' deleted");
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		toCheck.add("28.Nov.2014\n" + "CS2106 exam #important #exams\n");
+		toCheck.add("25.Dec.2014\n" + "christmas celebration #xmas\n" + "buy christmas presents #xmas\n" + "buy christmas groceries #xmas\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testSearchUpdate() {
+		mLocalMem.clearMemory();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad CS2103T exam 26.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2106 exam 28.11.2014 #important #exams");
+		taskLogic.executeCommand("ad christmas celebration 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas presents 25.12.2014 #xmas");
+		taskLogic.executeCommand("ad buy christmas groceries 25.12.2014 #xmas");
+		taskLogic.executeCommand("se christmas");
+		FeedbackObject feedback = taskLogic.executeCommand("up 1 - christmas celebration at aunt's house");
+		
+		//checking for feedback to user - searching for words in task descriptions 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'christmas celebration at aunt's house' updated");
+		//checking for output to user 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		toCheck.add("26.Nov.2014\n" + "CS2103T exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("28.Nov.2014\n" + "CS2106 exam #important #exams\n");
+		toCheck.add("25.Dec.2014\n" + "buy christmas presents #xmas\n" + "buy christmas groceries #xmas\n" + "christmas celebration at aunt's house #xmas\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	
+	@Test
+	public void testDone() {
+		init();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad buy stationeries 10.11.2014 #forexam");
+		
+		FeedbackObject feedback = taskLogic.executeCommand("do buy stationeries");
+		newTask = createDateTask("buy stationeries", "10.11.2014", null); 
+		labels.add("forexam"); 
+		
+		//checking for feedback to user  
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'buy stationeries' mark as done");
+		
+		//checking if task is still in local memory 
+		assertEquals(newTask.getDescription(), mLocalMem.getLocalMem().get(2).getDescription());
+		assertEquals(newTask.getFromDateTime(), mLocalMem.getLocalMem().get(2).getFromDateTime());
+		assertEquals(newTask.getToDateTime(), mLocalMem.getLocalMem().get(2).getToDateTime());
+		assertEquals(newTask.getLabels().get(0), mLocalMem.getLocalMem().get(2).getLabels().get(0));
+		
+		//checking if task is hidden from user
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	
+	@Test
+	public void testUndoDone() {
+		init();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad buy stationeries 10.11.2014 #forexam");
+		taskLogic.executeCommand("do buy stationeries");
+		
+		FeedbackObject feedback = taskLogic.executeCommand("un");			
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "buy stationeries undone");		
+		
+		//checking if task is shown to user
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("10.Nov.2014\n" + "buy stationeries #forexam\n");
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	
+	@Test
+	public void testRedoDone() {
+		init();
+		
+		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
+		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
+		taskLogic.executeCommand("ad buy stationeries 10.11.2014 #forexam");
+		taskLogic.executeCommand("do buy stationeries");
+		taskLogic.executeCommand("un");
+		
+		FeedbackObject feedback = taskLogic.executeCommand("re");
+		
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "'buy stationeries' mark as done");
+		
+		//checking if task is hidden from user
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("22.Nov.2014\n" + "bio exam from 13:00 to 15:00 #exam\n");
+		toCheck.add("24.Nov.2014\n" + "CS2010 exam from 17:00 to 19:00 #exam\n");
+		assertEquals(toCheck, taskLogic.obtainPrintableOutput());
+	}
+	
+	@Test
+	public void testHideLabels() {
+		init();
+		
+		taskLogic.executeCommand("ad bio lab from 12pm to 2pm #cells #tutorial #today");
+		taskLogic.executeCommand("ad CS2010 tut from 4pm to 5pm #tutorial");
+		taskLogic.executeCommand("ad CS2106 tut from 5pm to 6pm #tutorial #today");
+		taskLogic.executeCommand("ad CS2103T tut from 9am to 10am #important #tutorial #today");
+		taskLogic.executeCommand("ad collect welfare pack from 12pm to 2pm #today");
+		taskLogic.executeCommand("so tutorial");
+		FeedbackObject feedback = taskLogic.executeCommand("hi tutorial");
+		
+		//checking for feedback to users 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "Labels hidden");
+		
+		//checking for boolean value 
+		assertEquals(true, taskLogic.labelsHidden);
+		
+		//checking for correct labels to return to GUI 
+		ArrayList<String> toCheck = new ArrayList<String>();
+		toCheck.add("#tutorial");
+		assertEquals(toCheck, taskLogic.labelsToHide());
+		taskLogic.executeCommand("so date");
+	}
+	
+	@Test
+	public void testShowLabels() {
+		init();
+		
+		taskLogic.executeCommand("ad bio lab from 12pm to 2pm #cells #tutorial #today");
+		taskLogic.executeCommand("ad CS2010 tut from 4pm to 5pm #tutorial");
+		taskLogic.executeCommand("ad CS2106 tut from 5pm to 6pm #tutorial #today");
+		taskLogic.executeCommand("ad CS2103T tut from 9am to 10am #important #tutorial #today");
+		taskLogic.executeCommand("ad collect welfare pack from 12pm to 2pm #today");
+		taskLogic.executeCommand("so today tutorial");
+		taskLogic.executeCommand("hi tutorial");
+		FeedbackObject feedback = taskLogic.executeCommand("sh tutorial");
+		
+		//checking for boolean value
+		assertEquals(false, taskLogic.labelsHidden);
+				
+		//checking for feedback to user 
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "All labels shown");
+		taskLogic.executeCommand("so date");
+	}
+}
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\IntegrationTesting.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+	 */
+
+	// for testing purposes 
+	protected static void clearLocalMem() {
+		mLocalMem = new ArrayList<Task>(); 
+	}
+
+	protected void loadLocalMemory() {
+		mLocalMem = mStore.readExtMem(MyTasksController.DEFAULT_FILENAME);
+	}
+
+	public void saveLocalMemory() {
+		mStore.writeExtMem(mLocalMem);
+	}
+
+	public ArrayList<Task> getLocalMem() {
+		return mLocalMem;
+	}
+
+	public void add(Task userRequest) {
+		mLocalMem.add(userRequest);
+	}
+
+	public void remove(Task userRequest) {
+		for (int i = 0; i < mLocalMem.size(); i++) {
+			if (userRequest.getDescription().equals(
+							mLocalMem.get(i).getDescription())) {
+				mLocalMem.remove(i);
+			}
+		}
+	}
+	
+	public void remove(int index) {
+		mLocalMem.remove(index);
+	}
+
+	protected void update(String mToUpdateTaskDesc, Task userUpdate) {
+		for (int i = 0; i < mLocalMem.size(); i++) {
+			if (mToUpdateTaskDesc.equals(mLocalMem.get(i).getDescription())) {
+				if (userUpdate.getDescription() != null) {
+					mLocalMem.get(i)
+									.setDescription(userUpdate.getDescription());
+				}
+				if (userUpdate.getFromDateTime() != null) {
+					mLocalMem.get(i).setFromDateTime(
+									userUpdate.getFromDateTime());
+				}
+				if (userUpdate.getToDateTime() != null) {
+					mLocalMem.get(i).setToDateTime(userUpdate.getToDateTime());
+				}
+				if (userUpdate.getLabels() != null) {
+					if (!userUpdate.getLabels().isEmpty()) {
+						mLocalMem.get(i).setLabels(userUpdate.getLabels());
+					}
+				}
+			}
+		}
+
+	}
+
+	protected void print() {
+		for (int i = 0; i < mLocalMem.size(); i++) {
+			System.out.println("i: " + i);
+			if (mLocalMem.get(i).getDescription() != null) {
+				System.out.println(mLocalMem.get(i).getDescription());
+			}
+			if (mLocalMem.get(i).getFromDateTime() != null) {
+				System.out.println(mLocalMem.get(i).getFromDateTime()
+								.toString());
+			}
+			if (mLocalMem.get(i).getToDateTime() != null) {
+				System.out.println(mLocalMem.get(i).getToDateTime().toString());
+			}
+			if (mLocalMem.get(i).getLabels() != null) {
+				if (!mLocalMem.get(i).getLabels().isEmpty()) {
+					for (int k = 0; k < mLocalMem.get(i).getLabels().size(); k++) {
+						System.out.println("label: "
+										+ mLocalMem.get(i).getLabels().get(k));
+					}
+				}
+			}
+		}
+	}
+
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LocalMemory.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+	 */
+
+public class LogicTest {
+
+	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
+
+	@Test
+	public void testAddCommand() {
+		taskLogic.getMemory().clearMemory();
+		assertEquals("meeting added", taskLogic.executeCommand("ad meeting 22.09.2014 #important").getFeedback());
+	}
+
+
+	@Test
+	public void testUndoRedoAdd() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting 22.09.2014 #important");
+		assertEquals("meeting deleted", taskLogic.executeCommand("un").getFeedback());
+		// The following essentially tests undo function for delete
+		assertEquals("meeting added", taskLogic.executeCommand("re").getFeedback());
+	}
+	
+	@Test
+	public void testUpdateCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		assertEquals("'meeting' updated",
+				taskLogic.executeCommand("up meeting - CS2103T #important").getFeedback());
+	}
+
+	@Test
+	public void testUndoRedoUpdate() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		taskLogic.executeCommand("up play - do homework");
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("'play' updated", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	@Test
+	public void testDeleteCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		assertEquals("'play' deleted", taskLogic.executeCommand("de play").getFeedback());
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
+	}
+	
+	@Test
+	public void testUndoRedoDelete() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		taskLogic.executeCommand("de play");
+		assertEquals("play added", taskLogic.executeCommand("un").getFeedback());
+		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
+		assertEquals("'play' deleted", taskLogic.executeCommand("re").getFeedback());
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
+	}
+
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\LogicTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+	 */
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> obtainAllLabels() {
+		ArrayList<String> labelsResult = new ArrayList<String>();
+		for (int i = 0; i<mLocalMem.getLocalMem().size(); i++) {
+			if(mLocalMem.getLocalMem().get(i).getLabels() != null) {
+				if(!mLocalMem.getLocalMem().get(i).getLabels().isEmpty()) {
+					for(int k = 0; k < mLocalMem.getLocalMem().get(i).getLabels().size(); k++) {
+						String curLabels = mLocalMem.getLocalMem().get(i).getLabels().get(k);
+						labelsResult.add(curLabels);
+					}
+				}
+			}			
+		}
+		return labelsResult;
+	}
+	
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\logic\controller\MyTasksLogicController.java
+
+
+
+
+
+	/**
+	 * origin: C:\users\Lee\workspace\CS2103TProject\src\mytasks\ui\MyTasksUI.java
+	 */
+
+/**
+ * MyTasksUI accepts input to the user and prints output to the user through a
+ * GUI supported by the Swing framework
+ */
+@SuppressWarnings("serial")
+public class MyTasksUI extends JFrame implements ActionListener,
+		DocumentListener {
+	protected JTextField textField;
+	protected JTextArea textArea;
+	protected JTextArea textAreaFeedback;
+	private JLabel textAreaLabel, feedbackLabel, textfieldLabel;
+	private JPanel textAreaPanel;
+	private Border paneEdge;
+	private JScrollPane scrollPane, scrollPaneFeedback;
+	private Border titled;
+	private boolean lookingFor = false;
+	private int w = 0;
+	private ILogic mLogic;
+	private static MyTasksUI INSTANCE = null;
+
+	private Mode mode = Mode.INSERT;
+	private List<String> words, commands;
+	private HelpUI helpUI;
+
+	private static enum Mode {
+		INSERT, COMPLETION
+	};
+
+	public static MyTasksUI getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new MyTasksUI();
+		}
+		return INSTANCE;
+	}
+
+	protected Object readResolve() {
+		return INSTANCE;
+	}
+
+	private MyTasksUI() {
+		super("My Tasks");
+	}
+
+	/**
+	 * run starts the process of accepting and executing input
+	 */
+	public void run() {
+		// Schedule a job for the event dispatch thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+
+	/**
+	 * Create the GUI and show it. For thread safety, this method should be
+	 * invoked from the event dispatch thread.
+	 */
+	private static void createAndShowGUI() {
+		// Create and set up the window.
+		MyTasksUI frame = new MyTasksUI();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// set up the content pane
+		frame.addComponentsToPane();
+
+		// Display the window.
+		frame.pack();
+		frame.setVisible(true);
+
+		// pressing the escape key will close the window
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+	}
+
+	private void addComponentsToPane() {
+		GridBagLayout layout = new GridBagLayout();
+		getContentPane().setLayout(layout);
+
+		mLogic = MyTasksLogicController.getInstance(false);
+		helpUI = HelpUI.getInstance();
+
+		// for tasks label and box
+		initTextAreaLabelPanel();
+		clearTextAreaPanel();
+		printToUserOnStartUp();
+		initTextAreaScrollpane();
+
+		initFeedbackBox();
+		initTextfield();
+		initAutocomplete();
+		autocompleteStrings();
+		addComponents();
+	}
+
+	private void initTextAreaLabelPanel() {
+		textAreaLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Tasks</font>");
+		textAreaLabel.setOpaque(true);
+		textAreaLabel.setFocusable(false);
+
+		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
+		textAreaPanel = new JPanel();
+		textAreaPanel.setBorder(paneEdge);
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
+		textAreaPanel.setFocusable(false);
+	}
+
+	private void clearTextAreaPanel() {
+		textAreaPanel.removeAll();
+		textAreaPanel.revalidate();
+		textAreaPanel.repaint();
+	}
+
+	private void printToUserOnStartUp() {
+		if (mLogic.obtainPrintableOutput().size() == 0) {
+			newTextArea();
+			Border colourLine = BorderFactory.createLineBorder(new Color(
+					(int) (Math.random() * 255), (int) (Math.random() * 255),
+					(int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine,
+					"Welcome! Add your tasks below (:");
+			setTextareaContentBorder("", titled);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				newTextArea();
+
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
+				Border colourLine = BorderFactory.createLineBorder(new Color(
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255)), 3);
+				titled = BorderFactory
+						.createTitledBorder(colourLine, firstWord);
+				String content = mLogic.obtainPrintableOutput().get(i)
+						.replace(firstWord, "").trim();
+				setTextareaContentBorder(content, titled);
+			}
+		}
+	}
+
+	private void newTextArea() {
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFocusable(false);
+	}
+
+	private void setTextareaContentBorder(String content, Border titled2) {
+		textArea.setText(content);
+		textArea.setBorder(titled);
+		textAreaPanel.add(textArea);
+		textArea.setCaretPosition(0);
+	}
+
+	private void initTextAreaScrollpane() {
+		scrollPane = new JScrollPane(textAreaPanel);
+		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPane.setPreferredSize(new Dimension(500, 400));
+		scrollPane.setFocusable(true);
+	}
+
+	private JScrollPane initFeedbackBox() {
+		feedbackLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Feedback Box</font>");
+		feedbackLabel.setFocusable(false);
+		textAreaFeedback = new JTextArea(10, 40);
+		textAreaFeedback.setEditable(false);
+		textAreaFeedback.setFocusable(false);
+		scrollPaneFeedback = new JScrollPane(textAreaFeedback);
+		scrollPaneFeedback.setBorder(BorderFactory
+				.createLineBorder(Color.black));
+		scrollPaneFeedback.setFocusable(true);
+		return scrollPaneFeedback;
+	}
+
+	private void initTextfield() {
+		textfieldLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Input Tasks</font>");
+		textfieldLabel.setFocusable(false);
+		textField = new JTextField(20);
+		textField.addActionListener(this);
+		textField.getDocument().addDocumentListener(this);
+		textField.setFocusable(true);
+	}
+
+	private void initAutocomplete() {
+		InputMap im = textField.getInputMap();
+		ActionMap am = textField.getActionMap();
+		im.put(KeyStroke.getKeyStroke("RIGHT"), "commit");
+		am.put("commit", new CommitAction());
+	}
+
+	private void autocompleteStrings() {
+		commands = new ArrayList<String>();
+		commands.add("ad");
+		commands.add("se");
+		commands.add("de");
+		commands.add("do");
+		commands.add("un");
+		commands.add("re");
+		commands.add("up");
+		commands.add("so");
+		commands.add("hi");
+		commands.add("sh");
+		commands.add("?");
+		commands.add("he");
+		commands.add("help");
+
+		words = new ArrayList<String>(commands);
+		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
+			words.add(mLogic.obtainAllTaskDescription().get(i));
+		}
+		for (int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
+			words.add(mLogic.obtainAllLabels().get(i));
+		}
+		Collections.sort(words);
+	}
+
+	private void addComponents() {
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth = GridBagConstraints.REMAINDER;
+
+		c.fill = GridBagConstraints.VERTICAL;
+		c.gridx = 0;
+		initGridbagWeight(c);
+		add(textAreaLabel, c);
+
+		c.fill = GridBagConstraints.BOTH;
+		initGridbagWeight(c);
+		add(scrollPane, c);
+
+		c.fill = GridBagConstraints.VERTICAL;
+		initGridbagWeight(c);
+		add(feedbackLabel, c);
+
+		c.fill = GridBagConstraints.BOTH;
+		initGridbagWeight(c);
+		add(scrollPaneFeedback, c);
+
+		c.fill = GridBagConstraints.VERTICAL;
+		initGridbagWeight(c);
+		add(textfieldLabel, c);
+
+		c.fill = GridBagConstraints.BOTH;
+		initGridbagWeight(c);
+		add(textField, c);
+	}
+
+	private void initGridbagWeight(GridBagConstraints c) {
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+	}
+
+	public void actionPerformed(ActionEvent evt) {
+		lookingFor = false;
+		w = 0;
+		boolean isHide = false;
+		List<String> labelsToHide = new ArrayList<String>();
+
+		clearTextAreaPanel();
+
+		String text = textField.getText();
+		FeedbackObject feedback = mLogic.executeCommand(text);
+		returnFeedbackToUser(feedback);		
+		autocompleteStrings();
+
+		if (mLogic.checkIfToHelpUI()) {
+			helpUI.run();
+			mLogic.toggleHelpUI(false);
+		}
+		printToUser(isHide, labelsToHide);
+	}
+
+	private void returnFeedbackToUser(FeedbackObject feedback) {
+		if (feedback != null) {
+			if (feedback.getValidity() == false) {
+				textAreaFeedback.setForeground(new Color(255, 0, 0));
+				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
+			} else {
+				textAreaFeedback.setForeground(new Color(0, 150, 0));
+				textAreaFeedback.setText(feedback.getFeedback());
+				textAreaFeedback.setCaretPosition(0);
+			}
+		}
+	}
+
+	private void printToUser(boolean isHide, List<String> labelsToHide) {
+		boolean isRed;
+		Border colourLine;
+
+		if (mLogic.obtainPrintableOutput().size() == 0) {
+			newTextArea();
+			titled = BorderFactory
+					.createTitledBorder("Welcome! Add your tasks below (:");
+			setTextareaContentBorder("", titled);
+		} else {
+			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
+				newTextArea();
+
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
+				isRed = checkImportant(firstWord);
+				isHide = checkLabelsToHide(isHide, labelsToHide, firstWord);
+
+				if (isHide) {
+					colourLine = detBorderColour(isRed);
+					titled = BorderFactory.createTitledBorder(colourLine,
+							firstWord);
+					setTextareaContentBorder("", titled);
+				} else {
+					colourLine = detBorderColour(isRed);
+					titled = BorderFactory.createTitledBorder(colourLine,
+							firstWord);
+					String content = mLogic.obtainPrintableOutput().get(i)
+							.replace(firstWord, "").trim();
+					setTextareaContentBorder(content, titled);
+				}
+			}
+		}
+		textField.selectAll();
+	}
+
+	private boolean checkImportant(String firstWord) {
+		boolean isRed;
+		if (firstWord.equals("#important")) {
+			isRed = true;
+		} else {
+			isRed = false;
+		}
+		return isRed;
+	}
+
+	private boolean checkLabelsToHide(boolean isHide,
+			List<String> labelsToHide, String firstWord) {
+		isHide = false;
+		if (mLogic.checkIfToHide()) {
+			labelsToHide = mLogic.labelsToHide();
+		}
+		if (labelsToHide.size() > 0) {
+			for (int k = 0; k < labelsToHide.size(); k++) {
+				if (labelsToHide.get(k).equals(firstWord)) {
+					isHide = true;
+				}
+			}
+		}
+		return isHide;
+	}
+
+	private Border detBorderColour(boolean isRed) {
+		Border colourLine;
+		if (isRed) {
+			colourLine = BorderFactory
+					.createLineBorder(new Color(255, 0, 0), 3);
+		} else {
+			colourLine = BorderFactory.createLineBorder(
+					new Color((int) (Math.random() * 200),
+							(int) (Math.random() * 255),
+							(int) (Math.random() * 255)), 3);
+		}
+		return colourLine;
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent ev) {
+		if (ev.getLength() != 1)
+			return;
+
+		int pos = ev.getOffset(); // last letter of input
+		String content = null;
+		try {
+			content = textField.getText(0, pos + 1);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+
+		// Find where the word starts
+		if (lookingFor == false) {
+			for (w = pos; w >= 0; w--) {
+				if (!Character.isLetter(content.charAt(w))) {
+					lookingFor = true;
+					break;
+				}
+			}
+		}
+
+		if (pos - w < 1)
+			return;
+
+		String prefix = content.substring(w + 1);
+		int n = Collections.binarySearch(words, prefix);
+		if (n < 0 && -n <= words.size()) {
+			String match = words.get(-n - 1);
+			if (match.startsWith(prefix)) {
+				// A completion is found
+				String completion = match.substring(pos - w);
+				// Submitting a new function to do the completion
+				SwingUtilities.invokeLater(new CompletionTask(completion,
+						pos + 1));
+			}
+		} else {
+			// Nothing found
+			mode = Mode.INSERT;
+		}
+	}
+
+	public class CommitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent ev) {
+			if (mode == Mode.COMPLETION) {
+				int pos = textField.getSelectionEnd();
+				StringBuffer sb = new StringBuffer(textField.getText());
+				sb.insert(pos, " ");
+				textField.setText(sb.toString());
+				textField.setCaretPosition(pos + 1);
+				mode = Mode.INSERT;
+			} else {
+				textField.replaceSelection("");
+			}
+		}
+	}
+
+	private class CompletionTask implements Runnable {
+		private String completion;
+		private int position;
+
+		CompletionTask(String completion, int position) {
+			this.completion = completion;
+			this.position = position;
+		}
+
+		public void run() {
+			StringBuffer sb = new StringBuffer(textField.getText());
+			sb.insert(position, completion);
+			textField.setText(sb.toString());
+			textField.setCaretPosition(position + completion.length());
+			textField.moveCaretPosition(position);
+			mode = Mode.COMPLETION;
+		}
+	}
+	
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+	}
+}
+
+	// End of segment: C:\users\Lee\workspace\CS2103TProject\src\mytasks\ui\MyTasksUI.java
+
+
+
+
+
