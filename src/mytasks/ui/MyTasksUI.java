@@ -312,17 +312,19 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);
 		returnFeedbackToUser(feedback);
-		if (feedback.getValidity() == true) {
-			inputStrings.add(text);
-		}
-		
-		autocompleteStrings();
+		if (feedback != null) {
+			if (feedback.getValidity() == true) {
+				inputStrings.add(text);
+			}
+			
+			autocompleteStrings();
 
-		if (mLogic.checkIfToHelpUI()) {
-			helpUI.run();
-			mLogic.toggleHelpUI(false);
+			if (mLogic.checkIfToHelpUI()) {
+				helpUI.run();
+				mLogic.toggleHelpUI(false);
+			}
+			printToUser(isHide, labelsToHide);
 		}
-		printToUser(isHide, labelsToHide);
 	}
 
 	private void returnFeedbackToUser(FeedbackObject feedback) {
