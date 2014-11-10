@@ -508,14 +508,14 @@ public class MyTasksUI extends JFrame implements ActionListener,
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
 			} else if (numString == inputStrings.size() - 1) {
-				numString--;
+				numString -= 1;
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
-				numString--;
+				numString -= 1;
 			} else if ((numString < inputStrings.size() - 1) && numString > 0) {
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
-				numString--; // base case is 0
+				numString -= 1;
 			}
 		}
 		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -523,7 +523,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
 			} else if (numString < inputStrings.size()) {
-				numString++;
+				numString += 1;
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
 			}
