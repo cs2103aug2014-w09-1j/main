@@ -15,8 +15,8 @@ public class UpdateCommand extends Command {
 
 	// private variables
 	private LocalMemory mLocalMem;
-	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_SUCCESS = "'%1$s' updated";
+	private static String MESSAGE_UPDATE_FAIL = "Task '%1$s' does not exist. Unable to update. Auto search for similar tasks.";
 	private static String MESSAGE_UPDATE_DUPLICATE = "There are multiple tasks '%1$s'. Auto search to update the specific one.";
 
 	public UpdateCommand(String comdDes, Date fromDateTime, Date toDateTime,
