@@ -24,11 +24,9 @@ public class IntegrationTesting {
 	private LocalMemory mLocalMem = LocalMemory.getInstance(); 
 	private ArrayList<String> labels = new ArrayList<String>();
 	private Task newTask;
-	private boolean isTrue = false; 
 	
 	private void init() {
 		mLocalMem.clearMemory();
-		isTrue = true; 
 		labels = new ArrayList<String>();
 	}
 	
@@ -62,7 +60,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "meeting added");
 		
 		//checking whether task is added correctly into memory 
@@ -80,12 +78,11 @@ public class IntegrationTesting {
 	@Test
 	public void testAddFail() {		
 		init();
-		isTrue = false;
 		
 		FeedbackObject feedback = taskLogic.executeCommand("ad #important 24.11.2014");	
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), false);
 		assertEquals(feedback.getFeedback(), "Invalid input");
 	}
 	
@@ -102,7 +99,7 @@ public class IntegrationTesting {
 		labels.add("finalrush");
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "complete assignment deleted");
 		
 		//checking whether task is deleted from local memory 
@@ -135,7 +132,7 @@ public class IntegrationTesting {
 		newTask = new Task("complete assignment", null, null, labels);		
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "complete assignment added");
 		
 		//checking whether redone task is added into local memory 
@@ -166,7 +163,7 @@ public class IntegrationTesting {
 		labels.add("wecandoit"); 
 
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "meeting two added");
 		
 		//checking whether the correct task is deleted from memory 
@@ -195,7 +192,7 @@ public class IntegrationTesting {
 		labels.add("finals");
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "complete homework added");
 		
 		//checking whether deleted task is added properly into local memory
@@ -227,7 +224,7 @@ public class IntegrationTesting {
 		newTask = new Task("do homework", null, null, labels);
 
 		//checking for feedback to user
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'complete homework' deleted");
 		
 		//checking whether task is deleted correctly 
@@ -254,7 +251,7 @@ public class IntegrationTesting {
 		labels.add("letsdothis"); 
 
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'meeting' updated");
 		
 		//checking whether task is updated correctly into memory 
@@ -281,7 +278,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "meeting for CS2103T reverted");
 		
 		//checking whether task is reverted correctly in local memory 
@@ -309,7 +306,7 @@ public class IntegrationTesting {
 		labels.add("letsdothis"); 
 
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'meeting' updated");
 		
 		//checking whether task is updated correctly in local memory 
@@ -336,7 +333,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'meeting for 2103' updated");
 		
 		//checking whether task is updated correctly in local memory 
@@ -364,7 +361,7 @@ public class IntegrationTesting {
 		labels.add("important");
 
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "finish assignment reverted");
 		
 		//checking whether task is undone properly in memory 
@@ -394,7 +391,7 @@ public class IntegrationTesting {
 		labels.add("important");
 
 		//checking for feedback to user
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'complete assignment homework' updated");
 		
 		//checking whether task is updated correctly in memory 
@@ -422,7 +419,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'last meeting for CS2103T' updated");
 		
 		//checking whether task is updated correctly in memory 
@@ -449,7 +446,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "last meeting for CS2103T reverted");
 		
 		//checking whether task is reverted correctly in memory 
@@ -477,7 +474,7 @@ public class IntegrationTesting {
 		labels.add("important"); 
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'last meeting for CS2103T' updated");
 		
 		//checking whether task is updated correctly in memory 
@@ -503,7 +500,7 @@ public class IntegrationTesting {
 		labels.add("hiphiphooray"); 	
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'end of exams' updated");
 		
 		//checking whether task is updated correctly in memory 
@@ -530,7 +527,7 @@ public class IntegrationTesting {
 		labels.add("important"); 	
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "end of exams reverted");
 		
 		//checking whether task is reverted correctly in memory 
@@ -558,7 +555,7 @@ public class IntegrationTesting {
 		labels.add("hiphiphooray"); 	
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'end of exams' updated");
 		
 		//checking whether task is updated correctly in memory 
@@ -588,9 +585,9 @@ public class IntegrationTesting {
 		FeedbackObject feedbackTwo = taskLogic.executeCommand("so today tutorial");
 				
 		//checking for feedback to user - sorting by labels
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "tutorial sorted");
-		assertEquals(feedbackTwo.getValidity(), isTrue);
+		assertEquals(feedbackTwo.getValidity(), true);
 		assertEquals(feedbackTwo.getFeedback(), "today tutorial sorted");
 		
 		//checking for output to user 
@@ -615,8 +612,8 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("un");
 				
 		//checking for feedback to user 
-//		assertEquals(feedback.getValidity(), isTrue);
-//		assertEquals(feedback.getFeedback(), "tutorial sorted");
+		assertEquals(feedback.getValidity(), true);
+		assertEquals(feedback.getFeedback(), "date sorted");
 		
 		//checking for output to user 
 		ArrayList<String> toCheck = new ArrayList<String>();
@@ -639,7 +636,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("re");
 				
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "today tutorial sorted");
 		
 		//checking for output to user 
@@ -655,7 +652,6 @@ public class IntegrationTesting {
 	@Test
 	public void testSearch() {
 		mLocalMem.clearMemory();
-		isTrue = true; 
 		
 		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
 		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
@@ -669,11 +665,11 @@ public class IntegrationTesting {
 		FeedbackObject feedbackTwo = taskLogic.executeCommand("se christmas");
 				
 		//checking for feedback to user - searching for labels 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "1. bio exam from 22.11.2014 13:00 to 22.11.2014 15:00 #exam" + "\n" + "2. CS2010 exam from 24.11.2014 17:00 to 24.11.2014 19:00 #exam" + "\n" + "3. CS2103T exam from 26.11.2014 13:00 to 26.11.2014 15:00 #exam" + "\n" + "4. CS2106 exam on 28.11.2014 #important #exams" + "\n" + "task(s) with keyword 'exam' searched");
 	
 		//checking for feedback to user - searching for words in task descriptions 
-		assertEquals(feedbackTwo.getValidity(), isTrue);
+		assertEquals(feedbackTwo.getValidity(), true);
 		assertEquals(feedbackTwo.getFeedback(), "1. christmas celebration on 25.12.2014 #xmas" + "\n" + "2. buy christmas presents on 25.12.2014 #xmas" + "\n" + "3. buy christmas groceries on 25.12.2014 #xmas" + "\n" + "task(s) with keyword 'christmas' searched");
 		
 		//checking for output to user 
@@ -689,7 +685,6 @@ public class IntegrationTesting {
 	@Test
 	public void testSearchDelete() {
 		mLocalMem.clearMemory();
-		isTrue = true; 
 		
 		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
 		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
@@ -702,7 +697,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("de 3");
 		
 		//checking for feedback to user - searching for words in task descriptions 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'CS2103T exam' deleted");
 		//checking for output to user 
 		ArrayList<String> toCheck = new ArrayList<String>();
@@ -716,7 +711,6 @@ public class IntegrationTesting {
 	@Test
 	public void testSearchUpdate() {
 		mLocalMem.clearMemory();
-		isTrue = true; 
 		
 		taskLogic.executeCommand("ad bio exam 22.11.2014 from 1pm to 3pm #exam");
 		taskLogic.executeCommand("ad CS2010 exam 24.11.2014 from 5pm to 7pm #exam");
@@ -729,7 +723,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("up 1 - christmas celebration at aunt's house");
 		
 		//checking for feedback to user - searching for words in task descriptions 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'christmas celebration at aunt's house' updated");
 		//checking for output to user 
 		ArrayList<String> toCheck = new ArrayList<String>();
@@ -755,7 +749,7 @@ public class IntegrationTesting {
 		labels.add("forexam"); 
 		
 		//checking for feedback to user  
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'buy stationeries' mark as done");
 		
 		//checking if task is still in local memory 
@@ -784,7 +778,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("un");			
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "buy stationeries undone");		
 		
 		//checking if task is shown to user
@@ -809,7 +803,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("re");
 		
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "'buy stationeries' mark as done");
 		
 		//checking if task is hidden from user
@@ -832,7 +826,7 @@ public class IntegrationTesting {
 		FeedbackObject feedback = taskLogic.executeCommand("hi tutorial");
 		
 		//checking for feedback to users 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "Labels hidden");
 		
 		//checking for boolean value from parser
@@ -862,7 +856,7 @@ public class IntegrationTesting {
 		assertEquals(false, taskLogic.labelsHidden);
 				
 		//checking for feedback to user 
-		assertEquals(feedback.getValidity(), isTrue);
+		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "All labels shown");
 		taskLogic.executeCommand("so date");
 	}

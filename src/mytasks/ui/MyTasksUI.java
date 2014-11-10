@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ import mytasks.logic.controller.MyTasksLogicController;
 
 @SuppressWarnings("serial")
 public class MyTasksUI extends JFrame implements ActionListener,
-		DocumentListener {
+		DocumentListener, KeyListener {
 	protected JTextField textField;
 	protected JTextArea textArea;
 	protected JTextArea textAreaFeedback;	
@@ -51,8 +52,8 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private static MyTasksUI INSTANCE = null;
 
 	private Mode mode = Mode.INSERT;
-	private List<String> words;
-	private ArrayList<String> commands;
+	private List<String> words, commands, inputStrings;
+	private int numString = 0; 
 	private HelpUI helpUI;
 
 	private static enum Mode {
@@ -93,11 +94,11 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	 */
 	private static void createAndShowGUI() {
 		// Create and set up the window.
-		JFrame frame = new MyTasksUI();
+		MyTasksUI frame = new MyTasksUI();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//set up the content pane 
-		((MyTasksUI) frame).addComponentsToPane();
+		frame.addComponentsToPane();
 		
 		// Display the window.
 		frame.pack();
@@ -218,6 +219,8 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
+		textField.addKeyListener(this);
+		inputStrings = new ArrayList<String>();
 		textField.setFocusable(true);
 	}
 	
@@ -297,9 +300,15 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		
 		clearTextAreaPanel();
 		
-		String text = textField.getText();
+		String text = textField.getText();		
 		FeedbackObject feedback = mLogic.executeCommand(text);			
 		returnFeedbackToUser(feedback);		
+		if(feedback.getValidity() == true) {
+			inputStrings.add(text);
+		}
+		for(int i = 0; i < inputStrings.size(); i++) {
+			System.out.println("I: " + inputStrings.get(i));
+		}
 		
 		autocompleteStrings();
 		
@@ -471,6 +480,49 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			mode = Mode.COMPLETION;
 		}
 	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if(inputStrings.size() > 0) {
+				numString = inputStrings.size()-1;
+				System.out.println("inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+				System.out.println();
+			} else {
+				numString = 0;
+			}
+		} 
+		if(e.getKeyCode() == KeyEvent.VK_UP) {
+			if(numString == 0) {
+				System.out.println("first VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+			} else if(numString == inputStrings.size() - 1) {
+				numString--;
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+				numString--;
+				System.out.println("second VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+			} else if((numString < inputStrings.size() - 1) && numString > 0) {
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+				System.out.println("third VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+				numString--; //base case is 0
+			}	
+		}
+		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+			if(numString == inputStrings.size() - 1) {
+				System.out.println("VK_DOWN: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+			} else if(numString < inputStrings.size()) {
+				numString++;
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+				System.out.println("VK_DOWN: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+			}
+		}
+	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
@@ -478,5 +530,13 @@ public class MyTasksUI extends JFrame implements ActionListener,
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {		
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {		
 	}
 }
