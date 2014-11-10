@@ -266,13 +266,21 @@ public class MemorySnapshotHandler {
 		if (remainingList.isEmpty()){
 			labelCombinations.add(chosenList);
 		} else {
-			ArrayList<String> remaining = (ArrayList<String>) remainingList.clone();
+			ArrayList<String> remaining = clone(remainingList);
 			String str = remaining.remove(0);
-			ArrayList<String> chosen = (ArrayList<String>) chosenList.clone();
+			ArrayList<String> chosen = clone(chosenList);
 			chosen.add(str);
 			findCombinationOfLabelsRec(remaining, chosen);
 			findCombinationOfLabelsRec(remaining, chosenList);			
 		}
+	}
+	
+	private ArrayList<String> clone(ArrayList<String> list){
+		ArrayList<String> copy = new ArrayList<String>();
+		for (int i=0; i < list.size(); i++){
+			copy.add(list.get(i));
+		}
+		return copy;
 	}
 	
 	private void sortLabelCombinationsInDescendingOrder(){
@@ -441,7 +449,7 @@ public class MemorySnapshotHandler {
 				int matchingLabels=0;
 				for (int j=0; j < task.getLabels().size(); j++){
 					for (int k=0; k < labelCombinations.get(i).size(); k++){
-						if (task.getLabels().get(j).equals(labelCombinations.get(i).get(k))){
+						if (task.getLabels().get(j).toLowerCase().equals(labelCombinations.get(i).get(k).toLowerCase())){
 							matchingLabels++;
 						}
 					}
