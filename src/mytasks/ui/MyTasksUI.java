@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,7 @@ import mytasks.logic.controller.MyTasksLogicController;
  */
 @SuppressWarnings("serial")
 public class MyTasksUI extends JFrame implements ActionListener,
-		DocumentListener, KeyListener {
+		DocumentListener {
 	protected JTextField textField;
 	protected JTextArea textArea;
 	protected JTextArea textAreaFeedback;
@@ -55,8 +54,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private static MyTasksUI INSTANCE = null;
 
 	private Mode mode = Mode.INSERT;
-	private List<String> words, commands, inputStrings;
-	private int numString = 0;
+	private List<String> words, commands;
 	private HelpUI helpUI;
 
 	private static enum Mode {
@@ -228,8 +226,6 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		textField = new JTextField(20);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
-		textField.addKeyListener(this);
-		inputStrings = new ArrayList<String>();
 		textField.setFocusable(true);
 	}
 
@@ -312,10 +308,6 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);
 		returnFeedbackToUser(feedback);
-		if (feedback.getValidity() == true) {
-			inputStrings.add(text);
-		}
-		
 		autocompleteStrings();
 
 		if (mLogic.checkIfToHelpUI()) {
@@ -493,56 +485,12 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			mode = Mode.COMPLETION;
 		}
 	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (inputStrings.size() > 0) {
-				numString = inputStrings.size() - 1;
-			} else {
-				numString = 0;
-			}
-		}
-		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			if (numString == 0) {
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-			} else if (numString == inputStrings.size() - 1) {
-				numString -= 1;
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-				numString -= 1;
-			} else if ((numString < inputStrings.size() - 1) && numString > 0) {
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-				numString -= 1;
-			}
-		}
-		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			if (numString == inputStrings.size() - 1) {
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-			} else if (numString < inputStrings.size()) {
-				numString += 1;
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-			}
-		}
-	}
-
+	
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
 	}
 }
