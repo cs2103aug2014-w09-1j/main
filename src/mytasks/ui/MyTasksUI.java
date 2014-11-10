@@ -307,7 +307,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 
 		String text = textField.getText();
 		FeedbackObject feedback = mLogic.executeCommand(text);
-		returnFeedbackToUser(feedback);
+		returnFeedbackToUser(feedback);		
 		autocompleteStrings();
 
 		if (mLogic.checkIfToHelpUI()) {

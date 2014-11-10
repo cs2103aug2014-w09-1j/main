@@ -32,7 +32,8 @@ public class HelpCommand extends Command {
 	public FeedbackObject execute() {
 		hasSearched = false;
 		mController.toggleHelpUI(true);
-		return null;
+		FeedbackObject temp = new FeedbackObject("Help menu opened",true);
+		return temp;
 	}
 
 	@Override
