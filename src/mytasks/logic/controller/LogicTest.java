@@ -488,6 +488,7 @@ public class LogicTest {
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
 	}
 	
+	@Test
 	public void testUndoRedoDone2(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
@@ -502,6 +503,7 @@ public class LogicTest {
 		assertEquals("meeting undone", taskLogic.executeCommand("un").getFeedback());
 	}
 	
+	@Test
 	public void testUndoRedoDone3(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad meeting");
