@@ -28,16 +28,54 @@ public class LogicTest {
 		// The following essentially tests undo function for delete
 		assertEquals("meeting added", taskLogic.executeCommand("re").getFeedback());
 	}
+	
+	@Test
+	public void testUpdateCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad meeting");
+		assertEquals("'meeting' updated",
+				taskLogic.executeCommand("up meeting - CS2103T #important").getFeedback());
+	}
+
+	@Test
+	public void testUndoRedoUpdate() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		taskLogic.executeCommand("up play - do homework");
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
+		assertEquals("'play' updated", taskLogic.executeCommand("re").getFeedback());
+		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
+	}
+	
+	@Test
+	public void testDeleteCommand() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		assertEquals("'play' deleted", taskLogic.executeCommand("de play").getFeedback());
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
+	}
+	
+	@Test
+	public void testUndoRedoDelete() {
+		taskLogic.getMemory().clearMemory();
+		taskLogic.executeCommand("ad play");
+		taskLogic.executeCommand("de play");
+		assertEquals("play added", taskLogic.executeCommand("un").getFeedback());
+		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
+		assertEquals("'play' deleted", taskLogic.executeCommand("re").getFeedback());
+		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
+	}
+
 
 	//@author A0112139R
 	@Test
 	public void testSearchCommand1() {
 		taskLogic.getMemory().clearMemory();
-		// search for 1 keyword
 		assertEquals("unable to find task with keyword 'meeting'", taskLogic.executeCommand("se meeting").getFeedback());
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
 		taskLogic.executeCommand("ad important");
+		// search for 1 keyword
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
@@ -85,9 +123,9 @@ public class LogicTest {
 	@Test
 	public void testDeleteWithSearch1(){
 		taskLogic.getMemory().clearMemory();
-		// delete by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// delete by search results
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
@@ -151,9 +189,9 @@ public class LogicTest {
 	public void testUpdateWithSearch1(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("so date");
-		// update by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// update by search results
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
@@ -219,9 +257,9 @@ public class LogicTest {
 	public void testDoneWithSearch1(){
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("so done");
-		// done by search results
 		taskLogic.executeCommand("ad CS2103T meeting 22.09.2014 #important");
 		taskLogic.executeCommand("ad CS2101 meeting 29.09.2014");
+		// done by search results
 		assertEquals("1. CS2103T meeting on 22.09.2014 #important\n"
 				+ "2. CS2101 meeting on 29.09.2014\n" 
 				+ "task(s) with keyword 'meeting' searched", taskLogic.executeCommand("se meeting").getFeedback());
@@ -406,7 +444,6 @@ public class LogicTest {
 	
 	@Test
 	public void testGetSnapshot6(){
-		// sort by labels - sort multiple labels
 		taskLogic.getMemory().clearMemory();
 		taskLogic.executeCommand("ad tutorial #CS2103");
 		taskLogic.executeCommand("ad demo 5.11.2014 #CS2103 #important");
@@ -414,6 +451,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad lab #CS2100 #important");
 		taskLogic.executeCommand("ad meeting 3.11.2014 #CS2101 #important");
 		taskLogic.executeCommand("ad video making #CS2101");
+		// sort by labels - sort multiple labels
 		taskLogic.executeCommand("so CS2103 CS2100 important");
 		String output = obtainOutput();
 		assertEquals("#CS2103#important\n" + "demo on 05.11.2014\n"
@@ -457,7 +495,7 @@ public class LogicTest {
 		taskLogic.executeCommand("ad meeting");
 		taskLogic.executeCommand("ad do homework 26.10.2014 #important");
 		taskLogic.executeCommand("ad written quiz 2 25.10.2014 #CS2010 #important");
-		// test 2 - undo multiple times
+		// undo multiple times
 		taskLogic.executeCommand("do meeting");
 		taskLogic.executeCommand("do do homework");
 		taskLogic.executeCommand("do written quiz 2");
@@ -482,43 +520,6 @@ public class LogicTest {
 		assertEquals("'do homework' mark as done", taskLogic.executeCommand("re").getFeedback());
 	}
 	
-	@Test
-	public void testUpdateCommand() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad meeting");
-		assertEquals("'meeting' updated",
-				taskLogic.executeCommand("up meeting - CS2103T #important").getFeedback());
-	}
-
-	@Test
-	public void testUndoRedoUpdate() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad play");
-		taskLogic.executeCommand("up play - do homework");
-		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
-		assertEquals("'play' updated", taskLogic.executeCommand("re").getFeedback());
-		assertEquals("do homework reverted", taskLogic.executeCommand("un").getFeedback());
-	}
-	
-	@Test
-	public void testDeleteCommand() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad play");
-		assertEquals("'play' deleted", taskLogic.executeCommand("de play").getFeedback());
-		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
-	}
-	
-	@Test
-	public void testUndoRedoDelete() {
-		taskLogic.getMemory().clearMemory();
-		taskLogic.executeCommand("ad play");
-		taskLogic.executeCommand("de play");
-		assertEquals("play added", taskLogic.executeCommand("un").getFeedback());
-		assertEquals(1, taskLogic.getMemory().getLocalMem().size());
-		assertEquals("'play' deleted", taskLogic.executeCommand("re").getFeedback());
-		assertEquals(0, taskLogic.getMemory().getLocalMem().size());
-	}
-
 	//@author A0108543J
 	@Test
 	public void testHideCommand() {
