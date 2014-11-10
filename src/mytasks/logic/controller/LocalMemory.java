@@ -10,13 +10,11 @@ import mytasks.logic.command.Command;
 import mytasks.storage.IStorage;
 import mytasks.storage.MyTasksStorage;
 
+//@author A0114302A
 /**
  * LocalMemory holds all related task information in the current session and is
  * only required to read and write
  * to external memory minimally.
- * 
- * @author Huiwen, Michael, Shuan Siang 
- *
  */
 
 @SuppressWarnings("serial")

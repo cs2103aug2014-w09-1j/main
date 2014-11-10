@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+//@author A0115034X
 public class LogicTest {
 
 	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
@@ -14,9 +15,6 @@ public class LogicTest {
 	public void testAddCommand() {
 		taskLogic.getMemory().clearMemory();
 		assertEquals("meeting added", taskLogic.executeCommand("ad meeting 22.09.2014 #important").getFeedback());
-		taskLogic.executeCommand("ad meeting 1.11.2014 #CS2101");
-		taskLogic.executeCommand("ad meeting 2.11.2014 #CS2103T");
-		taskLogic.executeCommand("ad meeting 3.11.2014 #MA1101R");
 	}
 
 

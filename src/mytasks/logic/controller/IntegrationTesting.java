@@ -13,11 +13,6 @@ import mytasks.file.Task;
 import mytasks.logic.parser.MyTasksParser;
 
 //@author A0115034X 
-/**
- * TODO: check show/hide see correct not. check error handling? check boundary cases 
- *
- */
-
 public class IntegrationTesting {
 	
 	private MyTasksLogicController taskLogic = MyTasksLogicController.getInstance(true);
@@ -829,7 +824,7 @@ public class IntegrationTesting {
 		assertEquals(feedback.getValidity(), true);
 		assertEquals(feedback.getFeedback(), "Labels hidden");
 		
-		//checking for boolean value from parser
+		//checking for boolean value 
 		assertEquals(true, taskLogic.labelsHidden);
 		
 		//checking for correct labels to return to GUI 
@@ -852,7 +847,7 @@ public class IntegrationTesting {
 		taskLogic.executeCommand("hi tutorial");
 		FeedbackObject feedback = taskLogic.executeCommand("sh tutorial");
 		
-		//checking for boolean value from parser
+		//checking for boolean value
 		assertEquals(false, taskLogic.labelsHidden);
 				
 		//checking for feedback to user 

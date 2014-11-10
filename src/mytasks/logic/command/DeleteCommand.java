@@ -96,7 +96,6 @@ public class DeleteCommand extends Command {
 		return result;
 	}
 
-	//@author A0115034X
 	private FeedbackObject deleteSingleTask(){
 		for (int i = 0; i < mLocalMem.getLocalMem().size(); i++) {
 			if (mLocalMem.getLocalMem().get(i).getDescription()

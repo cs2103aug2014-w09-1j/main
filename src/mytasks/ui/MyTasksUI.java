@@ -34,13 +34,16 @@ import mytasks.logic.controller.ILogic;
 import mytasks.logic.controller.MyTasksLogicController;
 
 //@author A0115034X
-
+/**
+ * MyTasksUI accepts input to the user and prints output to the user through a
+ * GUI supported by the Swing framework
+ */
 @SuppressWarnings("serial")
 public class MyTasksUI extends JFrame implements ActionListener,
 		DocumentListener, KeyListener {
 	protected JTextField textField;
 	protected JTextArea textArea;
-	protected JTextArea textAreaFeedback;	
+	protected JTextArea textAreaFeedback;
 	private JLabel textAreaLabel, feedbackLabel, textfieldLabel;
 	private JPanel textAreaPanel;
 	private Border paneEdge;
@@ -53,28 +56,28 @@ public class MyTasksUI extends JFrame implements ActionListener,
 
 	private Mode mode = Mode.INSERT;
 	private List<String> words, commands, inputStrings;
-	private int numString = 0; 
+	private int numString = 0;
 	private HelpUI helpUI;
 
 	private static enum Mode {
 		INSERT, COMPLETION
 	};
-	
-	public static MyTasksUI getInstance(){
-		if (INSTANCE == null){
-			INSTANCE= new MyTasksUI();
+
+	public static MyTasksUI getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new MyTasksUI();
 		}
 		return INSTANCE;
 	}
-	
+
 	protected Object readResolve() {
 		return INSTANCE;
 	}
-	
+
 	private MyTasksUI() {
 		super("My Tasks");
 	}
-	
+
 	/**
 	 * run starts the process of accepting and executing input
 	 */
@@ -87,7 +90,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			}
 		});
 	}
-	
+
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be
 	 * invoked from the event dispatch thread.
@@ -97,17 +100,18 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		MyTasksUI frame = new MyTasksUI();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//set up the content pane 
+		// set up the content pane
 		frame.addComponentsToPane();
-		
+
 		// Display the window.
 		frame.pack();
-		frame.setVisible(true);		
-		
+		frame.setVisible(true);
+
 		// pressing the escape key will close the window
-		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "EXIT");
 		frame.getRootPane().getActionMap().put("EXIT", new AbstractAction() {
-			
+
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
@@ -115,47 +119,40 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			}
 		});
 	}
-	
+
 	private void addComponentsToPane() {
 		GridBagLayout layout = new GridBagLayout();
 		getContentPane().setLayout(layout);
-		
+
 		mLogic = MyTasksLogicController.getInstance(false);
 		helpUI = HelpUI.getInstance();
-		
-		// for tasks label and box 
+
+		// for tasks label and box
 		initTextAreaLabelPanel();
-		clearTextAreaPanel();		
-		printToUserOnStartUp();		
-		initTextAreaScrollpane();       
-        
-		// for feedback label and box 
+		clearTextAreaPanel();
+		printToUserOnStartUp();
+		initTextAreaScrollpane();
+
 		initFeedbackBox();
-		
-		// for text field label and box 
 		initTextfield();
-
-		// for auto complete 
-		initAutocomplete();		
+		initAutocomplete();
 		autocompleteStrings();
-
-		// Add Components 
 		addComponents();
 	}
-	
+
 	private void initTextAreaLabelPanel() {
-		textAreaLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Tasks</font>");
+		textAreaLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Tasks</font>");
 		textAreaLabel.setOpaque(true);
 		textAreaLabel.setFocusable(false);
 
-		// A border that puts 10 extra pixels at the sides and bottom of each pane.
 		paneEdge = BorderFactory.createEmptyBorder(0, 10, 10, 10);
 		textAreaPanel = new JPanel();
 		textAreaPanel.setBorder(paneEdge);
-		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));		
+		textAreaPanel.setLayout(new BoxLayout(textAreaPanel, BoxLayout.Y_AXIS));
 		textAreaPanel.setFocusable(false);
 	}
-	
+
 	private void clearTextAreaPanel() {
 		textAreaPanel.removeAll();
 		textAreaPanel.revalidate();
@@ -165,56 +162,68 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private void printToUserOnStartUp() {
 		if (mLogic.obtainPrintableOutput().size() == 0) {
 			newTextArea();
-			Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-			titled = BorderFactory.createTitledBorder(colourLine, "Welcome! Add your tasks below (:");
+			Border colourLine = BorderFactory.createLineBorder(new Color(
+					(int) (Math.random() * 255), (int) (Math.random() * 255),
+					(int) (Math.random() * 255)), 3);
+			titled = BorderFactory.createTitledBorder(colourLine,
+					"Welcome! Add your tasks below (:");
 			setTextareaContentBorder("", titled);
 		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
 				newTextArea();
-				
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
-				Border colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
-				titled = BorderFactory.createTitledBorder(colourLine, firstWord);				
-				String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
+
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
+				Border colourLine = BorderFactory.createLineBorder(new Color(
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255),
+						(int) (Math.random() * 255)), 3);
+				titled = BorderFactory
+						.createTitledBorder(colourLine, firstWord);
+				String content = mLogic.obtainPrintableOutput().get(i)
+						.replace(firstWord, "").trim();
 				setTextareaContentBorder(content, titled);
 			}
 		}
 	}
-	
+
 	private void newTextArea() {
 		textArea = new JTextArea();
 		textArea.setEditable(false);
 		textArea.setFocusable(false);
 	}
-	
+
 	private void setTextareaContentBorder(String content, Border titled2) {
 		textArea.setText(content);
 		textArea.setBorder(titled);
 		textAreaPanel.add(textArea);
 		textArea.setCaretPosition(0);
 	}
-	
+
 	private void initTextAreaScrollpane() {
 		scrollPane = new JScrollPane(textAreaPanel);
 		scrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
 		scrollPane.setPreferredSize(new Dimension(500, 400));
 		scrollPane.setFocusable(true);
 	}
-	
+
 	private JScrollPane initFeedbackBox() {
-		feedbackLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Feedback Box</font>");
+		feedbackLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Feedback Box</font>");
 		feedbackLabel.setFocusable(false);
 		textAreaFeedback = new JTextArea(10, 40);
 		textAreaFeedback.setEditable(false);
 		textAreaFeedback.setFocusable(false);
 		scrollPaneFeedback = new JScrollPane(textAreaFeedback);
-		scrollPaneFeedback.setBorder(BorderFactory.createLineBorder(Color.black));
+		scrollPaneFeedback.setBorder(BorderFactory
+				.createLineBorder(Color.black));
 		scrollPaneFeedback.setFocusable(true);
 		return scrollPaneFeedback;
 	}
-	
+
 	private void initTextfield() {
-		textfieldLabel = new JLabel("<html><center>" + "<font color=#7c5cff>Input Tasks</font>");
+		textfieldLabel = new JLabel("<html><center>"
+				+ "<font color=#7c5cff>Input Tasks</font>");
 		textfieldLabel.setFocusable(false);
 		textField = new JTextField(20);
 		textField.addActionListener(this);
@@ -223,7 +232,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		inputStrings = new ArrayList<String>();
 		textField.setFocusable(true);
 	}
-	
+
 	private void initAutocomplete() {
 		InputMap im = textField.getInputMap();
 		ActionMap am = textField.getActionMap();
@@ -251,12 +260,12 @@ public class MyTasksUI extends JFrame implements ActionListener,
 		for (int i = 0; i < mLogic.obtainAllTaskDescription().size(); i++) {
 			words.add(mLogic.obtainAllTaskDescription().get(i));
 		}
-		for(int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
+		for (int i = 0; i < mLogic.obtainAllLabels().size(); i++) {
 			words.add(mLogic.obtainAllLabels().get(i));
 		}
 		Collections.sort(words);
 	}
-	
+
 	private void addComponents() {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
@@ -290,37 +299,34 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private void initGridbagWeight(GridBagConstraints c) {
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-	}	
-	
+	}
+
 	public void actionPerformed(ActionEvent evt) {
 		lookingFor = false;
 		w = 0;
-		boolean isHide = false;		
+		boolean isHide = false;
 		List<String> labelsToHide = new ArrayList<String>();
-		
+
 		clearTextAreaPanel();
-		
-		String text = textField.getText();		
-		FeedbackObject feedback = mLogic.executeCommand(text);			
-		returnFeedbackToUser(feedback);		
-		if(feedback.getValidity() == true) {
+
+		String text = textField.getText();
+		FeedbackObject feedback = mLogic.executeCommand(text);
+		returnFeedbackToUser(feedback);
+		if (feedback.getValidity() == true) {
 			inputStrings.add(text);
-		}
-		for(int i = 0; i < inputStrings.size(); i++) {
-			System.out.println("I: " + inputStrings.get(i));
 		}
 		
 		autocompleteStrings();
-		
-		if(mLogic.checkIfToHelpUI()) {
+
+		if (mLogic.checkIfToHelpUI()) {
 			helpUI.run();
 			mLogic.toggleHelpUI(false);
 		}
-		printToUser(isHide, labelsToHide);		
+		printToUser(isHide, labelsToHide);
 	}
-	
+
 	private void returnFeedbackToUser(FeedbackObject feedback) {
-		if (feedback != null){
+		if (feedback != null) {
 			if (feedback.getValidity() == false) {
 				textAreaFeedback.setForeground(new Color(255, 0, 0));
 				textAreaFeedback.setText(feedback.getFeedback());
@@ -336,38 +342,42 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	private void printToUser(boolean isHide, List<String> labelsToHide) {
 		boolean isRed;
 		Border colourLine;
-		
+
 		if (mLogic.obtainPrintableOutput().size() == 0) {
-			newTextArea();						
-			titled = BorderFactory.createTitledBorder("Welcome! Add your tasks below (:");
+			newTextArea();
+			titled = BorderFactory
+					.createTitledBorder("Welcome! Add your tasks below (:");
 			setTextareaContentBorder("", titled);
-		} else {			
+		} else {
 			for (int i = 0; i < mLogic.obtainPrintableOutput().size(); i++) {
-				newTextArea();				
-				
-				String firstWord = mLogic.obtainPrintableOutput().get(i).split("\\s+")[0];
+				newTextArea();
+
+				String firstWord = mLogic.obtainPrintableOutput().get(i)
+						.split("\\s+")[0];
 				isRed = checkImportant(firstWord);
 				isHide = checkLabelsToHide(isHide, labelsToHide, firstWord);
-				
-				if(isHide) {
-					colourLine = detBorderColour(isRed);						
-					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					setTextareaContentBorder("", titled);
-				}
-				else {
+
+				if (isHide) {
 					colourLine = detBorderColour(isRed);
-					titled = BorderFactory.createTitledBorder(colourLine, firstWord);
-					String content = mLogic.obtainPrintableOutput().get(i).replace(firstWord, "").trim();
-					setTextareaContentBorder(content, titled);					
+					titled = BorderFactory.createTitledBorder(colourLine,
+							firstWord);
+					setTextareaContentBorder("", titled);
+				} else {
+					colourLine = detBorderColour(isRed);
+					titled = BorderFactory.createTitledBorder(colourLine,
+							firstWord);
+					String content = mLogic.obtainPrintableOutput().get(i)
+							.replace(firstWord, "").trim();
+					setTextareaContentBorder(content, titled);
 				}
-			}			
+			}
 		}
 		textField.selectAll();
 	}
 
 	private boolean checkImportant(String firstWord) {
 		boolean isRed;
-		if(firstWord.equals("#important")) {
+		if (firstWord.equals("#important")) {
 			isRed = true;
 		} else {
 			isRed = false;
@@ -377,13 +387,13 @@ public class MyTasksUI extends JFrame implements ActionListener,
 
 	private boolean checkLabelsToHide(boolean isHide,
 			List<String> labelsToHide, String firstWord) {
-		isHide = false; 
-		if(mLogic.checkIfToHide()) {
+		isHide = false;
+		if (mLogic.checkIfToHide()) {
 			labelsToHide = mLogic.labelsToHide();
 		}
-		if(labelsToHide.size() > 0) {
-			for(int k = 0; k < labelsToHide.size(); k++) {
-				if(labelsToHide.get(k).equals(firstWord)) {
+		if (labelsToHide.size() > 0) {
+			for (int k = 0; k < labelsToHide.size(); k++) {
+				if (labelsToHide.get(k).equals(firstWord)) {
 					isHide = true;
 				}
 			}
@@ -393,14 +403,18 @@ public class MyTasksUI extends JFrame implements ActionListener,
 
 	private Border detBorderColour(boolean isRed) {
 		Border colourLine;
-		if(isRed) {
-			colourLine = BorderFactory.createLineBorder(new Color(255, 0, 0), 3);
+		if (isRed) {
+			colourLine = BorderFactory
+					.createLineBorder(new Color(255, 0, 0), 3);
 		} else {
-			colourLine = BorderFactory.createLineBorder(new Color((int) (Math.random() * 200), (int) (Math.random() * 255), (int) (Math.random() * 255)), 3);
+			colourLine = BorderFactory.createLineBorder(
+					new Color((int) (Math.random() * 200),
+							(int) (Math.random() * 255),
+							(int) (Math.random() * 255)), 3);
 		}
 		return colourLine;
 	}
-	
+
 	@Override
 	public void insertUpdate(DocumentEvent ev) {
 		if (ev.getLength() != 1)
@@ -424,7 +438,6 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			}
 		}
 
-		// Too few chars
 		if (pos - w < 1)
 			return;
 
@@ -435,7 +448,7 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			if (match.startsWith(prefix)) {
 				// A completion is found
 				String completion = match.substring(pos - w);
-				// Submitting a new function to do the completion 
+				// Submitting a new function to do the completion
 				SwingUtilities.invokeLater(new CompletionTask(completion,
 						pos + 1));
 			}
@@ -480,46 +493,39 @@ public class MyTasksUI extends JFrame implements ActionListener,
 			mode = Mode.COMPLETION;
 		}
 	}
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(inputStrings.size() > 0) {
-				numString = inputStrings.size()-1;
-				System.out.println("inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
-				System.out.println();
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (inputStrings.size() > 0) {
+				numString = inputStrings.size() - 1;
 			} else {
 				numString = 0;
 			}
-		} 
-		if(e.getKeyCode() == KeyEvent.VK_UP) {
-			if(numString == 0) {
-				System.out.println("first VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-			} else if(numString == inputStrings.size() - 1) {
-				numString--;
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-				numString--;
-				System.out.println("second VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
-			} else if((numString < inputStrings.size() - 1) && numString > 0) {
-				textField.setText(inputStrings.get(numString));
-				textField.selectAll();
-				System.out.println("third VK_UP: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
-				numString--; //base case is 0
-			}	
 		}
-		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-			if(numString == inputStrings.size() - 1) {
-				System.out.println("VK_DOWN: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			if (numString == 0) {
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
-			} else if(numString < inputStrings.size()) {
+			} else if (numString == inputStrings.size() - 1) {
+				numString--;
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+				numString--;
+			} else if ((numString < inputStrings.size() - 1) && numString > 0) {
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+				numString--; // base case is 0
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			if (numString == inputStrings.size() - 1) {
+				textField.setText(inputStrings.get(numString));
+				textField.selectAll();
+			} else if (numString < inputStrings.size()) {
 				numString++;
 				textField.setText(inputStrings.get(numString));
 				textField.selectAll();
-				System.out.println("VK_DOWN: inputStrings.size(): " + inputStrings.size() + "numstrings: " + numString);
 			}
 		}
 	}
@@ -533,10 +539,10 @@ public class MyTasksUI extends JFrame implements ActionListener,
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {		
+	public void keyTyped(KeyEvent e) {
 	}
-	
+
 	@Override
-	public void keyReleased(KeyEvent e) {		
+	public void keyReleased(KeyEvent e) {
 	}
 }
